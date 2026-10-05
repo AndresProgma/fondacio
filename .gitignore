@@ -1,0 +1,6 @@
+# Solo se sube la página, su README y el ejemplo de clave.
+/*
+!/.gitignore
+!/README.md
+!/fondacio.html
+!/clave.example.js
