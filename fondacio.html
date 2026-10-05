@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fondacio Agenda</title>
+<style>
+:root{
+  --ground:#F4F5F7;--sheet:#FFFFFF;--field:#F8F9FA;--ink:#14181F;--ink-2:#4A5260;--muted:#6C7480;
+  --line:#E1E4E9;--acc:#1F4FD8;--acc-d:#173CAA;--acc-bg:#E9EEFC;--acc-ink:#fff;--focus:#14181F;--danger:#B3261E;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ground:#0F1115;--sheet:#171A20;--field:#12151A;--ink:#EEF0F3;--ink-2:#B5BBC6;--muted:#8A919D;
+  --line:#2A2F38;--acc:#7C9CFF;--acc-d:#9DB6FF;--acc-bg:#1B2440;--acc-ink:#0F1115;--focus:#EEF0F3;--danger:#FF8A80;
+}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",Roboto,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1220px;margin:0 auto;padding:0 16px}
+header.top{padding:20px 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:1.5rem;margin:0;letter-spacing:-.01em;line-height:1.2}
+h1 small{display:block;font-size:.85rem;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:2px}
+h2{font-size:1.15rem;margin:0}
+h3{font-size:1rem;margin:16px 0 6px}
+h3 small{font-weight:400;color:var(--muted)}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:16px}
+.btn{border:1px solid var(--line);background:var(--sheet);border-radius:9px;padding:7px 14px;cursor:pointer;min-height:40px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{border-color:var(--ink-2)}
+.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.btn.pri:hover{background:var(--acc-d)}
+.btn.del{color:var(--danger)}
+.btn.sm{min-height:34px;padding:3px 11px;font-size:.88rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.between{justify-content:space-between}
+.grid{display:grid;gap:16px}
+
+.steps{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 14px;padding:0;list-style:none;counter-reset:s;color:var(--ink-2);font-size:.92rem}
+.steps li{counter-increment:s}
+.steps li::before{content:counter(s)".";font-weight:700;color:var(--ink);margin-right:5px}
+
+.main{grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);align-items:start}
+@media(max-width:940px){.main{grid-template-columns:1fr}.pan{order:-1}}
+.seg{display:inline-flex;background:var(--field);border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg button{border:0;background:none;padding:5px 14px;border-radius:7px;cursor:pointer;color:var(--ink-2);min-height:32px}
+.seg button[aria-selected=true]{background:var(--sheet);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.14)}
+.badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:var(--acc);color:var(--acc-ink);font-size:.78rem;font-weight:700;margin-left:6px;line-height:20px;text-align:center}
+
+/* calendario */
+.tb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tb strong{font-size:1.1rem;min-width:150px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
+.dow{font-size:.75rem;color:var(--muted);text-align:center;padding:6px 0;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.day{min-height:92px;padding:4px;cursor:pointer;overflow:hidden;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--sheet)}
+.day:hover{background:var(--field)}
+.day.out{color:var(--muted);background:var(--field)}
+.day .n{display:inline-grid;place-items:center;min-width:24px;height:24px;font-size:.8rem;border-radius:50%}
+.day.today .n{background:var(--acc);color:var(--acc-ink);font-weight:700}
+.chip{display:block;font-size:.72rem;line-height:1.3;border-radius:4px;padding:1px 5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border:0;width:100%;text-align:left;background:var(--acc-bg);color:var(--acc)}
+.more{font-size:.72rem;color:var(--muted);padding-left:5px}
+@media(max-width:600px){.day{min-height:56px}.cal .chip{font-size:0;height:6px;padding:0}}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+@media(max-width:760px){.wk{grid-template-columns:1fr}}
+.wd{border:1px solid var(--line);border-radius:10px;padding:8px;min-height:150px;cursor:pointer}
+.wd:hover{background:var(--field)}
+.wd .wh{font-size:.8rem;color:var(--muted);margin-bottom:6px;text-transform:capitalize}
+.wd .wh b{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:50%;font-size:.95rem;color:var(--ink)}
+.wd.today .wh b{background:var(--acc);color:var(--acc-ink)}
+.wev{display:block;width:100%;text-align:left;border:0;background:var(--acc-bg);color:var(--ink);border-left:3px solid var(--acc);border-radius:6px;padding:5px 7px;margin-bottom:5px;cursor:pointer;font-size:.85rem;line-height:1.3}
+.wev span{display:block;color:var(--ink-2);font-size:.78rem}
+
+/* panel lateral */
+.pan{padding:0;overflow:hidden}
+.pan .tabs{display:flex;border-bottom:1px solid var(--line)}
+.pan .tabs button{flex:1;border:0;background:none;padding:12px 8px;cursor:pointer;color:var(--ink-2);border-bottom:3px solid transparent;min-height:46px}
+.pan .tabs button[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--acc)}
+.pp{padding:14px;max-height:680px;overflow:auto}
+.hint{color:var(--muted);font-size:.88rem;margin:8px 0 12px}
+.pc{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--sheet)}
+.pc .t{font-weight:600}
+.pc .m{color:var(--ink-2);font-size:.88rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:600;border:1px solid var(--ink-2);border-radius:99px;padding:0 8px;margin-left:6px;color:var(--ink-2);vertical-align:middle}
+.warn{font-size:.85rem;color:var(--danger);margin:4px 0 0}
+.pc details{margin-top:6px;font-size:.88rem}
+.pc summary{cursor:pointer;color:var(--ink-2)}
+.pc .msg{white-space:pre-wrap;background:var(--field);border-radius:8px;padding:8px;margin:6px 0 0;color:var(--ink-2)}
+.imp{display:flex;gap:10px;align-items:flex-start;font-size:1rem;color:var(--ink);margin:0 0 8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.imp input{width:auto;margin-top:6px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.done{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+
+/* chat */
+.chat{display:flex;flex-direction:column;height:600px;padding:14px}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.m2{max-width:92%;padding:8px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+.m2.u{align-self:flex-end;background:var(--acc);color:var(--acc-ink)}
+.m2.a{align-self:flex-start;background:var(--field);border:1px solid var(--line)}
+.m2.s{align-self:center;color:var(--muted);font-size:.85rem;text-align:center}
+.chat form{display:flex;gap:8px;margin-top:8px}
+.chat input[type=text]{flex:1;min-width:0}
+.sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sug button{font-size:.8rem;border:1px solid var(--line);background:var(--field);border-radius:99px;padding:3px 10px;cursor:pointer}
+.act{border:1px dashed var(--ink-2);border-radius:10px;padding:8px;margin-top:6px;font-size:.88rem}
+
+input,select,textarea{border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px;width:100%}
+label{display:block;font-size:.85rem;color:var(--ink-2);margin:8px 0 3px}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--sheet);color:var(--ink);padding:18px;width:min(620px,94vw);max-height:92vh}
+dialog::backdrop{background:rgba(5,8,14,.55)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
+.box summary{cursor:pointer;font-weight:600}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:8px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>Fondacio · Agenda<small>Altos de Cazucá · un calendario sencillo con bandeja de pendientes de WhatsApp</small></h1>
+  <div class="row">
+    <button class="btn pri" id="bNew">+ Crear actividad</button>
+    <button class="btn" id="bSet">Ajustes IA</button>
+  </div>
+</header>
+
+<main id="resumen">
+  <ol class="steps" aria-label="Cómo funciona">
+    <li>Te llega un mensaje por WhatsApp: pégalo o importa el chat en <strong>Pendientes</strong>.</li>
+    <li>Decide: <strong>aceptar</strong>, <strong>preguntar</strong> o <strong>rechazar</strong>.</li>
+    <li>Al aceptar pasa al calendario y respondes por WhatsApp desde aquí.</li>
+  </ol>
+
+  <div class="grid main">
+    <section class="card" aria-label="Calendario">
+      <div class="tb">
+        <div class="row"><button class="btn sm" id="hoy">Hoy</button>
+          <button class="btn sm" id="prev" aria-label="Anterior">‹</button><button class="btn sm" id="next" aria-label="Siguiente">›</button>
+          <strong id="titulo"></strong></div>
+        <div class="row"><select id="fEje" style="width:auto" aria-label="Filtrar por eje"></select>
+          <div class="seg" role="tablist"><button role="tab" id="vMes" aria-selected="true">Mes</button><button role="tab" id="vSem" aria-selected="false">Semana</button></div></div>
+      </div>
+      <div id="calMes" class="cal"></div>
+      <div id="calSem" class="wk" hidden></div>
+    </section>
+
+    <section class="card pan" aria-label="Pendientes y asistente">
+      <div class="tabs" role="tablist"><button role="tab" id="tPend" aria-selected="true">Pendientes<span class="badge" id="nPend">0</span></button><button role="tab" id="tAsis" aria-selected="false">Asistente IA</button></div>
+
+      <div class="pp" id="pPend">
+        <div class="row"><button class="btn pri" id="bPend" style="flex:1;justify-content:center">+ Guardar un mensaje</button><button class="btn" id="bImp" style="flex:1;justify-content:center">Importar chat <span class="pill">beta</span></button></div>
+        <p class="hint">Aquí quedan las invitaciones y reuniones que te llegan. No entran al calendario hasta que las aceptes.</p>
+        <div id="listaPend"></div>
+        <details style="margin-top:12px"><summary id="resp" style="cursor:pointer;color:var(--ink-2)">Respondidas</summary><div id="listaResp"></div></details>
+      </div>
+
+      <div class="chat" id="pAsis" hidden>
+        <div class="row between"><strong>Asistente con IA</strong><button class="btn sm" id="bClr">Limpiar</button></div>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <div class="sug" id="sug"></div>
+        <form id="chatForm"><input type="text" id="chatIn" placeholder="Ej: ¿qué tengo pendiente por responder?" aria-label="Mensaje"><button class="btn pri" type="submit">Enviar</button></form>
+      </div>
+    </section>
+  </div>
+  </main>
+
+</div>
+
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="clave.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const EJES={form:"Formación",com:"Comunidad",eco:"Economía circular",eq:"Equipo"};
+const KEY="fondacio_v3";
+const pad=n=>String(n).padStart(2,"0");
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const pf=s=>{const[a,b,c]=s.split("-").map(Number);return new Date(a,b-1,c)};
+const hora=h=>{if(!h)return"";let[a,b]=h.split(":").map(Number);const p=a>=12?"p. m.":"a. m.";a=a%12||12;return`${a}:${pad(b)} ${p}`};
+const fechaLarga=s=>{const d=pf(s);return`${DIAS[d.getDay()]} ${d.getDate()} de ${MESES[d.getMonth()]}`};
+const ord=(a,b)=>(a.fecha+a.ini).localeCompare(b.fecha+b.ini);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const mins=h=>{const[a,b]=h.split(":").map(Number);return a*60+b};
+
+/* Todos usan el mismo formato (compatible con OpenAI), por eso cambiar de proveedor es solo cambiar la dirección, la clave y el modelo. */
+const PROV={
+  groq:{n:"Groq (gratis, recomendado)",url:"https://api.groq.com/openai/v1/chat/completions",model:"openai/gpt-oss-120b",donde:"console.groq.com/keys",pre:"gsk_"},
+  gemini:{n:"Google Gemini (gratis)",url:"https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",model:"gemini-2.0-flash",donde:"aistudio.google.com/apikey",pre:"AIza"},
+  openrouter:{n:"OpenRouter (modelos gratis)",url:"https://openrouter.ai/api/v1/chat/completions",model:"meta-llama/llama-3.3-70b-instruct:free",donde:"openrouter.ai/keys",pre:"sk-or-"},
+  xai:{n:"xAI Grok (de pago)",url:"https://api.x.ai/v1/chat/completions",model:"grok-4",donde:"console.x.ai",pre:"xai-"}
+};
+function seed(){
+  const t=new Date(),f=n=>{const d=new Date(t);d.setDate(t.getDate()+n);return iso(d)};
+  return {
+    eventos:[
+      {id:uid(),titulo:"Reunión de equipo",eje:"eq",fecha:f(2),ini:"18:30",fin:"19:30",lugar:"Videollamada",obj:"Organizar la semana."},
+      {id:uid(),titulo:"Jornada de clasificación de ropa",eje:"eco",fecha:f(4),ini:"09:00",fin:"12:00",lugar:"Sede Fondacio",obj:"Clasificar y registrar las donaciones."},
+      {id:uid(),titulo:"Feria de economía circular",eje:"eco",fecha:f(12),ini:"08:00",fin:"14:00",lugar:"Parque principal",obj:"Vender ropa donada y recaudar fondos."}
+    ],
+    pend:[
+      {id:uid(),estado:"pendiente",de:"Valentina",tel:"",tipo:"Solicitud de visita",org:"Grupo de Automatización de la Huerta Urbana",titulo:"Visita",
+       resumen:"Quieren visitar la huerta hidropónica y saber qué día está César.",persona:"César, encargado de la huerta hidropónica",plazo:"esta semana",
+       fecha:"",ini:"",fin:"",lugar:"",recibido:new Date(Date.now()-3*3600e3).toISOString(),
+       texto:"Hola Rodolfo, feliz tarde.\nSoy del grupo de Automatización de la Huerta Urbana.\nNos gustaría saber qué día se encuentra César, encargado de la huerta hidropónica, para realizar una visita esta semana."},
+      {id:uid(),estado:"pendiente",de:"Rodolfo",tel:"",tipo:"Taller",org:"Fondacio",titulo:"Taller de habilidades digitales",
+       resumen:"Los invitan al taller y piden confirmar asistencia.",persona:"",plazo:"",
+       fecha:f(3),ini:"15:00",fin:"16:30",lugar:"Sede Fondacio",recibido:new Date(Date.now()-26*3600e3).toISOString(),
+       texto:`Hola, los invitamos al taller de habilidades digitales el ${fechaLarga(f(3))} de 3:00 a 4:30 pm en la sede de Fondacio. Por favor confirmen asistencia.`},
+      {id:uid(),estado:"pendiente",de:"Grupo Voluntarias",tel:"",tipo:"Evento",org:"Grupo de Voluntarias",titulo:"Jornada con las familias del barrio",
+       resumen:"Organizan una jornada con las familias y avisarán la fecha.",persona:"",plazo:"cuando tengan fecha",
+       fecha:"",ini:"",fin:"",lugar:"",recibido:new Date(Date.now()-50*3600e3).toISOString(),
+       texto:"Buenas! Estamos organizando una jornada con las familias del barrio, apenas tengamos fecha les confirmamos."}
+    ],
+    cfg:{key:"",prov:"groq",model:"openai/gpt-oss-120b"},
+    chat:[]
+  };
+}
+/* La clave de la IA se lee de un archivo local aparte, clave.js (no se sube a GitHub). Sin ese archivo, se pega una vez en Ajustes IA. */
+const CLAVE_INCLUIDA=window.CLAVE_INCLUIDA||"";
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
+if(!S||!S.eventos)S=seed();
+S.cfg=S.cfg||{};if(!PROV[S.cfg.prov]){S.cfg.prov="groq";S.cfg.model=PROV.groq.model}S.cfg.key=S.cfg.key||CLAVE_INCLUIDA;if(S.cfg.model==="llama-3.3-70b-versatile")S.cfg.model=PROV.groq.model;S.chat=S.chat||[];S.pend=S.pend||seed().pend;
+S.pend.forEach(p=>{if(p.tipo!==undefined)return;const a=analizar(p.texto||"",p.recibido?new Date(p.recibido):null);
+  ["tipo","org","persona","plazo","resumen"].forEach(k=>{if(p[k]===undefined)p[k]=a[k]||""});if(!p.titulo&&a.titulo)p.titulo=a.titulo});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600)}
+
+/* ---------- entender un mensaje de WhatsApp (sin IA, con reglas simples) ---------- */
+function analizar(texto,base){
+  const r={titulo:"",fecha:"",ini:"",fin:"",lugar:"",tipo:"",org:"",persona:"",plazo:"",resumen:""},s=texto.toLowerCase();
+  const MK="(a\\.?\\s?m\\.?|p\\.?\\s?m\\.?|de la mañana|de la tarde|de la noche)";
+  const pm=m=>/p\.?\s?m|tarde|noche/.test(m||""),am=m=>/a\.?\s?m|mañana/.test(m||"");
+  const conv=(h,m,mk)=>{h=+h;if(h>23)return"";if(pm(mk)&&h<12)h+=12;else if(am(mk)&&h===12)h=0;else if(!mk&&h>=1&&h<=6)h+=12;return`${pad(h)}:${pad(+m||0)}`};
+  let m=s.match(new RegExp("(?:de|entre)\\s+(?:las\\s+)?(\\d{1,2})(?:[:.](\\d{2}))?\\s*(?:a|y|hasta|-)\\s*(?:las\\s+)?(\\d{1,2})(?:[:.](\\d{2}))?\\s*"+MK+"?"));
+  if(m&&(/\blas\b/.test(m[0])||m[5]||m[2]||m[4])){r.fin=conv(m[3],m[4],m[5]);r.ini=conv(m[1],m[2],m[5]);if(r.ini&&r.fin&&r.ini>=r.fin&&+r.ini.slice(0,2)>=12)r.ini=pad(+r.ini.slice(0,2)-12)+r.ini.slice(2)}
+  else if((m=s.match(new RegExp("\\b(\\d{1,2})[:.](\\d{2})\\s*"+MK+"?"))))r.ini=conv(m[1],m[2],m[3]);
+  else if((m=s.match(new RegExp("\\b(\\d{1,2})\\s*"+MK+"(?![a-záéíóúñ])"))))r.ini=conv(m[1],0,m[2]);
+  else if((m=s.match(/\ba las\s+(\d{1,2})\b(?!\s*(?:de|\/))/)))r.ini=conv(m[1],0,"");
+  const hoy=base?new Date(base):new Date();hoy.setHours(0,0,0,0);
+  const mas=n=>{const d=new Date(hoy);d.setDate(d.getDate()+n);return iso(d)};
+  const mesRe=MESES.join("|");
+  if((m=s.match(new RegExp("\\b(\\d{1,2})\\s+de\\s+("+mesRe+")(?:\\s+(?:de\\s+)?(\\d{4}))?")))){
+    let d=new Date(m[3]?+m[3]:hoy.getFullYear(),MESES.indexOf(m[2]),+m[1]);if(!m[3]&&d<hoy)d.setFullYear(d.getFullYear()+1);r.fecha=iso(d)}
+  else if((m=s.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/))){
+    let y=m[3]?+m[3]:hoy.getFullYear();if(y<100)y+=2000;let d=new Date(y,+m[2]-1,+m[1]);if(!m[3]&&d<hoy)d.setFullYear(d.getFullYear()+1);r.fecha=iso(d)}
+  else if(/pasado mañana/.test(s))r.fecha=mas(2);
+  else if(/\bhoy\b|\besta (?:tarde|noche|mañana)\b/.test(s))r.fecha=mas(0);
+  else{
+    let i=-1,k=-1;while((i=s.indexOf("mañana",i+1))>=0){if(!/(^|\s)la\s$/.test(s.slice(0,i))&&!/de la $/.test(s.slice(0,i))){k=i;break}}
+    if(k>=0)r.fecha=mas(1);
+    else if((m=s.match(/\b(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\b/))){
+      const wd={domingo:0,lunes:1,martes:2,miércoles:3,miercoles:3,jueves:4,viernes:5,sábado:6,sabado:6}[m[1]];
+      let diff=(wd-hoy.getDay()+7)%7;if(diff===0)diff=7;r.fecha=mas(diff)}
+  }
+  if((m=texto.match(/\b(?:lugar|dirección|direccion|sede)\s*:\s*([^\n.]+)/i)))r.lugar=m[1].trim();
+  else if((m=texto.match(/\ben (?:el |la |los |las )?((?:sede|salón|salon|parque|casa|colegio|iglesia|centro|biblioteca|cancha|sala)[^.,\n]*?)(?=\s+(?:a las|para|por|el|este)\b|[.,\n]|$)/i)))r.lugar=cap(m[1].trim());
+  if((m=texto.match(/\b(taller|reuni[oó]n|jornada|feria|encuentro|capacitaci[oó]n|asamblea|evento|charla|visita)\b(?:\s+(?:de|del|con)\s+(?!\d)[^\s,.]+(?:\s+(?!\d)(?!(?:el|la|los|las|en|a|al|para|por|un|una|este|esta|hoy|mañana|lunes|martes|miércoles|jueves|viernes|sábado|domingo|desde|que|y)\b)[^\s,.]+){0,3})?/i)))r.titulo=cap(m[0].trim());
+  if((m=texto.match(/\b(?:soy|somos|escribo|escribimos)\s+(?:del|de la|de los|de las)\s+([^.,\n]{3,80})/i)))r.org=cap(m[1].trim());
+  if((m=texto.match(/(?:[Ss]aber (?:qué día|cuándo)(?: se encuentra| está| puede)?|[Hh]ablar con|[Bb]uscamos a|[Pp]reguntar por)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:,\s*[^.,\n]{3,60})?)/)))r.persona=m[1].trim();
+  if((m=s.match(/\b(esta semana|la próxima semana|la proxima semana|este mes|lo antes posible|urgente)\b/)))r.plazo=m[1];
+  r.tipo=/visita/.test(s)?"Solicitud de visita":/disponibilidad/.test(s)?"Consulta de disponibilidad":/taller|charla|capacitaci/.test(s)?"Taller":/reuni[oó]n|\bcita\b/.test(s)?"Reunión":/feria|jornada|encuentro|evento/.test(s)?"Evento":/invit/.test(s)?"Invitación":"";
+  return r;
+}
+function choque(p){
+  if(!p.fecha||!p.ini)return null;
+  const a=mins(p.ini),b=p.fin?mins(p.fin):a+60;
+  return S.eventos.find(e=>e.fecha===p.fecha&&e.id!==p.eventoId&&mins(e.ini)<b&&a<(e.fin?mins(e.fin):mins(e.ini)+60))||null;
+}
+function waUrl(tel,txt){let d=String(tel||"").replace(/\D/g,"");if(d.length===10&&d[0]==="3")d="57"+d;return"https://wa.me/"+d+"?text="+encodeURIComponent(txt)}
+const abrirWa=(tel,txt)=>window.open(waUrl(tel,txt),"_blank","noopener");
+
+/* ---------- importar un chat exportado de WhatsApp (beta) ---------- */
+const RE_LINEA=/^\[?(?:(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2})(?::\d{2})?\s*([ap]\.?\s?m\.?)?|(\d{1,2}:\d{2})(?::\d{2})?\s*([ap]\.?\s?m\.?)?[,\s]+(\d{1,2}\/\d{1,2}\/\d{2,4}))\]?\s*[-–]?\s*([^:\n]{1,60}?):\s?(.*)$/i;
+function parseChat(raw,fmt){
+  const out=[];
+  for(const ln of raw.replace(/[‎‏‪-‮]/g,"").split(/\r?\n/)){
+    const m=ln.match(RE_LINEA);
+    if(m)out.push({f:m[1]||m[6],h:m[2]||m[4],ap:m[3]||m[5]||"",de:m[7].trim(),texto:m[8]});
+    else if(out.length)out[out.length-1].texto+="\n"+ln;
+  }
+  const fs=out.map(x=>x.f.split("/").map(Number));
+  const mdy=fmt==="mdy"||(!fmt&&fs.some(([a,b])=>b>12)&&!fs.some(([a])=>a>12));
+  return out.map(x=>{
+    let[a,b,y]=x.f.split("/").map(Number);if(y<100)y+=2000;
+    const[mo,d]=mdy?[a,b]:[b,a];let[hh,mm]=x.h.split(":").map(Number);const ap=x.ap.toLowerCase();
+    if(/p/.test(ap)&&hh<12)hh+=12;else if(/a/.test(ap)&&hh===12)hh=0;
+    return{ts:new Date(y,mo-1,d,hh,mm),de:x.de,texto:x.texto.trim()}
+  }).filter(x=>x.texto&&!isNaN(x.ts)&&!/omitid[oa]|omitted/i.test(x.texto));
+}
+const ACEPTA=/^(s[ií]\b|claro|perfecto|dale\b|listo|de acuerdo|ok\b|vale\b|bueno\b|confirmo|con gusto|all[aá] nos vemos)|me parece (?:bien|perfecto)|\bconfirmo\b/i;
+const RELEV=/visita|reuni[oó]n|\bcita\b|disponibilidad|taller|jornada|feria|encuentro|invit|agendar|asamblea|evento|charla|capacitaci[oó]n|te parece/i;
+/* Qué mensajes parecen actividades. Si el otro (o tú) respondió que sí, ya está confirmada. */
+function candidatosChat(msgs,yo){
+  const res=[],hoy=iso(new Date());
+  msgs.forEach((m,i)=>{
+    if(ACEPTA.test(m.texto.trim()))return;
+    const a=analizar(m.texto,m.ts);
+    if(!(a.fecha||a.ini||RELEV.test(m.texto)))return;
+    let conf=false,otro=m.de;
+    if(yo&&a.fecha&&a.ini)for(const n of msgs.slice(i+1,i+4)){
+      const t=n.texto.trim();
+      if(n.de!==m.de&&(m.de===yo||n.de===yo)&&ACEPTA.test(t)&&!/^no\b/i.test(t)){conf=true;otro=m.de===yo?n.de:m.de;break}}
+    if(yo&&m.de===yo&&!conf)return;
+    const ref=m.ts.getTime()+"|"+m.de+"|"+m.texto.slice(0,40);
+    res.push({m,a,conf,ref,titulo:a.titulo||(conf?"Reunión con "+otro:""),pasada:!!a.fecha&&a.fecha<hoy,dup:S.pend.some(p=>p.ref===ref),
+      tel:m.de!==yo&&/^\+?[\d\s-]{10,}$/.test(m.de)?m.de.replace(/\D/g,""):""});
+  });
+  return res;
+}
+function chatEjemplo(){
+  const t=new Date(),a=new Date(t);a.setDate(t.getDate()-5);
+  const fe=d=>`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`,f=fe(t),g=fe(a);
+  return `[12:55 PM, ${g}] Andrés: Buenas tardes Rodolfo, cómo estás. Te escribo para preguntarte por la disponibilidad de una visita esta semana con el grupo de formación en habilidades digitales.
+[10:19 AM, ${f}] +57 300 000 0000: Hola Andrés
+Gusto de saludarte
+
+¿Te parece bien esta tarde a las 15:00?
+[10:31 AM, ${f}] Andrés: hola Rodolfo, cómo estás
+[10:31 AM, ${f}] Andrés: sí me parece perfecto
+[10:31 AM, ${f}] Andrés: allá nos vemos a las 3
+[10:40 AM, ${f}] +57 300 000 0000: Vale. Gracias.
+[12:03 PM, ${f}] Valentina: Hola Rodolfo, feliz tarde.
+Soy del grupo de Automatización de la Huerta Urbana.
+Nos gustaría saber qué día se encuentra César, encargado de la huerta hidropónica, para realizar una visita esta semana.`;
+}
+
+function cuandoTs(ts){const d=new Date(ts);return`${fechaLarga(iso(d))}, ${hora(pad(d.getHours())+":"+pad(d.getMinutes()))}`}
+function hace(ts){const m=Math.round((Date.now()-new Date(ts))/60000);if(m<1)return"ahora";if(m<60)return`hace ${m} min`;const h=Math.round(m/60);if(h<24)return`hace ${h} h`;const d=Math.round(h/24);return`hace ${d} ${d===1?"día":"días"}`}
+const palabras=t=>(t||"").trim().split(/\s+/).filter(Boolean).length;
+
+/* ---------- estado de las vistas ---------- */
+let cursor=new Date(),vista="mes",ejeSel="";
+const visibles=()=>S.eventos.filter(e=>!ejeSel||e.eje===ejeSel).sort(ord);
+function lunes(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+
+function render(){renderCal();renderPend();renderFiltro()}
+function renderFiltro(){
+  $("#fEje").innerHTML=`<option value="">Todos los ejes</option>`+Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k===ejeSel?"selected":""}>${v}</option>`).join("");
+}
+function renderCal(){
+  $("#calMes").hidden=vista!=="mes";$("#calSem").hidden=vista!=="sem";
+  $("#vMes").setAttribute("aria-selected",vista==="mes");$("#vSem").setAttribute("aria-selected",vista==="sem");
+  const hoy=iso(new Date()),evs=visibles();
+  if(vista==="mes"){
+    $("#titulo").textContent=cap(`${MESES[cursor.getMonth()]} ${cursor.getFullYear()}`);
+    const first=new Date(cursor.getFullYear(),cursor.getMonth(),1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+    let h=["lun","mar","mié","jue","vie","sáb","dom"].map(d=>`<div class="dow">${d}</div>`).join("");
+    for(let i=0;i<42;i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);const k=iso(d),de=evs.filter(e=>e.fecha===k);
+      h+=`<div class="day ${d.getMonth()!==first.getMonth()?"out":""} ${k===hoy?"today":""}" data-d="${k}" tabindex="0" role="button" aria-label="${esc(fechaLarga(k))}"><span class="n">${d.getDate()}</span>${de.slice(0,3).map(e=>`<button class="chip" data-ev="${e.id}">${esc(hora(e.ini).replace(" ",""))} ${esc(e.titulo)}</button>`).join("")}${de.length>3?`<div class="more">+${de.length-3} más</div>`:""}</div>`;
+    }
+    $("#calMes").innerHTML=h;
+  }else{
+    const a=lunes(cursor),b=new Date(a);b.setDate(a.getDate()+6);
+    $("#titulo").textContent=`${a.getDate()} ${a.getMonth()!==b.getMonth()?MESES[a.getMonth()].slice(0,3)+" ":""}– ${b.getDate()} ${MESES[b.getMonth()].slice(0,3)} ${b.getFullYear()}`;
+    let h="";
+    for(let i=0;i<7;i++){
+      const d=new Date(a);d.setDate(a.getDate()+i);const k=iso(d),de=evs.filter(e=>e.fecha===k);
+      h+=`<div class="wd ${k===hoy?"today":""}" data-d="${k}"><div class="wh">${DIAS[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></div>${de.map(e=>`<button class="wev" data-ev="${e.id}">${esc(e.titulo)}<span>${esc(hora(e.ini))}${e.lugar?" · "+esc(e.lugar):""}${e.con?" · con "+esc(e.con):""}</span></button>`).join("")}</div>`;
+    }
+    $("#calSem").innerHTML=h;
+  }
+}
+function renderPend(){
+  const pend=S.pend.filter(p=>p.estado==="pendiente").sort((a,b)=>(a.fecha?0:1)-(b.fecha?0:1)||(a.fecha+a.ini).localeCompare(b.fecha+b.ini));
+  $("#nPend").textContent=pend.length;
+  $("#listaPend").innerHTML=pend.map(p=>{
+    const posible=!p.fecha||!p.ini,c=choque(p);
+    const cuando=p.fecha?`${cap(fechaLarga(p.fecha))}${p.ini?" · "+hora(p.ini)+(p.fin?" a "+hora(p.fin):""):" · falta la hora"}`:"Sin fecha confirmada"+(p.plazo?" · lo quieren: "+p.plazo:"");
+    const quien=[p.de&&"De "+p.de,p.org].filter(Boolean).join(" · ");
+    return`<div class="pc"><div class="t">${esc(p.titulo||p.tipo||"Mensaje de "+(p.de||"alguien"))}${p.tipo&&p.titulo?`<span class="pill">${esc(p.tipo)}</span>`:""}${posible?`<span class="pill">Posible</span>`:""}${p.preguntado?`<span class="pill">Ya preguntaste</span>`:""}</div>
+    ${p.resumen?`<div class="m">${esc(p.resumen)}</div>`:""}
+    ${quien?`<div class="m">${esc(quien)}</div>`:""}
+    ${p.persona?`<div class="m">Buscan a: ${esc(p.persona)}</div>`:""}
+    <div class="m">${esc(cuando)}${p.lugar?" · "+esc(p.lugar):""}</div>
+    <div class="m">${p.recibido?"Recibido "+esc(cuandoTs(p.recibido))+" ("+esc(hace(p.recibido))+") · ":""}${palabras(p.texto)} palabras</div>
+    ${c?`<p class="warn">Se cruza con «${esc(c.titulo)}» a las ${esc(hora(c.ini))}.</p>`:""}
+    <details><summary>Ver mensaje</summary><div class="msg">${esc(p.texto)}</div></details>
+    <div class="acts"><button class="btn sm pri" data-ac="aceptar" data-p="${p.id}">Aceptar</button><button class="btn sm" data-ac="preguntar" data-p="${p.id}">Preguntar</button><button class="btn sm" data-ac="rechazar" data-p="${p.id}">Rechazar</button><button class="btn sm" data-ac="editar" data-p="${p.id}">Editar</button></div></div>`}).join("")
+    ||`<p class="hint">No tienes pendientes. Cuando te llegue una invitación por WhatsApp, guárdala aquí.</p>`;
+  const rs=S.pend.filter(p=>p.estado!=="pendiente");
+  $("#resp").textContent=`Respondidas (${rs.length})`;
+  $("#listaResp").innerHTML=rs.map(p=>`<div class="done"><span>${p.estado==="aceptada"?"✔ Aceptada":"✖ Rechazada"} · ${esc(p.titulo||"Mensaje de "+(p.de||"alguien"))}</span><button class="btn sm" data-ac="deshacer" data-p="${p.id}">Deshacer</button></div>`).join("")||`<p class="hint">Aún no has respondido ninguna.</p>`;
+}
+function panel(asis){
+  $("#pPend").hidden=asis;$("#pAsis").hidden=!asis;
+  $("#tPend").setAttribute("aria-selected",!asis);$("#tAsis").setAttribute("aria-selected",asis);
+}
+
+/* ---------- diálogos ---------- */
+const dlg=$("#dlg");
+function abrir(html){dlg.innerHTML=html;dlg.showModal()}
+function cerrar(){dlg.close()}
+
+/* Guardar (o editar) un mensaje recibido. La IA lee el mensaje sola al pegarlo. */
+const CAMPOS_PEND=["tipo","org","titulo","resumen","persona","fecha","lugar","ini","fin","plazo"];
+function formPend(p){
+  const n=!p;p=p||{texto:"",de:"",tel:"",tipo:"",org:"",titulo:"",resumen:"",persona:"",fecha:"",lugar:"",ini:"",fin:"",plazo:""};
+  const CAMPOS=CAMPOS_PEND;
+  abrir(`<form id="fp"><div class="row between"><h2>${n?"Guardar mensaje recibido":"Editar pendiente"}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
+  <label>Mensaje que te llegó (pégalo aquí)<textarea name="texto" rows="5" required placeholder="Pega aquí el texto de WhatsApp">${esc(p.texto)}</textarea></label>
+  <div class="two"><label>¿Quién lo escribe?<input name="de" value="${esc(p.de)}" placeholder="Nombre o grupo de WhatsApp"></label>
+  <label>Su WhatsApp (opcional)<input name="tel" type="tel" value="${esc(p.tel)}" placeholder="3001234567"></label></div>
+  <h3>Lo que entendí <small>· revísalo; deja vacío lo que no esté claro</small> <small id="est"></small></h3>
+  <div class="two"><label>Tipo<input name="tipo" value="${esc(p.tipo)}" placeholder="Invitación, visita, reunión…"></label>
+  <label>Grupo u organización<input name="org" value="${esc(p.org)}"></label></div>
+  <label>Actividad<input name="titulo" value="${esc(p.titulo)}"></label>
+  <label>Resumen<input name="resumen" value="${esc(p.resumen)}" placeholder="Qué piden o proponen"></label>
+  <label>A quién buscan o mencionan<input name="persona" value="${esc(p.persona)}" placeholder="Persona y cargo"></label>
+  <div class="two"><label>Fecha<input type="date" name="fecha" value="${p.fecha}"></label><label>Lugar<input name="lugar" value="${esc(p.lugar)}"></label>
+  <label>Hora de inicio<input type="time" name="ini" value="${p.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${p.fin||""}"></label></div>
+  <label>Plazo (si no dan fecha exacta)<input name="plazo" value="${esc(p.plazo)}" placeholder="Ej: esta semana"></label>
+  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">${n?"Guardar como pendiente":"Guardar cambios"}</button><button type="button" class="btn" id="ia">Leer con IA</button>${n?"":`<button type="button" class="btn del" id="del">Borrar</button>`}</div></form>`);
+  const f=$("#fp"),tocado=new Set(n?[]:CAMPOS);let tm=0,rid=0;
+  async function leerIA(auto){
+    const txt=f.elements.texto.value.trim();
+    if(!txt||(auto&&(!S.cfg.key||txt.length<20)))return;
+    if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
+    const id=++rid,est=$("#est"),b=$("#ia");est.textContent="· leyendo con IA…";b.disabled=true;
+    try{const a=await extraerIA(txt,new Date());if(id!==rid)return;
+      CAMPOS.forEach(k=>{if(a[k]&&(!auto||!tocado.has(k))){f.elements[k].value=a[k];if(!auto)tocado.add(k)}});est.textContent="· revisa lo que entendió la IA"}
+    catch(e){if(id===rid){est.textContent="";if(!auto)toast(e.message)}}
+    finally{if(id===rid)b.disabled=false}
+  }
+  f.addEventListener("input",ev=>{const nm=ev.target.name;
+    if(nm==="texto"){const a=analizar(ev.target.value);CAMPOS.forEach(k=>{if(!tocado.has(k))f.elements[k].value=a[k]||""});
+      if(n){clearTimeout(tm);tm=setTimeout(()=>leerIA(true),1000)}}
+    else if(CAMPOS.includes(nm))tocado.add(nm)});
+  $("#x").onclick=cerrar;
+  $("#ia").onclick=()=>leerIA(false);
+  f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
+    if(n)S.pend.unshift({id:uid(),estado:"pendiente",recibido:new Date().toISOString(),...d});else Object.assign(p,d);
+    save();render();cerrar();panel(false);toast(n?"Guardado en pendientes":"Cambios guardados")};
+  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar este mensaje?")){S.pend=S.pend.filter(x=>x.id!==p.id);save();render();cerrar()}};
+}
+
+function formImportar(){
+  abrir(`<form id="fim"><div class="row between"><h2>Importar chat de WhatsApp <span class="pill">beta</span></h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
+  <p class="hint">En WhatsApp abre el chat, toca ⋮ → Más → Exportar chat → Sin archivos, y pega aquí el texto. También sirve copiar varios mensajes seleccionados.</p>
+  <textarea id="raw" rows="7" placeholder="[12:55 PM, 30/9/2026] Nombre: mensaje..."></textarea>
+  <div class="two" style="margin-top:6px"><label>¿Cuál eres tú en el chat?<select id="yo"></select></label>
+  <label>Formato de fecha<select id="fmt"><option value="">Automático</option><option value="dmy">día/mes</option><option value="mdy">mes/día</option></select></label></div>
+  <div class="row" style="margin-top:6px"><button type="button" class="btn sm" id="iaImp">Leer con IA</button><button type="button" class="btn sm" id="ej">Ver un ejemplo</button></div>
+  <div id="res"></div>
+  <div class="row" style="margin-top:14px"><button class="btn pri" id="add" type="submit" disabled>Agregar</button></div></form>`);
+  const raw=$("#raw"),yoS=$("#yo"),cache={};let cands=[];
+  const fmtF=c=>c.a.fecha?cap(fechaLarga(c.a.fecha))+(c.a.ini?" · "+hora(c.a.ini):""):"Sin fecha"+(c.a.plazo?" · lo quieren: "+c.a.plazo:"");
+  function analizarChat(){
+    const msgs=parseChat(raw.value,$("#fmt").value),quien=[...new Set(msgs.map(x=>x.de))];
+    const sel=yoS.value||S.cfg.yo||"";
+    yoS.innerHTML=`<option value="">No sé / ninguno</option>`+quien.map(q=>`<option ${q===sel?"selected":""}>${esc(q)}</option>`).join("");
+    const yo=yoS.value;cands=candidatosChat(msgs,yo);
+    cands.forEach(c=>{const x=cache[c.ref];if(x){for(const k in x)if(x[k])c.a[k]=x[k];c.titulo=c.a.titulo||c.titulo;c.pasada=!!c.a.fecha&&c.a.fecha<iso(new Date())}});
+    if(!raw.value.trim()){$("#res").innerHTML="";$("#add").disabled=true;return}
+    if(!msgs.length){$("#res").innerHTML=`<p class="hint">No reconocí el formato. Si es un solo mensaje, usa «Guardar un mensaje».</p>`;$("#add").disabled=true;return}
+    $("#res").innerHTML=`<p class="hint">Leí ${msgs.length} mensajes de ${quien.length} personas. ${cands.length} parecen actividades${yo?"":" (elige quién eres para detectar las que ya se confirmaron)"}.</p>`+
+    cands.map((c,k)=>`<label class="imp"><input type="checkbox" data-k="${k}" ${c.pasada||c.dup?"disabled":"checked"}><div><strong>${esc(c.titulo||c.a.tipo||"Mensaje de "+c.m.de)}</strong>
+      <span class="pill">${c.dup?"Ya importado":c.conf?"Va al calendario":"Va a pendientes"}</span>${c.a.tipo&&c.titulo?`<span class="pill">${esc(c.a.tipo)}</span>`:""}${!c.conf&&(!c.a.fecha||!c.a.ini)?`<span class="pill">Posible</span>`:""}${c.pasada?`<span class="pill">Fecha pasada</span>`:""}
+      ${c.a.resumen?`<div class="m">${esc(c.a.resumen)}</div>`:""}
+      <div class="m">De ${esc(c.m.de)}${c.a.org?" · "+esc(c.a.org):""} · ${esc(fmtF(c))}${c.a.lugar?" · "+esc(c.a.lugar):""}</div>
+      ${c.a.persona?`<div class="m">Buscan a: ${esc(c.a.persona)}</div>`:""}
+      <div class="m">Recibido ${esc(cuandoTs(c.m.ts))} · ${palabras(c.m.texto)} palabras</div>
+      <div class="m">«${esc(c.m.texto.replace(/\s+/g," ").slice(0,110))}»</div>${c.conf?`<div class="m">Ya confirmada en el chat.</div>`:""}</div></label>`).join("");
+    $("#add").disabled=!cands.some(c=>!c.pasada&&!c.dup);
+  }
+  raw.addEventListener("input",analizarChat);yoS.onchange=analizarChat;$("#fmt").onchange=analizarChat;
+  $("#ej").onclick=()=>{raw.value=chatEjemplo();analizarChat();yoS.value="+57 300 000 0000";analizarChat()};
+  $("#iaImp").onclick=async()=>{
+    if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
+    const lista=cands.filter(c=>!c.pasada&&!c.dup);if(!lista.length){toast("No hay mensajes para leer");return}
+    const b=$("#iaImp");b.disabled=true;let ok=0;
+    for(const [i,c] of lista.entries()){b.textContent=`Leyendo ${i+1} de ${lista.length}…`;
+      try{cache[c.ref]=await extraerIA(c.m.texto,c.m.ts);ok++}catch(e){toast(e.message);break}}
+    b.disabled=false;b.textContent="Leer con IA";analizarChat();if(ok)toast("Revisa lo que entendió la IA")};
+  $("#x").onclick=cerrar;
+  $("#fim").onsubmit=ev=>{ev.preventDefault();let p=0,e=0;S.cfg.yo=yoS.value;
+    document.querySelectorAll("#res input[type=checkbox]:checked").forEach(cb=>{
+      const c=cands[+cb.dataset.k],a=c.a,pid=uid();
+      const base={id:pid,de:c.m.de,tel:c.tel,titulo:c.titulo,tipo:a.tipo||"",org:a.org||"",persona:a.persona||"",resumen:a.resumen||"",plazo:a.plazo||"",fecha:a.fecha,ini:a.ini,fin:a.fin,lugar:a.lugar,texto:c.m.texto,ref:c.ref,recibido:c.m.ts.toISOString()};
+      if(c.conf){const evn={id:uid(),titulo:c.titulo,eje:"eq",fecha:a.fecha,ini:a.ini,fin:a.fin,lugar:a.lugar,con:[a.org,a.persona].filter(Boolean).join(" · ")||c.m.de,obj:a.resumen||"Confirmada en el chat de WhatsApp.",desde:pid};
+        S.eventos.push(evn);S.pend.unshift({...base,estado:"aceptada",eventoId:evn.id});e++}
+      else{S.pend.unshift({...base,estado:"pendiente"});p++}});
+    save();render();cerrar();panel(false);toast(`${p} a pendientes, ${e} al calendario`)};
+}
+
+/* Aceptar, preguntar o rechazar: siempre con una respuesta lista para WhatsApp */
+function textoRespuesta(modo,p){
+  const sal=`Hola${p.de?" "+p.de:""}, gracias por la invitación${p.titulo?" a *"+p.titulo+"*":""}.`;
+  if(modo==="aceptar")return`${sal} Confirmo mi asistencia${p.fecha?" el "+fechaLarga(p.fecha):""}${p.ini?" a las "+hora(p.ini):""}. ¡Nos vemos!`;
+  if(modo==="rechazar")return`${sal} Lamentablemente no podré asistir. Quedo pendiente de la próxima actividad.`;
+  const falta=[!p.fecha&&"la fecha",!p.ini&&"la hora",!p.lugar&&"el lugar"].filter(Boolean);
+  return`${sal} ¿Me confirmas ${falta.length?falta.join(", ").replace(/, ([^,]*)$/," y $1"):"los detalles"}?`;
+}
+function responder(p,modo){
+  const T={aceptar:"Aceptar invitación",rechazar:"Rechazar invitación",preguntar:"Preguntar los datos que faltan"}[modo];
+  const campos=modo==="aceptar"?`<h3>Datos de la actividad <small>· se agrega al calendario</small></h3>
+  <label>Actividad<input name="titulo" required value="${esc(p.titulo)}"></label>
+  <div class="two"><label>Eje<select name="eje">${Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k==="eq"?"selected":""}>${v}</option>`).join("")}</select></label><label>Lugar<input name="lugar" value="${esc(p.lugar)}"></label>
+  <label>Fecha<input type="date" name="fecha" required value="${p.fecha}"></label><label>Con quién<input name="con" value="${esc([p.org||p.de,p.persona].filter(Boolean).join(" · "))}"></label>
+  <label>Hora de inicio<input type="time" name="ini" required value="${p.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${p.fin||""}"></label></div>
+  <p class="warn" id="warn"></p>`:"";
+  const bt={aceptar:["Aceptar y responder por WhatsApp","Solo agregar al calendario"],rechazar:["Rechazar y responder por WhatsApp","Solo archivar"],preguntar:["Abrir en WhatsApp",""]}[modo];
+  abrir(`<form id="fr"><div class="row between"><h2>${T}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
+  <details class="box"><summary>Mensaje original</summary><p style="white-space:pre-wrap;color:var(--ink-2);margin:8px 0 0">${esc(p.texto)}</p></details>
+  ${campos}
+  <h3>Tu respuesta por WhatsApp</h3>
+  <textarea id="txt" rows="4"></textarea>
+  <div class="row" style="margin-top:6px"><button type="button" class="btn sm" id="ia">Redactar con IA</button>${p.tel?"":`<span class="hint" style="margin:0">Sin número guardado: elegirás el chat en WhatsApp.</span>`}</div>
+  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">${bt[0]}</button>${bt[1]?`<button type="button" class="btn" id="solo">${bt[1]}</button>`:""}</div></form>`);
+  const f=$("#fr"),t=$("#txt");let editado=false;
+  const datos=()=>({...p,...(modo==="aceptar"?Object.fromEntries(new FormData(f)):{})});
+  const sync=()=>{const d=datos();if(!editado)t.value=textoRespuesta(modo,d);
+    if(modo==="aceptar"){const c=choque({...d,eventoId:null});$("#warn").textContent=c?`Ojo: se cruza con «${c.titulo}» a las ${hora(c.ini)}.`:""}};
+  f.addEventListener("input",ev=>{if(ev.target!==t)sync()});t.addEventListener("input",()=>editado=true);sync();
+  $("#x").onclick=cerrar;
+  $("#ia").onclick=async()=>{if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
+    const b=$("#ia");b.textContent="Escribiendo…";
+    try{t.value=await ia([{role:"user",content:promptRespuesta(modo,datos())}]);editado=true}catch(e){toast(e.message)}
+    b.textContent="Redactar con IA"};
+  const fin=(enviar)=>{
+    if(modo==="aceptar"){
+      if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
+      const ev={id:uid(),titulo:d.titulo,eje:d.eje,fecha:d.fecha,ini:d.ini,fin:d.fin||"",lugar:d.lugar||"",con:d.con||"",obj:p.resumen||"",desde:p.id};
+      S.eventos.push(ev);Object.assign(p,{estado:"aceptada",eventoId:ev.id,titulo:d.titulo,fecha:d.fecha,ini:d.ini,fin:d.fin||"",lugar:d.lugar||""});
+      cursor=pf(d.fecha);
+    }else if(modo==="rechazar")p.estado="rechazada";
+    else p.preguntado=true;
+    if(enviar)abrirWa(p.tel,t.value);
+    save();render();cerrar();
+    toast(modo==="aceptar"?"Agregada al calendario":modo==="rechazar"?"Rechazada y archivada":"Pregunta enviada, sigue pendiente");
+  };
+  f.onsubmit=ev=>{ev.preventDefault();fin(true)};
+  if(bt[1])$("#solo").onclick=()=>fin(false);
+}
+function deshacer(p){
+  if(p.eventoId)S.eventos=S.eventos.filter(e=>e.id!==p.eventoId);
+  p.estado="pendiente";delete p.eventoId;save();render();toast("Volvió a pendientes");
+}
+
+/* Crear o editar una actividad del calendario */
+function invitacion(e,tono){
+  const f=`${fechaLarga(e.fecha)}, de ${hora(e.ini)}${e.fin?" a "+hora(e.fin):""}`;
+  const lug=e.lugar?`\nLugar: ${e.lugar}`:"";const obj=e.obj?`\n${e.obj}`:"";
+  if(tono==="cercano")return`¡Hola! 👋 Te esperamos en *${e.titulo}* el ${f}.${lug}${obj}\n¿Nos confirmas si vienes? 🙌`;
+  if(tono==="recordatorio")return`Recordatorio: *${e.titulo}* es el ${f}.${lug}\nPor favor confirma tu asistencia.`;
+  return`Cordial saludo.\nFondacio los invita a *${e.titulo}*, el ${f}.${lug}${obj}\nAgradecemos confirmar su asistencia.`;
+}
+function formEvento(e,fecha){
+  const n=!e;e=e||{titulo:"",eje:"form",fecha:fecha||iso(new Date()),ini:"15:00",fin:"16:00",lugar:"",obj:""};
+  abrir(`<form id="fe"><div class="row between"><h2>${n?"Nueva actividad":"Actividad"}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
+  <label>Nombre<input name="titulo" required value="${esc(e.titulo)}" placeholder="Ej: Taller de habilidades digitales"></label>
+  <div class="two"><label>Eje<select name="eje">${Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k===e.eje?"selected":""}>${v}</option>`).join("")}</select></label>
+  <label>Fecha<input type="date" name="fecha" required value="${e.fecha}"></label>
+  <label>Hora de inicio<input type="time" name="ini" required value="${e.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${e.fin||""}"></label></div>
+  <label>Lugar<input name="lugar" value="${esc(e.lugar)}"></label>
+  <label>Con quién (grupo, organización o persona)<input name="con" value="${esc(e.con||"")}"></label>
+  <label>Notas<textarea name="obj" rows="2">${esc(e.obj)}</textarea></label>
+  <details class="box"><summary>Invitación para el grupo (opcional)</summary>
+    <div class="row" style="margin:8px 0"><select id="tono" style="width:auto"><option value="formal">Formal</option><option value="cercano">Cercano</option><option value="recordatorio">Recordatorio</option></select><button type="button" class="btn sm" id="ia">Redactar con IA</button></div>
+    <textarea id="txt" rows="5"></textarea>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="wa">Abrir en WhatsApp</button><button type="button" class="btn sm" id="cp">Copiar</button></div></details>
+  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">Guardar</button>${n?"":`<button type="button" class="btn del" id="del">Borrar</button>`}</div></form>`);
+  const f=$("#fe"),t=$("#txt");let editado=false;
+  const leer=()=>({...e,...Object.fromEntries(new FormData(f))});
+  const sync=()=>{if(!editado)t.value=invitacion(leer(),$("#tono").value)};
+  f.addEventListener("input",ev=>{if(ev.target!==t)sync()});t.addEventListener("input",()=>editado=true);
+  $("#tono").onchange=()=>{editado=false;sync()};sync();
+  $("#x").onclick=cerrar;
+  f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
+    if(n)S.eventos.push({id:uid(),...d});else Object.assign(e,d);save();render();cerrar();toast("Actividad guardada")};
+  $("#wa").onclick=()=>abrirWa("",t.value);
+  $("#cp").onclick=()=>navigator.clipboard.writeText(t.value).then(()=>toast("Copiado"),()=>toast("No se pudo copiar"));
+  $("#ia").onclick=async()=>{if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
+    const b=$("#ia"),v=leer();b.textContent="Escribiendo…";
+    try{t.value=await ia([{role:"user",content:`Redacta una invitación para un grupo de WhatsApp en español de Colombia, máximo 110 palabras, tono ${$("#tono").value}. Pide confirmación de asistencia y no inventes datos. Actividad: ${v.titulo}. Fecha: ${v.fecha?fechaLarga(v.fecha):"por definir"}. Hora: ${hora(v.ini)}${v.fin?" a "+hora(v.fin):""}. Lugar: ${v.lugar||"por definir"}. Notas: ${v.obj||"ninguna"}.`}]);editado=true}catch(err){toast(err.message)}
+    b.textContent="Redactar con IA"};
+  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar esta actividad?")){S.eventos=S.eventos.filter(x=>x.id!==e.id);save();render();cerrar()}};
+}
+function ajustes(){
+  const c=S.cfg;
+  abrir(`<form id="fa"><h2>Ajustes de la IA</h2>
+  <label>Proveedor<select name="prov" id="prov">${Object.entries(PROV).map(([k,v])=>`<option value="${k}" ${k===c.prov?"selected":""}>${v.n}</option>`).join("")}</select></label>
+  <p class="hint" id="donde" style="margin:6px 0 0"></p>
+  <label>Clave API<input type="password" name="key" autocomplete="off" value="${esc(c.key)}"></label>
+  <label>Modelo<input name="model" value="${esc(c.model)}"></label>
+  <p class="hint">La clave se guarda solo en este navegador. Cualquiera que use este computador podría verla. Los nombres de los modelos cambian con el tiempo: si da error de modelo, copia el nombre actual desde la página del proveedor.</p>
+  <div class="row" style="margin-top:14px"><button class="btn pri">Guardar</button><button type="button" class="btn" id="x">Cancelar</button></div></form>`);
+  const f=$("#fa"),ayuda=()=>{const p=PROV[f.elements.prov.value];$("#donde").textContent="Saca la clave en "+p.donde;f.elements.key.placeholder=p.pre+"..."};
+  let previo=c.prov;
+  f.elements.prov.onchange=()=>{if(f.elements.model.value===PROV[previo].model)f.elements.model.value=PROV[f.elements.prov.value].model;previo=f.elements.prov.value;ayuda()};
+  ayuda();
+  $("#x").onclick=cerrar;
+  f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
+    S.cfg={key:d.key.trim(),prov:d.prov,model:d.model.trim()||PROV[d.prov].model};save();cerrar();renderChat();toast("Ajustes guardados")};
+}
+
+/* ---------- IA ---------- */
+function contexto(){
+  const ev=[...S.eventos].sort(ord).map(e=>({id:e.id,titulo:e.titulo,eje:e.eje,fecha:e.fecha,ini:e.ini,fin:e.fin,lugar:e.lugar,con:e.con||""}));
+  const pe=S.pend.filter(p=>p.estado==="pendiente").map(p=>({de:p.de,grupo:p.org,tipo:p.tipo,titulo:p.titulo,resumen:p.resumen,buscan_a:p.persona,fecha:p.fecha,ini:p.ini,lugar:p.lugar,plazo:p.plazo,recibido:p.recibido?cuandoTs(p.recibido):"",palabras:palabras(p.texto),mensaje:p.texto.slice(0,300)}));
+  return`Eres el asistente de Fondacio, una fundación en Altos de Cazucá (Colombia). Responde en español de Colombia, breve y claro, en texto plano: sin tablas ni markdown, con listas simples usando guiones. Escribe las fechas como «viernes 9 de octubre» y las horas como «3:00 p. m.». Hoy es ${iso(new Date())} (${DIAS[new Date().getDay()]}).
+Ejes válidos: form (Formación), com (Comunidad), eco (Economía circular), eq (Equipo).
+Calendario (solo actividades aceptadas): ${JSON.stringify(ev)}
+Pendientes por responder (mensajes de WhatsApp aún no aceptados): ${JSON.stringify(pe)}
+Si el usuario pide crear o borrar actividades del calendario, explica en una frase y agrega AL FINAL un bloque \`\`\`json con {"acciones":[{"tipo":"crear","titulo":"","eje":"form","fecha":"AAAA-MM-DD","ini":"HH:MM","fin":"HH:MM","lugar":"","obj":""},{"tipo":"borrar","id":"..."}]}. No inventes datos que el usuario no dio: pregunta lo que falte. Si no piden cambios, no incluyas el bloque.`;
+}
+async function ia(msgs,sistema){
+  if(!S.cfg.key)throw new Error("Falta la clave en Ajustes IA");
+  let r;
+  const P=PROV[S.cfg.prov]||PROV.groq;
+  try{r=await fetch(P.url,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+S.cfg.key},
+    body:JSON.stringify({model:S.cfg.model||P.model,messages:[{role:"system",content:sistema||contexto()},...msgs],temperature:.3})})}
+  catch(e){throw new Error("No se pudo conectar con "+P.n.split(" (")[0]+" (¿internet o bloqueo del navegador?)")}
+  if(!r.ok){let m="Error "+r.status;try{const j=await r.json();m+=": "+(j.error?.message||j.error||"")}catch(e){}throw new Error(m.slice(0,200))}
+  const j=await r.json();return j.choices?.[0]?.message?.content?.trim()||"(sin respuesta)";
+}
+async function extraerIA(texto,base){
+  base=base||new Date();
+  const sis=`El mensaje de WhatsApp se envió el ${iso(base)} (${DIAS[base.getDay()]}) a las ${pad(base.getHours())}:${pad(base.getMinutes())}. Extrae sus datos y responde SOLO un JSON con esta forma exacta: {"tipo":"invitación | solicitud de visita | consulta de disponibilidad | reunión | taller | evento | otro","titulo":"nombre corto de la actividad","resumen":"una frase con lo que piden o proponen","org":"grupo, organización o institución de quien escribe","persona":"persona por la que preguntan o con quien quieren hablar, con su cargo si lo dicen","fecha":"AAAA-MM-DD","ini":"HH:MM","fin":"HH:MM","lugar":"","plazo":"cuándo lo quieren si no dan fecha exacta, por ejemplo esta semana"}. Usa "" en lo que no esté claro. No inventes datos. Las fechas relativas (hoy, mañana, el viernes, esta tarde) se cuentan desde el día en que se envió el mensaje.`;
+  const raw=await ia([{role:"user",content:texto}],sis);
+  let j;try{j=JSON.parse(raw.match(/\{[\s\S]*\}/)[0])}catch(e){throw new Error("La IA no devolvió datos legibles")}
+  const t=(v,n=120)=>typeof v==="string"?v.trim().slice(0,n):"";
+  return{tipo:cap(t(j.tipo,40)),titulo:cap(t(j.titulo,80)),resumen:t(j.resumen,160),org:t(j.org,90),persona:t(j.persona,90),
+    fecha:/^\d{4}-\d{2}-\d{2}$/.test(j.fecha||"")?j.fecha:"",ini:/^\d{2}:\d{2}$/.test(j.ini||"")?j.ini:"",fin:/^\d{2}:\d{2}$/.test(j.fin||"")?j.fin:"",lugar:t(j.lugar,90),plazo:t(j.plazo,60)};
+}
+const promptRespuesta=(modo,p)=>`Redacta una respuesta corta de WhatsApp en español de Colombia (máximo 60 palabras), cordial y respetuosa. Intención: ${{aceptar:"aceptar la invitación y confirmar asistencia",rechazar:"declinar la invitación con amabilidad",preguntar:"pedir los datos que faltan (fecha, hora o lugar)"}[modo]}. Mensaje recibido: «${p.texto}». Tipo: ${p.tipo||"no indicado"}. Resumen: ${p.resumen||"no indicado"}. Actividad: ${p.titulo||"sin nombre"}. Fecha: ${p.fecha?fechaLarga(p.fecha):"no indicada"}. Hora: ${p.ini?hora(p.ini):"no indicada"}. Lugar: ${p.lugar||"no indicado"}. Plazo: ${p.plazo||"no indicado"}. Remitente: ${p.de||"desconocido"}${p.org?" del grupo "+p.org:""}. Persona por la que preguntan: ${p.persona||"ninguna"}. No inventes datos que no estén aquí.`;
+function acciones(txt){
+  const m=txt.match(/```json\s*([\s\S]*?)```/);if(!m)return{texto:txt,acc:null};
+  let acc=null;try{acc=JSON.parse(m[1]).acciones}catch(e){}
+  return{texto:txt.replace(m[0],"").trim(),acc:Array.isArray(acc)&&acc.length?acc:null};
+}
+function descr(a){return a.tipo==="crear"?`Crear: ${a.titulo} · ${a.fecha} ${a.ini||""}`:`Borrar: ${(S.eventos.find(e=>e.id===a.id)||{}).titulo||"(no encontrada)"}`}
+function aplicar(acc){
+  let c=0,b=0;
+  acc.forEach(a=>{
+    if(a.tipo==="crear"&&a.titulo&&/^\d{4}-\d{2}-\d{2}$/.test(a.fecha||"")&&/^\d{2}:\d{2}$/.test(a.ini||"")){
+      S.eventos.push({id:uid(),titulo:String(a.titulo),eje:EJES[a.eje]?a.eje:"eq",fecha:a.fecha,ini:a.ini,fin:/^\d{2}:\d{2}$/.test(a.fin||"")?a.fin:"",lugar:a.lugar||"",obj:a.obj||""});c++}
+    else if(a.tipo==="borrar"&&S.eventos.some(e=>e.id===a.id)){S.eventos=S.eventos.filter(e=>e.id!==a.id);b++}
+  });
+  save();render();toast(`${c} creada(s), ${b} borrada(s)`);
+}
+function renderChat(){
+  const el=$("#msgs");
+  if(!S.chat.length){el.innerHTML=`<div class="m2 s">Pregúntame por la agenda o por tus pendientes, o pídeme crear actividades y textos para redes.${S.cfg.key?"":"<br>Para activarme, pega tu clave en <strong>Ajustes IA</strong>."}</div>`}
+  else el.innerHTML=S.chat.map((m,i)=>`<div class="m2 ${m.role==="user"?"u":m.role==="error"?"s":"a"}">${esc(m.texto??m.content)}${m.acc&&!m.hecho?`<div class="act">${m.acc.map(a=>"• "+esc(descr(a))).join("<br>")}<div class="row" style="margin-top:6px"><button class="btn sm pri" data-ap="${i}">Aplicar</button><button class="btn sm" data-no="${i}">Descartar</button></div></div>`:""}</div>`).join("");
+  el.scrollTop=el.scrollHeight;
+}
+async function enviar(txt){
+  if(!txt.trim())return;
+  S.chat.push({role:"user",content:txt});renderChat();$("#chatIn").value="";
+  const ph={role:"assistant",content:"Pensando…"};S.chat.push(ph);renderChat();
+  try{
+    const hist=S.chat.filter(m=>m.role==="user"||(m.role==="assistant"&&m!==ph)).slice(-10).map(m=>({role:m.role,content:m.raw||m.content}));
+    const raw=await ia(hist);const{texto,acc}=acciones(raw);
+    Object.assign(ph,{content:texto||"Listo.",raw,acc});
+  }catch(e){ph.role="error";ph.content=e.message}
+  save();renderChat();
+}
+
+/* ---------- eventos de la interfaz ---------- */
+$("#tPend").onclick=()=>panel(false);
+$("#tAsis").onclick=()=>panel(true);
+$("#vMes").onclick=()=>{vista="mes";renderCal()};
+$("#vSem").onclick=()=>{vista="sem";renderCal()};
+$("#hoy").onclick=()=>{cursor=new Date();renderCal()};
+$("#prev").onclick=()=>{vista==="mes"?cursor.setMonth(cursor.getMonth()-1,1):cursor.setDate(cursor.getDate()-7);renderCal()};
+$("#next").onclick=()=>{vista==="mes"?cursor.setMonth(cursor.getMonth()+1,1):cursor.setDate(cursor.getDate()+7);renderCal()};
+$("#fEje").onchange=e=>{ejeSel=e.target.value;renderCal()};
+$("#bNew").onclick=()=>formEvento();
+$("#bPend").onclick=()=>formPend();
+$("#bImp").onclick=formImportar;
+$("#bSet").onclick=ajustes;
+$("#bClr").onclick=()=>{S.chat=[];save();renderChat()};
+function clicCal(e){
+  const ev=e.target.closest("[data-ev]");if(ev){e.stopPropagation();return formEvento(S.eventos.find(x=>x.id===ev.dataset.ev))}
+  const d=e.target.closest("[data-d]");if(d)formEvento(null,d.dataset.d)}
+$("#calMes").onclick=clicCal;$("#calSem").onclick=clicCal;
+$("#calMes").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset.d){e.preventDefault();formEvento(null,e.target.dataset.d)}};
+function clicPend(e){
+  const b=e.target.closest("[data-ac]");if(!b)return;
+  const p=S.pend.find(x=>x.id===b.dataset.p);if(!p)return;const a=b.dataset.ac;
+  if(a==="editar")formPend(p);else if(a==="deshacer")deshacer(p);else responder(p,a)}
+$("#listaPend").onclick=clicPend;$("#listaResp").onclick=clicPend;
+$("#chatForm").onsubmit=e=>{e.preventDefault();enviar($("#chatIn").value)};
+$("#msgs").onclick=e=>{
+  const ap=e.target.dataset.ap,no=e.target.dataset.no;
+  if(ap!=null){const m=S.chat[ap];aplicar(m.acc);m.hecho=true;save();renderChat()}
+  if(no!=null){S.chat[no].hecho=true;save();renderChat()}};
+$("#sug").innerHTML=["¿Qué tengo pendiente por responder?","¿Qué hay esta semana?","¿De quiénes son mis pendientes?"].map(t=>`<button type="button">${t}</button>`).join("");
+$("#sug").onclick=e=>{if(e.target.tagName==="BUTTON")enviar(e.target.textContent)};
+
+dlg.addEventListener("click",e=>{if(e.target===dlg)cerrar()});
+
+render();renderChat();
+</script>
+</body>
+</html>
