@@ -388,7 +388,15 @@ function renderPend(){
     ||`<p class="hint">No tienes pendientes. Cuando te llegue una invitación por WhatsApp, guárdala aquí.</p>`;
   const rs=S.pend.filter(p=>p.estado!=="pendiente");
   $("#resp").textContent=`Respondidas (${rs.length})`;
-  $("#listaResp").innerHTML=rs.map(p=>`<div class="done"><span>${p.estado==="aceptada"?"✔ Aceptada":"✖ Rechazada"} · ${esc(p.titulo||"Mensaje de "+(p.de||"alguien"))}</span><button class="btn sm" data-ac="deshacer" data-p="${p.id}">Deshacer</button></div>`).join("")||`<p class="hint">Aún no has respondido ninguna.</p>`;
+  $("#listaResp").innerHTML=rs.map(p=>{
+    const quien=[p.de&&"De "+p.de,p.org].filter(Boolean).join(" · ");
+    const cuando=p.fecha?cap(fechaLarga(p.fecha))+(p.ini?" · "+hora(p.ini):""):"";
+    return`<div class="pc"><div class="t">${p.estado==="aceptada"?"✔ Aceptada":"✖ Rechazada"} · ${esc(p.titulo||p.tipo||"Mensaje de "+(p.de||"alguien"))}</div>
+    ${p.resumen?`<div class="m">${esc(p.resumen)}</div>`:""}
+    ${quien||cuando?`<div class="m">${esc([quien,cuando].filter(Boolean).join(" · "))}</div>`:""}
+    ${p.respondido?`<div class="m">Respondida ${esc(cuandoTs(p.respondido))}</div>`:""}
+    <details><summary>Ver mensaje</summary><div class="msg">${esc(p.texto)}</div></details>
+    <div class="acts"><button class="btn sm" data-ac="deshacer" data-p="${p.id}">Deshacer</button></div></div>`}).join("")||`<p class="hint">Aún no has respondido ninguna. Las que aceptes o rechaces aparecerán aquí.</p>`;
 }
 function panel(asis){
   $("#pPend").hidden=asis;$("#pAsis").hidden=!asis;
@@ -534,6 +542,7 @@ function responder(p,modo){
     }else if(modo==="rechazar")p.estado="rechazada";
     else p.preguntado=true;
     if(enviar)abrirWa(p.tel,t.value);
+    if(modo!=="preguntar")p.respondido=new Date().toISOString();
     save();render();cerrar();
     toast(modo==="aceptar"?"Agregada al calendario":modo==="rechazar"?"Rechazada y archivada":"Pregunta enviada, sigue pendiente");
   };
@@ -545,6 +554,25 @@ function deshacer(p){
   p.estado="pendiente";delete p.eventoId;save();render();toast("Volvió a pendientes");
 }
 
+/* Detalle de un día: todas sus actividades completas y la opción de agregar otra */
+function verDia(k){
+  const evs=S.eventos.filter(e=>e.fecha===k).sort(ord);
+  abrir(`<div class="row between"><h2>${esc(cap(fechaLarga(k)))}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
+  ${evs.length?`<p class="hint" style="margin:6px 0 0">${evs.length} ${evs.length===1?"actividad":"actividades"}</p>`+evs.map(e=>{
+    const pe=e.desde&&S.pend.find(p=>p.id===e.desde);
+    return`<div class="pc" style="margin-top:10px"><div class="t">${esc(e.titulo)}</div>
+    <div class="m">${esc(hora(e.ini))}${e.fin?" a "+esc(hora(e.fin)):""} · ${esc(EJES[e.eje]||"")}</div>
+    ${e.lugar?`<div class="m">Lugar: ${esc(e.lugar)}</div>`:""}
+    ${e.con?`<div class="m">Con: ${esc(e.con)}</div>`:""}
+    ${e.obj?`<div class="m">${esc(e.obj)}</div>`:""}
+    ${pe?`<details><summary>Mensaje de WhatsApp de donde salió</summary><div class="msg">${esc(pe.texto)}</div></details>`:""}
+    <div class="acts"><button class="btn sm" data-ed="${e.id}">Editar</button></div></div>`}).join(""):`<p class="hint" style="margin-top:12px">No hay actividades este día.</p>`}
+  <div class="row" style="margin-top:14px"><button class="btn pri" id="nuevo">+ Agregar actividad este día</button></div>`);
+  $("#x").onclick=cerrar;
+  $("#nuevo").onclick=()=>formEvento(null,k,true);
+  dlg.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>formEvento(S.eventos.find(x=>x.id===b.dataset.ed),null,true));
+}
+
 /* Crear o editar una actividad del calendario */
 function invitacion(e,tono){
   const f=`${fechaLarga(e.fecha)}, de ${hora(e.ini)}${e.fin?" a "+hora(e.fin):""}`;
@@ -553,7 +581,7 @@ function invitacion(e,tono){
   if(tono==="recordatorio")return`Recordatorio: *${e.titulo}* es el ${f}.${lug}\nPor favor confirma tu asistencia.`;
   return`Cordial saludo.\nFondacio los invita a *${e.titulo}*, el ${f}.${lug}${obj}\nAgradecemos confirmar su asistencia.`;
 }
-function formEvento(e,fecha){
+function formEvento(e,fecha,desdeDia){
   const n=!e;e=e||{titulo:"",eje:"form",fecha:fecha||iso(new Date()),ini:"15:00",fin:"16:00",lugar:"",obj:""};
   abrir(`<form id="fe"><div class="row between"><h2>${n?"Nueva actividad":"Actividad"}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
   <label>Nombre<input name="titulo" required value="${esc(e.titulo)}" placeholder="Ej: Taller de habilidades digitales"></label>
@@ -573,16 +601,16 @@ function formEvento(e,fecha){
   const sync=()=>{if(!editado)t.value=invitacion(leer(),$("#tono").value)};
   f.addEventListener("input",ev=>{if(ev.target!==t)sync()});t.addEventListener("input",()=>editado=true);
   $("#tono").onchange=()=>{editado=false;sync()};sync();
-  $("#x").onclick=cerrar;
+  $("#x").onclick=()=>{cerrar();if(desdeDia)verDia(e.fecha)};
   f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
-    if(n)S.eventos.push({id:uid(),...d});else Object.assign(e,d);save();render();cerrar();toast("Actividad guardada")};
+    if(n)S.eventos.push({id:uid(),...d});else Object.assign(e,d);save();render();cerrar();toast("Actividad guardada");if(desdeDia)verDia(d.fecha)};
   $("#wa").onclick=()=>abrirWa("",t.value);
   $("#cp").onclick=()=>navigator.clipboard.writeText(t.value).then(()=>toast("Copiado"),()=>toast("No se pudo copiar"));
   $("#ia").onclick=async()=>{if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
     const b=$("#ia"),v=leer();b.textContent="Escribiendo…";
     try{t.value=await ia([{role:"user",content:`Redacta una invitación para un grupo de WhatsApp en español de Colombia, máximo 110 palabras, tono ${$("#tono").value}. Pide confirmación de asistencia y no inventes datos. Actividad: ${v.titulo}. Fecha: ${v.fecha?fechaLarga(v.fecha):"por definir"}. Hora: ${hora(v.ini)}${v.fin?" a "+hora(v.fin):""}. Lugar: ${v.lugar||"por definir"}. Notas: ${v.obj||"ninguna"}.`}]);editado=true}catch(err){toast(err.message)}
     b.textContent="Redactar con IA"};
-  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar esta actividad?")){S.eventos=S.eventos.filter(x=>x.id!==e.id);save();render();cerrar()}};
+  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar esta actividad?")){S.eventos=S.eventos.filter(x=>x.id!==e.id);save();render();cerrar();if(desdeDia)verDia(e.fecha)}};
 }
 function ajustes(){
   const c=S.cfg;
@@ -680,14 +708,15 @@ $("#bImp").onclick=formImportar;
 $("#bSet").onclick=ajustes;
 $("#bClr").onclick=()=>{S.chat=[];save();renderChat()};
 function clicCal(e){
-  const ev=e.target.closest("[data-ev]");if(ev){e.stopPropagation();return formEvento(S.eventos.find(x=>x.id===ev.dataset.ev))}
-  const d=e.target.closest("[data-d]");if(d)formEvento(null,d.dataset.d)}
+  const ev=e.target.closest("[data-ev]");if(ev){e.stopPropagation();const x=S.eventos.find(y=>y.id===ev.dataset.ev);return x&&verDia(x.fecha)}
+  const d=e.target.closest("[data-d]");if(d)verDia(d.dataset.d)}
 $("#calMes").onclick=clicCal;$("#calSem").onclick=clicCal;
-$("#calMes").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset.d){e.preventDefault();formEvento(null,e.target.dataset.d)}};
+$("#calMes").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset.d){e.preventDefault();verDia(e.target.dataset.d)}};
 function clicPend(e){
   const b=e.target.closest("[data-ac]");if(!b)return;
   const p=S.pend.find(x=>x.id===b.dataset.p);if(!p)return;const a=b.dataset.ac;
   if(a==="editar")formPend(p);else if(a==="deshacer")deshacer(p);else responder(p,a)}
+$("#resp").parentElement.addEventListener("toggle",e=>{if(e.target.open)setTimeout(()=>{const c=$("#pPend");c.scrollTop=c.scrollHeight},30)});
 $("#listaPend").onclick=clicPend;$("#listaResp").onclick=clicPend;
 $("#chatForm").onsubmit=e=>{e.preventDefault();enviar($("#chatIn").value)};
 $("#msgs").onclick=e=>{
