@@ -6,9 +6,10 @@ Un calendario con el aspecto de Google Calendar, hecho para la fundación Fondac
 
 1. Muestra las actividades en vistas de **día, semana, mes y agenda**, con mini calendario y un calendario de color por eje (Formación, Comunidad, Economía circular, Equipo).
 2. Se crean, editan y borran actividades con el botón **Crear** o haciendo clic en un espacio libre del calendario.
-3. Atajos de teclado: D, W, M y A cambian de vista; T va a hoy; J y K avanzan o retroceden; C crea una actividad.
+3. Atajos de teclado: D, W, M y A cambian de vista; B abre el tablero; R las actas; T va a hoy; J y K avanzan o retroceden; C crea una actividad.
 4. **Cada persona del equipo tiene su calendario.** Al entrar se elige quién eres. Tu calendario muestra lo que es tuyo y la barra lateral muestra tus compromisos de las actas, con un botón para ponerlos en el calendario. El **calendario general** muestra todo. El equipo sale de la última acta y se puede editar.
-5. Un **asistente con IA** contesta preguntas sobre la agenda y los compromisos, y puede crear o borrar actividades.
+5. **Tablero de cada persona** (botón de columnas a la derecha, o tecla B): tres columnas, **Por hacer**, **Haciendo** y **Hecho**, con los compromisos de las actas y las tareas que se agreguen ahí. Se pasan de una columna a otra con los botones o arrastrándolas. «Todo el equipo» muestra cuánto lleva cada persona.
+6. Un **asistente con IA** contesta preguntas sobre la agenda y los compromisos, y puede crear o borrar actividades.
 
 ## Actas de los viernes
 
