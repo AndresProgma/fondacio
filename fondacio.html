@@ -4,169 +4,447 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fondacio Agenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ground:#F4F5F7;--sheet:#FFFFFF;--field:#F8F9FA;--ink:#14181F;--ink-2:#4A5260;--muted:#6C7480;
-  --line:#E1E4E9;--acc:#1F4FD8;--acc-d:#173CAA;--acc-bg:#E9EEFC;--acc-ink:#fff;--focus:#14181F;--danger:#B3261E;
+  --bg:#F8FAFD;--surface:#FFFFFF;--surface-2:#F0F4F9;--ink:#1F1F1F;--ink-2:#3C4043;--muted:#70757A;
+  --line:#DADCE0;--outline:#747775;--hover:rgba(31,31,31,.08);--primary:#0B57D0;--on-primary:#FFFFFF;
+  --tonal:#C2E7FF;--on-tonal:#001D35;--field:#F1F3F4;--now:#EA4335;--danger:#B3261E;
+  --snack:#303030;--on-snack:#F2F2F2;--snack-act:#A8C7FA;--focus:#0B57D0;
+  --shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);
+  --shadow-lg:0 24px 38px 3px rgba(0,0,0,.14),0 9px 46px 8px rgba(0,0,0,.12),0 11px 15px -7px rgba(0,0,0,.2);
 }
 @media (prefers-color-scheme:dark){:root{
-  --ground:#0F1115;--sheet:#171A20;--field:#12151A;--ink:#EEF0F3;--ink-2:#B5BBC6;--muted:#8A919D;
-  --line:#2A2F38;--acc:#7C9CFF;--acc-d:#9DB6FF;--acc-bg:#1B2440;--acc-ink:#0F1115;--focus:#EEF0F3;--danger:#FF8A80;
+  --bg:#131314;--surface:#1E1F20;--surface-2:#282A2C;--ink:#E3E3E3;--ink-2:#C4C7C5;--muted:#9AA0A6;
+  --line:#3C4043;--outline:#8E918F;--hover:rgba(227,227,227,.08);--primary:#A8C7FA;--on-primary:#062E6F;
+  --tonal:#004A77;--on-tonal:#C2E7FF;--field:#2D2F31;--now:#F28B82;--danger:#F2B8B5;
+  --snack:#E3E3E3;--on-snack:#303030;--snack-act:#0B57D0;--focus:#A8C7FA;
+  --shadow:0 1px 3px rgba(0,0,0,.5),0 4px 8px 3px rgba(0,0,0,.35);
+  --shadow-lg:0 24px 38px 3px rgba(0,0,0,.5),0 9px 46px 8px rgba(0,0,0,.4);
 }}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 system-ui,"Segoe UI",Roboto,sans-serif}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.43 Roboto,"Google Sans",system-ui,"Segoe UI",Arial,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
 button,input,select,textarea{font:inherit;color:inherit}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-.wrap{max-width:1220px;margin:0 auto;padding:0 16px}
-header.top{padding:20px 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-h1{font-size:1.5rem;margin:0;letter-spacing:-.01em;line-height:1.2}
-h1 small{display:block;font-size:.85rem;font-weight:400;color:var(--muted);letter-spacing:0;margin-top:2px}
-h2{font-size:1.15rem;margin:0}
-h3{font-size:1rem;margin:16px 0 6px}
-h3 small{font-weight:400;color:var(--muted)}
-.card{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:16px}
-.btn{border:1px solid var(--line);background:var(--sheet);border-radius:9px;padding:7px 14px;cursor:pointer;min-height:40px;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{border-color:var(--ink-2)}
-.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
-.btn.pri:hover{background:var(--acc-d)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+svg{width:24px;height:24px;fill:currentColor;flex:none}
+.sp1{flex:1}
+
+/* ---------- barra superior ---------- */
+.bar{height:64px;display:flex;align-items:center;gap:2px;padding:8px 12px 8px 8px}
+.ib{width:40px;height:40px;border:0;border-radius:50%;background:none;display:inline-grid;place-items:center;cursor:pointer;color:var(--ink-2);position:relative;flex:none;padding:0}
+.ib:hover{background:var(--hover)}
+.ib.sm{width:28px;height:28px}.ib.sm svg{width:20px;height:20px}
+.ib.on{background:var(--tonal);color:var(--on-tonal)}
+.logo{display:flex;align-items:center;gap:10px;padding:0 4px;min-width:204px;margin-right:12px;flex:none;font-size:22px;color:var(--ink-2);white-space:nowrap}
+.logo .mk{flex:none;width:40px;height:40px;border-radius:10px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-weight:500;font-size:20px}
+.logo b{font-weight:500;color:var(--ink)}
+.ttl-h{font-size:22px;line-height:28px;color:var(--ink);margin:0 0 0 12px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.badge{position:absolute;top:2px;right:0;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:#D93025;color:#fff;font-size:10px;line-height:16px;font-weight:500;text-align:center}
+.mob{display:none!important}
+
+/* ---------- botones ---------- */
+.btn{height:36px;padding:0 16px;border:1px solid var(--outline);border-radius:18px;background:none;color:var(--primary);font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;text-decoration:none;letter-spacing:.01em}
+.btn:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.btn.pri{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.btn.pri:hover{background:var(--primary);box-shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15)}
+.btn.txt{border-color:transparent}
 .btn.del{color:var(--danger)}
-.btn.sm{min-height:34px;padding:3px 11px;font-size:.88rem}
-.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.between{justify-content:space-between}
-.grid{display:grid;gap:16px}
+.btn.sm{height:32px;padding:0 12px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default}
+.btn svg{width:18px;height:18px}
+.hoy{color:var(--ink);height:40px;padding:0 20px;margin:0 10px 0 2px;border-radius:20px}
+.hoy:hover{background:var(--hover)}
+.vbtn{color:var(--ink);height:40px;padding:0 10px 0 18px;border-radius:20px;margin-left:6px;gap:4px}
+.vbtn:hover{background:var(--hover)}
 
-.steps{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 14px;padding:0;list-style:none;counter-reset:s;color:var(--ink-2);font-size:.92rem}
-.steps li{counter-increment:s}
-.steps li::before{content:counter(s)".";font-weight:700;color:var(--ink);margin-right:5px}
+/* ---------- estructura ---------- */
+.app{display:flex;height:calc(100% - 64px)}
+.side{width:256px;flex:none;overflow-y:auto;padding:8px 8px 16px 8px}
+.app.nosid .side{display:none}
+.cv{flex:1;min-width:0;background:var(--surface);border-radius:16px;margin:0 0 16px 0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.app.nosid .cv{margin-left:8px}
+.sp{width:328px;flex:none;background:var(--surface);border-radius:16px;margin:0 0 16px 8px;display:flex;flex-direction:column;overflow:hidden}
+.rail{width:56px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding-top:4px}
 
-.main{grid-template-columns:minmax(0,1.6fr) minmax(320px,1fr);align-items:start}
-@media(max-width:940px){.main{grid-template-columns:1fr}.pan{order:-1}}
-.seg{display:inline-flex;background:var(--field);border:1px solid var(--line);border-radius:9px;padding:3px}
-.seg button{border:0;background:none;padding:5px 14px;border-radius:7px;cursor:pointer;color:var(--ink-2);min-height:32px}
-.seg button[aria-selected=true]{background:var(--sheet);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.14)}
-.badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:var(--acc);color:var(--acc-ink);font-size:.78rem;font-weight:700;margin-left:6px;line-height:20px;text-align:center}
+/* ---------- barra lateral ---------- */
+.crear{display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 20px 0 16px;border:0;border-radius:16px;background:var(--surface);color:var(--ink);font-weight:500;font-size:14px;box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15);cursor:pointer;margin:0 0 20px 0}
+.crear:hover{box-shadow:var(--shadow);background:color-mix(in srgb,var(--surface) 92%,var(--primary))}
+.crear>svg:first-child{color:var(--primary);width:28px;height:28px}
+.crear>svg:last-child{width:20px;height:20px;color:var(--ink-2);margin-left:-4px}
+.mini{padding:0 4px 0 8px;margin-bottom:12px}
+.mh2{display:flex;align-items:center;justify-content:space-between;padding-left:8px;margin-bottom:2px;font-weight:500;color:var(--ink)}
+.mgd{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10px}
+.mgd .dl{color:var(--muted);font-weight:500;line-height:28px}
+.mgd button{width:26px;height:26px;margin:1px auto;border:0;border-radius:50%;background:none;font-size:10px;font-weight:500;cursor:pointer;padding:0;color:var(--ink)}
+.mgd button:hover{background:var(--hover)}
+.mgd .out{color:var(--muted)}
+.mgd .sel{background:var(--tonal);color:var(--on-tonal)}
+.mgd .today{background:var(--primary);color:var(--on-primary)}
+.mgd .today:hover{background:var(--primary)}
+.grp{margin:2px 0}
+.gh{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:0 6px 0 16px;height:40px;border-radius:20px;cursor:pointer;font-size:15px;font-weight:500;color:var(--ink);text-align:left}
+.gh:hover{background:var(--hover)}
+.gh svg{width:22px;height:22px;transition:transform .15s}
+.gh[aria-expanded=true] svg{transform:rotate(180deg)}
+.cb{display:flex;align-items:center;gap:16px;min-height:32px;margin:0;font-size:14px;font-weight:400;padding:4px 12px 4px 18px;border-radius:16px;cursor:pointer;color:var(--ink-2);position:relative;line-height:1.3}
+.cb:hover{background:var(--hover)}
+.cb input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.bx{width:18px;height:18px;border:2px solid var(--c);border-radius:2px;flex:none;display:grid;place-items:center}
+.cb input:checked+.bx{background:var(--c)}
+.cb input:checked+.bx::after{content:"";width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+.cb input:focus-visible+.bx{outline:2px solid var(--focus);outline-offset:2px}
+.slink{display:flex;align-items:center;gap:14px;width:100%;border:0;background:none;padding:0 16px;height:40px;border-radius:20px;cursor:pointer;color:var(--ink-2);margin-top:10px;text-align:left}
+.slink:hover{background:var(--hover)}
+.slink svg{width:20px;height:20px}
+.foot{font-size:12px;color:var(--muted);padding:8px 16px 0;margin:0}
+/* ---------- equipo: quién eres y calendario de cada persona ---------- */
+.av{flex:none;width:28px;height:28px;border-radius:50%;background:var(--c,#5F6368);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:500}
+.av.gen{background:var(--primary);color:var(--on-primary)}
+.yo{display:inline-flex;align-items:center;gap:8px;height:40px;border:1px solid var(--outline);border-radius:20px;background:none;padding:0 8px 0 6px;cursor:pointer;color:var(--ink);font:inherit;font-weight:500;margin-left:6px;max-width:220px}
+.yo:hover{background:var(--hover)}
+.yo span:not(.av){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.yo svg{width:20px;height:20px;flex:none}
+.pers{display:flex;align-items:center;gap:12px;width:100%;border:0;background:none;padding:4px 12px 4px 14px;min-height:40px;border-radius:20px;cursor:pointer;color:var(--ink-2);text-align:left;font:inherit}
+.pers:hover{background:var(--hover)}
+.pers.on{background:var(--tonal);color:var(--on-tonal);font-weight:500}
+.mis{margin:0 4px 10px;padding:10px 12px;border-radius:12px;background:var(--surface-2)}
+.mis h3{font-size:13px;font-weight:500;margin:0 0 6px;color:var(--ink)}
+.mi{display:block;width:100%;border:0;background:none;text-align:left;padding:6px 4px;border-radius:8px;cursor:pointer;color:var(--ink);font:inherit;font-size:13px;line-height:18px}
+.mi:hover{background:var(--hover)}
+.mi small{display:block;color:var(--muted);font-size:12px}
+.mi small b{color:var(--primary);font-weight:500}
+.quien{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;padding:16px;overflow:auto}
+.qbox{width:min(520px,100%);background:var(--surface);border-radius:24px;padding:28px 24px;box-shadow:var(--shadow);text-align:center}
+.qbox h1{font-size:26px;font-weight:400;margin:14px 0 4px}
+.qbox p{color:var(--ink-2);margin:0 0 18px}
+.qlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.qp{display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid var(--line);background:none;border-radius:16px;padding:14px 8px;cursor:pointer;color:var(--ink);font:inherit;font-weight:500}
+.qp:hover{background:var(--hover)}
+.qp.ult{border-color:var(--primary)}
+.qp .av{width:44px;height:44px;font-size:18px}
+.qbox .mk{width:48px;height:48px;border-radius:12px;background:var(--primary);color:var(--on-primary);display:inline-grid;place-items:center;font-size:24px;font-weight:500}
+.qnew{display:flex;gap:8px;margin-bottom:12px}
+.qnew input{flex:1}
+.eqs{display:flex;flex-wrap:wrap;gap:6px}
+.eqc{display:inline-flex;align-items:center;margin:0;cursor:pointer}
+.eqc input{position:absolute;opacity:0;width:1px;height:1px}
+.eqc span{border:1px solid var(--outline);border-radius:8px;padding:4px 10px;font-size:13px;color:var(--ink-2)}
+.eqc input:checked+span{background:var(--tonal);color:var(--on-tonal);border-color:transparent}
+.eqc input:focus-visible+span{outline:2px solid var(--focus)}
+.mviews{display:none;margin-bottom:12px}
+.mviews button{display:flex;align-items:center;width:100%;border:0;background:none;height:44px;padding:0 20px;border-radius:22px;cursor:pointer;font-weight:500;color:var(--ink-2);text-align:left}
+.mviews button.on{background:var(--tonal);color:var(--on-tonal)}
 
-/* calendario */
-.tb{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
-.tb strong{font-size:1.1rem;min-width:150px}
-.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}
-.dow{font-size:.75rem;color:var(--muted);text-align:center;padding:6px 0;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.day{min-height:92px;padding:4px;cursor:pointer;overflow:hidden;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--sheet)}
-.day:hover{background:var(--field)}
-.day.out{color:var(--muted);background:var(--field)}
-.day .n{display:inline-grid;place-items:center;min-width:24px;height:24px;font-size:.8rem;border-radius:50%}
-.day.today .n{background:var(--acc);color:var(--acc-ink);font-weight:700}
-.chip{display:block;font-size:.72rem;line-height:1.3;border-radius:4px;padding:1px 5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;border:0;width:100%;text-align:left;background:var(--acc-bg);color:var(--acc)}
-.more{font-size:.72rem;color:var(--muted);padding-left:5px}
-@media(max-width:600px){.day{min-height:56px}.cal .chip{font-size:0;height:6px;padding:0}}
-.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
-@media(max-width:760px){.wk{grid-template-columns:1fr}}
-.wd{border:1px solid var(--line);border-radius:10px;padding:8px;min-height:150px;cursor:pointer}
-.wd:hover{background:var(--field)}
-.wd .wh{font-size:.8rem;color:var(--muted);margin-bottom:6px;text-transform:capitalize}
-.wd .wh b{display:inline-grid;place-items:center;min-width:26px;height:26px;border-radius:50%;font-size:.95rem;color:var(--ink)}
-.wd.today .wh b{background:var(--acc);color:var(--acc-ink)}
-.wev{display:block;width:100%;text-align:left;border:0;background:var(--acc-bg);color:var(--ink);border-left:3px solid var(--acc);border-radius:6px;padding:5px 7px;margin-bottom:5px;cursor:pointer;font-size:.85rem;line-height:1.3}
-.wev span{display:block;color:var(--ink-2);font-size:.78rem}
+/* ---------- vista de mes ---------- */
+.mg{flex:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));min-height:0}
+.mc{position:relative;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 0 2px;min-height:0;overflow:hidden;text-align:center}
+.mc:nth-child(7n){border-right:0}
+.mc .dw{font-size:11px;font-weight:500;color:var(--muted);padding-top:4px;line-height:16px;letter-spacing:.8px;text-transform:uppercase}
+.dn{min-width:24px;height:24px;padding:0 6px;border:0;border-radius:12px;background:none;font-size:12px;font-weight:500;color:var(--ink);cursor:pointer;margin:2px 0 2px}
+.dn:hover{background:var(--hover)}
+.mc.out .dn{color:var(--muted)}
+.mc.today .dn{background:var(--primary);color:var(--on-primary)}
+.evs{text-align:left}
+.ch{display:flex;align-items:center;gap:6px;width:calc(100% - 8px);margin:0 4px 2px;height:20px;border:0;border-radius:4px;background:none;padding:0 4px;font-size:12px;line-height:20px;cursor:pointer;color:var(--ink);white-space:nowrap;overflow:hidden;text-align:left}
+.ch:hover{background:var(--hover)}
+.ch i{width:8px;height:8px;border-radius:50%;background:var(--c);flex:none}
+.ch .ct{flex:none;color:var(--ink-2)}
+.ch b{font-weight:500;overflow:hidden;text-overflow:ellipsis}
+.more{display:block;width:calc(100% - 8px);margin:0 4px;height:20px;border:0;border-radius:4px;background:none;text-align:left;padding:0 6px;font-size:12px;font-weight:500;color:var(--ink);cursor:pointer}
+.more:hover{background:var(--hover)}
 
-/* panel lateral */
-.pan{padding:0;overflow:hidden}
-.pan .tabs{display:flex;border-bottom:1px solid var(--line)}
-.pan .tabs button{flex:1;border:0;background:none;padding:12px 8px;cursor:pointer;color:var(--ink-2);border-bottom:3px solid transparent;min-height:46px}
-.pan .tabs button[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--acc)}
-.pp{padding:14px;max-height:680px;overflow:auto}
-.hint{color:var(--muted);font-size:.88rem;margin:8px 0 12px}
-.pc{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px;background:var(--sheet)}
-.pc .t{font-weight:600}
-.pc .m{color:var(--ink-2);font-size:.88rem}
-.pill{display:inline-block;font-size:.72rem;font-weight:600;border:1px solid var(--ink-2);border-radius:99px;padding:0 8px;margin-left:6px;color:var(--ink-2);vertical-align:middle}
-.warn{font-size:.85rem;color:var(--danger);margin:4px 0 0}
-.pc details{margin-top:6px;font-size:.88rem}
-.pc summary{cursor:pointer;color:var(--ink-2)}
-.pc .msg{white-space:pre-wrap;background:var(--field);border-radius:8px;padding:8px;margin:6px 0 0;color:var(--ink-2)}
-.imp{display:flex;gap:10px;align-items:flex-start;font-size:1rem;color:var(--ink);margin:0 0 8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
-.imp input{width:auto;margin-top:6px}
-.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.done{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:.88rem}
+/* ---------- vistas de día y semana ---------- */
+.tg{flex:1;overflow-y:auto;min-height:0;position:relative}
+.th,.tbd{display:grid;grid-template-columns:64px repeat(var(--n),minmax(0,1fr))}
+.th{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding-top:8px}
+.tz{font-size:10px;color:var(--muted);align-self:end;text-align:right;padding:0 8px 6px 0}
+.thd{text-align:center;padding-bottom:8px}
+.dw2{display:block;font-size:11px;font-weight:500;letter-spacing:.8px;color:var(--muted);text-transform:uppercase;line-height:20px}
+.dn2{width:46px;height:46px;border:0;border-radius:50%;background:none;font-size:26px;color:var(--ink-2);cursor:pointer;line-height:46px;padding:0}
+.dn2:hover{background:var(--hover)}
+.today>.dw2,.thd.today .dw2{color:var(--primary)}
+.today .dn2{background:var(--primary);color:var(--on-primary)}
+.gut{position:relative;background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hh)) no-repeat right top/8px 100%}
+.gut span{position:absolute;right:12px;transform:translateY(-50%);font-size:10px;color:var(--muted);white-space:nowrap}
+.col{position:relative;border-left:1px solid var(--line);background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px var(--hh))}
+.te{position:absolute;border:1px solid var(--surface);border-radius:4px;background:var(--c);color:#fff;padding:1px 6px;font-size:12px;line-height:16px;text-align:left;overflow:hidden;cursor:pointer;display:block;z-index:1}
+.te b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.te span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.te.one{white-space:nowrap;text-overflow:ellipsis}
+.te.one b{display:inline}
+.te:hover{box-shadow:var(--shadow);z-index:2}
+.now{position:absolute;left:-1px;right:0;height:2px;background:var(--now);z-index:3;pointer-events:none}
+.now::before{content:"";position:absolute;left:-6px;top:-5px;width:12px;height:12px;border-radius:50%;background:var(--now)}
+
+/* ---------- agenda ---------- */
+.ag{flex:1;overflow:auto;padding:8px 0}
+.agd{display:grid;grid-template-columns:132px 1fr;border-bottom:1px solid var(--line);padding:6px 8px 6px 0}
+.agn{display:flex;align-items:center;gap:6px;padding-left:12px;height:44px}
+.agn .dn2{width:40px;height:40px;font-size:22px;line-height:40px}
+.agm{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.agd.today .agm{color:var(--primary)}
+.agr{display:grid;grid-template-columns:20px 180px 1fr;align-items:center;gap:10px;width:100%;border:0;background:none;padding:0 12px;min-height:44px;border-radius:4px;cursor:pointer;text-align:left;color:var(--ink)}
+.agr:hover{background:var(--hover)}
+.agr i{width:12px;height:12px;border-radius:50%;background:var(--c);justify-self:center}
+.agr .at{color:var(--ink-2)}
+.agr b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- tarjeta emergente y menús ---------- */
+.pop{position:fixed;z-index:30;width:448px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto;background:var(--surface-2);border-radius:24px;box-shadow:var(--shadow-lg);padding:8px 8px 20px}
+.pop.narrow{width:232px;text-align:center;padding-bottom:12px}
+.pop.sheet{left:0!important;right:0;bottom:0;top:auto!important;width:auto;max-width:none;border-radius:28px 28px 0 0;max-height:82vh}
+.ptb{display:flex;justify-content:flex-end;gap:2px;margin-bottom:2px}
+.ptb .ib svg{width:20px;height:20px}
+.prow{display:grid;grid-template-columns:52px 1fr;align-items:start;padding:5px 16px 5px 0;color:var(--ink-2);text-align:left;overflow-wrap:anywhere}
+.prow>svg{width:20px;height:20px;justify-self:center}
+.prow>.sq{justify-self:center;margin-top:7px}
+.sq{display:inline-block;width:14px;height:14px;border-radius:4px;background:var(--c);flex:none}
+.ptt{font-size:22px;line-height:28px;color:var(--ink)}
+.psub{color:var(--ink-2);margin-top:2px}
+.pdh{margin:-28px 0 8px}
+.pdh .dw{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
+.pdl{text-align:left}
+.pdl .ch{width:100%;margin:0 0 2px}
+.menu{position:fixed;z-index:35;background:var(--surface-2);border-radius:8px;box-shadow:var(--shadow);padding:8px 0;min-width:220px}
+.menu button{display:flex;justify-content:space-between;align-items:center;gap:24px;width:100%;border:0;background:none;padding:0 16px;height:40px;cursor:pointer;text-align:left;color:var(--ink)}
+.menu button:hover,.menu button:focus-visible{background:var(--hover);outline:0}
+.menu kbd{font:inherit;color:var(--muted)}
+
+/* ---------- panel lateral (asistente) ---------- */
+.sph{display:flex;align-items:center;justify-content:space-between;padding:14px 8px 6px 20px}
+.spt{font-size:11px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.sps{font-size:18px;color:var(--ink);line-height:24px}
+.spb{flex:1;overflow:auto;padding:4px 12px 16px}
+.hint{color:var(--muted);font-size:13px;margin:8px 4px 12px}
+summary{cursor:pointer;color:var(--ink-2)}
 
 /* chat */
-.chat{display:flex;flex-direction:column;height:600px;padding:14px}
+.chat{display:flex;flex-direction:column;flex:1;min-height:0;padding:0 12px 12px}
 .msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px}
-.m2{max-width:92%;padding:8px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
-.m2.u{align-self:flex-end;background:var(--acc);color:var(--acc-ink)}
-.m2.a{align-self:flex-start;background:var(--field);border:1px solid var(--line)}
-.m2.s{align-self:center;color:var(--muted);font-size:.85rem;text-align:center}
+.m2{max-width:90%;padding:8px 14px;border-radius:18px;white-space:pre-wrap;word-wrap:break-word}
+.m2.u{align-self:flex-end;background:var(--primary);color:var(--on-primary);border-bottom-right-radius:4px}
+.m2.a{align-self:flex-start;background:var(--field);border-bottom-left-radius:4px}
+.m2.s{align-self:center;color:var(--muted);font-size:13px;text-align:center}
 .chat form{display:flex;gap:8px;margin-top:8px}
-.chat input[type=text]{flex:1;min-width:0}
+.chat input[type=text]{flex:1;min-width:0;border-radius:24px;padding:10px 16px}
 .sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.sug button{font-size:.8rem;border:1px solid var(--line);background:var(--field);border-radius:99px;padding:3px 10px;cursor:pointer}
-.act{border:1px dashed var(--ink-2);border-radius:10px;padding:8px;margin-top:6px;font-size:.88rem}
+.sug button{font-size:12px;border:1px solid var(--outline);background:none;border-radius:8px;padding:4px 12px;cursor:pointer;color:var(--ink-2)}
+.sug button:hover{background:var(--hover)}
+.act{border:1px dashed var(--outline);border-radius:12px;padding:8px 10px;margin-top:6px;font-size:13px}
 
-input,select,textarea{border:1px solid var(--line);background:var(--field);border-radius:8px;padding:8px 10px;width:100%}
-label{display:block;font-size:.85rem;color:var(--ink-2);margin:8px 0 3px}
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--sheet);color:var(--ink);padding:18px;width:min(620px,94vw);max-height:92vh}
-dialog::backdrop{background:rgba(5,8,14,.55)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.box{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
-.box summary{cursor:pointer;font-weight:600}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--ground);padding:8px 16px;border-radius:99px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
-.toast.on{opacity:1}
+/* ---------- formularios y diálogos ---------- */
+input,select,textarea{background:var(--field);border:0;border-radius:4px;padding:8px 10px;width:100%;min-height:36px}
+input:focus,select:focus,textarea:focus{outline:none;box-shadow:inset 0 -2px 0 var(--primary)}
+input[type=checkbox]{width:auto;min-height:0}
+label{display:block;font-size:12px;color:var(--ink-2);margin:12px 0 0;font-weight:500}
+label>input,label>select,label>textarea{display:block;margin-top:4px;font-weight:400;font-size:14px;color:var(--ink)}
+dialog{border:0;border-radius:28px;background:var(--surface);color:var(--ink);padding:20px 24px 24px;width:min(600px,94vw);max-height:92vh;box-shadow:var(--shadow-lg)}
+dialog::backdrop{background:rgba(0,0,0,.4)}
+dialog h2{font-size:22px;font-weight:400;margin:0;line-height:28px}
+dialog h3{font-size:14px;font-weight:500;margin:22px 0 2px;color:var(--ink)}
+h3 small{font-weight:400;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.between{justify-content:space-between}
+dialog form>.row:last-child{justify-content:flex-end;margin-top:20px!important}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.box{background:var(--surface-2);border-radius:12px;padding:12px 14px;margin-top:16px}
+.box summary{font-weight:500;color:var(--ink);display:flex;align-items:center;gap:10px}
+.box summary svg{width:20px;height:20px;color:var(--ink-2)}
+.ttl{font-size:22px;background:none;border-radius:0;box-shadow:inset 0 -1px 0 var(--line);padding:10px 0 6px;margin:8px 0 12px 48px;width:calc(100% - 48px)}
+.ttl:focus{box-shadow:inset 0 -2px 0 var(--primary)}
+.fr{display:grid;grid-template-columns:40px 1fr;align-items:center;gap:8px;margin:8px 0}
+.fr>svg{width:20px;height:20px;color:var(--ink-2);justify-self:center}
+.fr.top{align-items:start}.fr.top>svg{margin-top:8px}
+.dt{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dt input[type=date]{flex:1 1 150px;width:auto}
+.dt input[type=time]{flex:0 1 120px;width:auto}
+.dact{display:flex;gap:8px;align-items:center;margin-top:22px}
+.toast{position:fixed;left:24px;bottom:24px;max-width:calc(100vw - 48px);background:var(--snack);color:var(--on-snack);padding:6px 8px 6px 16px;border-radius:4px;min-height:48px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow);z-index:50;transform:translateY(16px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.on{opacity:1;transform:none;pointer-events:auto}
+.toast button{border:0;background:none;color:var(--snack-act);font-weight:500;cursor:pointer;padding:8px;border-radius:4px}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:38}
+
+
+/* ---------- actas ---------- */
+.actas{flex:1;display:flex;min-height:0}
+.al{width:250px;flex:none;border-right:1px solid var(--line);overflow:auto;padding:12px 8px}
+.alh{padding:0 4px 10px}
+.ali{display:block;width:100%;text-align:left;border:0;background:none;border-radius:12px;padding:8px 12px;cursor:pointer;color:var(--ink);margin-bottom:2px}
+.ali:hover{background:var(--hover)}
+.ali.on{background:var(--tonal);color:var(--on-tonal)}
+.ali b{display:block;font-weight:500}
+.ali span{font-size:12px;color:var(--muted)}
+.ali.on span{color:inherit;opacity:.8}
+.ad{flex:1;min-width:0;overflow:auto;padding:16px 24px 40px}
+.ah{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between}
+.ah2{font-size:22px;font-weight:400;margin:2px 0 0;line-height:28px}
+.ah .btn svg,.alh .btn svg,.vacio .btn svg{width:18px;height:18px}
+.ameta{display:flex;flex-wrap:wrap;gap:12px;margin:8px 0 4px}
+.ameta label{margin:4px 0 0;flex:1 1 200px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px}
+.fchip{height:32px;border:1px solid var(--outline);border-radius:8px;background:none;padding:0 12px;cursor:pointer;color:var(--ink-2);font-size:13px}
+.fchip b{font-weight:500;margin-left:4px}
+.fchip.on{background:var(--tonal);color:var(--on-tonal);border-color:transparent}
+.fchip.warnc:not(.on){border-color:#E37400;color:#B06000}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:16px 0 6px}
+.card{display:flex;flex-direction:column;align-items:flex-start;gap:0;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;cursor:pointer;color:var(--ink);font:inherit}
+.card:hover{background:var(--hover)}
+.card b{font-size:28px;font-weight:400;line-height:34px}
+.card span{font-weight:500;font-size:14px}
+.card small{font-size:12px;color:var(--muted);line-height:16px}
+.card.warn b{color:#B06000}
+.card.ok b{color:#188038}
+.card.on{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary);background:color-mix(in srgb,var(--primary) 8%,var(--surface))}
+.guia ol{margin:8px 0 0;padding-left:22px;line-height:1.6}
+.guia-txt{max-height:55vh;overflow:auto;line-height:1.55}
+.guia-txt h3{font-size:15px;font-weight:500;margin:14px 0 4px}
+.guia-txt ul{margin:0;padding-left:20px}
+.guia summary,.box summary{cursor:pointer;font-weight:500}
+.tbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 0}
+.tg2{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.tg2>summary{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:12px 16px;cursor:pointer;user-select:none}
+.tg2>summary::-webkit-details-marker{display:none}
+.tg2>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--ink-2);border-bottom:2px solid var(--ink-2);transform:rotate(-45deg);transition:transform .15s;margin-right:4px}
+.tg2[open]>summary::before{transform:rotate(45deg)}
+.tg2>summary:hover{background:var(--hover)}
+.tn{font-size:16px;font-weight:500;color:var(--ink)}
+.tc{font-size:13px;color:var(--muted)}
+.tc .ca{color:#B06000;font-weight:500}
+.tg2[open]>summary{border-bottom:1px solid var(--line)}
+.th3{font-weight:500;color:var(--ink-2);margin:0;padding:12px 16px 2px;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+.avs{font-size:13px;color:var(--ink-2);margin:0;padding:4px 16px 6px}
+.avs b{font-weight:500}
+.tr{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.th3+.tr,.avs+.tr,summary+.tr{border-top:0}
+.tr.aire{box-shadow:inset 4px 0 0 #F9AB00}
+.tr.hecha .tt{text-decoration:line-through;color:var(--muted)}
+.tt{color:var(--ink);font-size:15px;line-height:22px;overflow-wrap:anywhere}
+.tm{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px;color:var(--muted);margin-top:4px}
+.who{display:inline-flex;align-items:center;gap:4px;color:var(--ink-2);font-weight:500}
+.who svg{width:16px;height:16px}
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 8px;font-size:13px;border:0}
+.tag svg{width:14px;height:14px}
+.tag.aire{background:#FEEFC3;color:#7A4A00}
+.tag.ok{background:#E6F4EA;color:#0D652D}
+.tag.habl{background:var(--tonal);color:var(--on-tonal)}
+.tag.cal{background:var(--surface-2);color:var(--ink-2);cursor:pointer;font:inherit;font-size:13px}
+.tag.cal:hover{background:var(--hover)}
+.tacts{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px}
+.btn.ok{color:#188038;border-color:#188038}
+.btn.ok:hover{background:rgba(24,128,56,.08)}
+.btn.habl.on{background:var(--tonal);color:var(--on-tonal);border-color:transparent}
+.vacio{max-width:460px;margin:60px auto;text-align:center;color:var(--ink-2)}
+.vacio svg{width:48px;height:48px;color:var(--primary)}
+.vacio h2{font-weight:400;color:var(--ink)}
+.pp{margin:10px 0}
+.pp .m{font-size:13px;color:var(--ink-2);margin-top:2px}
+.hist{font-size:13px;color:var(--ink-2);max-height:180px;overflow:auto;background:var(--surface-2);border-radius:8px;padding:8px 10px}
+.hist div{margin:2px 0}
+.cf{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cf.ya{opacity:.6}
+.cf input[type=checkbox]{margin-top:10px}
+.cft{font-weight:500;margin-bottom:6px}
+.cf .dt select{width:auto}
+.cf .m{font-size:12px;color:var(--muted);margin-top:4px}
+.warn2{color:var(--danger);font-weight:500}
+.aviso{background:#FEEFC3;color:#7A4A00;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:8px}
+.imp{display:flex;gap:12px;align-items:flex-start;margin:0 0 8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;font-size:14px;font-weight:400;color:var(--ink)}
+.imp input{width:auto;min-height:0;margin-top:4px}
+.imp .m{color:var(--ink-2);font-size:13px}
+.msg{white-space:pre-wrap;background:var(--field);border-radius:8px;padding:8px 10px;margin:6px 0 0;color:var(--ink-2);font-size:13px;text-align:left;max-height:300px;overflow:auto}
+.allday{display:flex;flex-direction:column;gap:2px;padding:4px 4px 0;text-align:left}
+.allday .ch{width:100%;margin:0;background:color-mix(in srgb,var(--c) 18%,transparent)}
+@media(max-width:800px){.actas{flex-direction:column}.al{width:auto;border-right:0;border-bottom:1px solid var(--line);max-height:30vh}.ad{padding:12px}.tr{grid-template-columns:1fr}.tacts{justify-content:flex-start}.cards{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- teléfono ---------- */
+@media(max-width:800px){
+  .bar{padding:8px 4px}
+  .logo,.dsk,.vbtn,.rail{display:none!important}
+  .yo{border:0;padding:0 4px;margin:0}.yo span:not(.av),.yo svg{display:none}
+  .mob{display:inline-grid!important}
+  .ttl-h{font-size:18px;margin-left:4px}
+  .hoy{padding:0 14px;margin:0 2px}
+  .side{position:fixed;inset:0 auto 0 0;z-index:40;width:288px;max-width:85vw;background:var(--surface);transform:translateX(-100%);transition:transform .2s;padding-top:16px;box-shadow:var(--shadow-lg);visibility:hidden}
+  body.drw .side{transform:none;visibility:visible}
+  .app.nosid .side{display:block}
+  .cv,.app.nosid .cv{margin:0 4px 4px}
+  .sp{position:fixed;inset:0 0 0 auto;z-index:40;width:min(400px,100%);margin:0;border-radius:0}
+  .mviews{display:block}
+  .two{grid-template-columns:1fr}
+  .toast{left:12px;right:12px;bottom:12px;max-width:none}
+  .mc .dw{font-size:10px;letter-spacing:0}
+  .ch{gap:3px;padding:0 2px;margin:0 2px 2px;width:calc(100% - 4px)}
+  .ch .ct{display:none}
+  .th,.tbd{grid-template-columns:44px repeat(var(--n),minmax(0,1fr))}
+  .gut span{right:6px;font-size:9px}
+  .dn2{width:34px;height:34px;font-size:18px;line-height:34px}
+  .te{padding:1px 3px;font-size:11px}
+  .agd{grid-template-columns:76px 1fr}
+  .agn{flex-direction:column;gap:0;height:auto;padding-left:8px}
+  .agr{grid-template-columns:14px 1fr;row-gap:0;padding:6px 8px}
+  .agr .at{grid-column:2;grid-row:2;font-size:12px}
+  .agr b{grid-column:2;grid-row:1}
+  .agr i{grid-row:1/3}
+  .ttl{margin-left:0;width:100%}
+  dialog{padding:16px 16px 20px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header class="top">
-  <h1>Fondacio · Agenda<small>Altos de Cazucá · un calendario sencillo con bandeja de pendientes de WhatsApp</small></h1>
-  <div class="row">
-    <button class="btn pri" id="bNew">+ Crear actividad</button>
-    <button class="btn" id="bSet">Ajustes IA</button>
-  </div>
+<header class="bar">
+  <button class="ib" id="menu" aria-label="Menú principal" title="Menú principal"><i data-i="menu"></i></button>
+  <div class="logo"><span class="mk" aria-hidden="true">F</span><span><b>Fondacio</b> Agenda</span></div>
+  <button class="btn hoy" id="hoy" title="Hoy (T)">Hoy</button>
+  <button class="ib dsk" id="prev" aria-label="Anterior" title="Anterior (K)"><i data-i="left"></i></button>
+  <button class="ib dsk" id="next" aria-label="Siguiente" title="Siguiente (J)"><i data-i="right"></i></button>
+  <h1 class="ttl-h" id="titulo"></h1>
+  <span class="sp1"></span>
+  <button class="ib dsk" id="bSet" aria-label="Ajustes IA" title="Ajustes IA"><i data-i="gear"></i></button>
+  <button class="yo" id="bYo" aria-haspopup="menu" title="Cambiar de calendario o de persona"><span class="av" id="yoAv"></span><span id="yoN"></span><i data-i="drop"></i></button>
+  <button class="btn vbtn" id="vBtn" aria-haspopup="menu"><span id="vLbl">Mes</span><i data-i="drop"></i></button>
+  <button class="ib mob" id="mActas" aria-label="Actas"><i data-i="doc"></i></button>
+  <button class="ib mob" id="mAsis" aria-label="Asistente IA"><i data-i="spark"></i></button>
 </header>
 
-<main id="resumen">
-  <ol class="steps" aria-label="Cómo funciona">
-    <li>Te llega un mensaje por WhatsApp: pégalo o importa el chat en <strong>Pendientes</strong>.</li>
-    <li>Decide: <strong>aceptar</strong>, <strong>preguntar</strong> o <strong>rechazar</strong>.</li>
-    <li>Al aceptar pasa al calendario y respondes por WhatsApp desde aquí.</li>
-  </ol>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Barra lateral">
+    <button class="crear" id="crear"><i data-i="plus"></i><span>Crear</span></button>
+    <nav class="mviews" id="mViews" aria-label="Vistas"><button data-mv="agenda">Agenda</button><button data-mv="dia">Día</button><button data-mv="sem">Semana</button><button data-mv="mes">Mes</button><button data-mv="actas">Actas</button></nav>
+    <div class="mini" id="mini"></div>
+    <div id="misComp"></div>
+    <div class="grp"><button class="gh" aria-expanded="true">Mis calendarios<i data-i="down"></i></button><div id="cals"></div></div>
+    <div class="grp"><button class="gh" aria-expanded="true">Calendarios del equipo<i data-i="down"></i></button><div id="pers"></div></div>
+    <button class="slink" id="sideActas"><i data-i="doc"></i>Actas de los viernes</button>
+    <button class="slink" id="sideSet" style="margin-top:0"><i data-i="gear"></i>Ajustes IA</button>
+    <p class="foot">Altos de Cazucá · los datos se guardan solo en este navegador.</p>
+  </aside>
 
-  <div class="grid main">
-    <section class="card" aria-label="Calendario">
-      <div class="tb">
-        <div class="row"><button class="btn sm" id="hoy">Hoy</button>
-          <button class="btn sm" id="prev" aria-label="Anterior">‹</button><button class="btn sm" id="next" aria-label="Siguiente">›</button>
-          <strong id="titulo"></strong></div>
-        <div class="row"><select id="fEje" style="width:auto" aria-label="Filtrar por eje"></select>
-          <div class="seg" role="tablist"><button role="tab" id="vMes" aria-selected="true">Mes</button><button role="tab" id="vSem" aria-selected="false">Semana</button></div></div>
-      </div>
-      <div id="calMes" class="cal"></div>
-      <div id="calSem" class="wk" hidden></div>
-    </section>
+  <main class="cv" id="cv" aria-label="Calendario"></main>
 
-    <section class="card pan" aria-label="Pendientes y asistente">
-      <div class="tabs" role="tablist"><button role="tab" id="tPend" aria-selected="true">Pendientes<span class="badge" id="nPend">0</span></button><button role="tab" id="tAsis" aria-selected="false">Asistente IA</button></div>
+  <section class="sp" id="sp" aria-label="Panel lateral" hidden>
+    <div class="sph"><div><div class="spt">Asistente</div><div class="sps">IA de Fondacio</div></div><button class="ib" id="spX" aria-label="Cerrar panel" title="Cerrar"><i data-i="x"></i></button></div>
+    <div class="chat" id="pAsis">
+      <div class="row between"><span class="hint" style="margin:0">Pregunta por tu agenda</span><button class="btn sm txt" id="bClr">Limpiar</button></div>
+      <div class="msgs" id="msgs" aria-live="polite"></div>
+      <div class="sug" id="sug"></div>
+      <form id="chatForm"><input type="text" id="chatIn" placeholder="Ej: ¿qué tengo esta semana?" aria-label="Mensaje"><button class="btn pri" type="submit">Enviar</button></form>
+    </div>
+  </section>
 
-      <div class="pp" id="pPend">
-        <div class="row"><button class="btn pri" id="bPend" style="flex:1;justify-content:center">+ Guardar un mensaje</button><button class="btn" id="bImp" style="flex:1;justify-content:center">Importar chat <span class="pill">beta</span></button></div>
-        <p class="hint">Aquí quedan las invitaciones y reuniones que te llegan. No entran al calendario hasta que las aceptes.</p>
-        <div id="listaPend"></div>
-        <details style="margin-top:12px"><summary id="resp" style="cursor:pointer;color:var(--ink-2)">Respondidas</summary><div id="listaResp"></div></details>
-      </div>
-
-      <div class="chat" id="pAsis" hidden>
-        <div class="row between"><strong>Asistente con IA</strong><button class="btn sm" id="bClr">Limpiar</button></div>
-        <div class="msgs" id="msgs" aria-live="polite"></div>
-        <div class="sug" id="sug"></div>
-        <form id="chatForm"><input type="text" id="chatIn" placeholder="Ej: ¿qué tengo pendiente por responder?" aria-label="Mensaje"><button class="btn pri" type="submit">Enviar</button></form>
-      </div>
-    </section>
-  </div>
-  </main>
-
+  <nav class="rail" aria-label="Paneles">
+    <button class="ib" id="rActas" aria-label="Actas de los viernes" title="Actas de los viernes"><i data-i="doc"></i></button>
+    <button class="ib" id="rAsis" aria-label="Asistente IA" title="Asistente IA"><i data-i="spark"></i></button>
+  </nav>
 </div>
 
+<div class="pop" id="pop" role="dialog" tabindex="-1" hidden></div>
+<div class="menu" id="menuEl" role="menu" hidden></div>
+<div id="scrim" hidden></div>
+<div class="quien" id="quien" hidden role="dialog" aria-modal="true" aria-labelledby="qT"><div class="qbox"><span class="mk" aria-hidden="true">F</span><h1 id="qT">¿Quién eres?</h1><p>Elige tu nombre para ver tu calendario y tus compromisos.</p><div id="qCuerpo"></div><button class="btn" data-q="">Ver el calendario general</button> <button class="btn txt" id="qEq">Editar el equipo</button></div></div>
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" role="status"></div>
 
@@ -204,20 +482,6 @@ function seed(){
       {id:uid(),titulo:"Jornada de clasificación de ropa",eje:"eco",fecha:f(4),ini:"09:00",fin:"12:00",lugar:"Sede Fondacio",obj:"Clasificar y registrar las donaciones."},
       {id:uid(),titulo:"Feria de economía circular",eje:"eco",fecha:f(12),ini:"08:00",fin:"14:00",lugar:"Parque principal",obj:"Vender ropa donada y recaudar fondos."}
     ],
-    pend:[
-      {id:uid(),estado:"pendiente",de:"Valentina",tel:"",tipo:"Solicitud de visita",org:"Grupo de Automatización de la Huerta Urbana",titulo:"Visita",
-       resumen:"Quieren visitar la huerta hidropónica y saber qué día está César.",persona:"César, encargado de la huerta hidropónica",plazo:"esta semana",
-       fecha:"",ini:"",fin:"",lugar:"",recibido:new Date(Date.now()-3*3600e3).toISOString(),
-       texto:"Hola Rodolfo, feliz tarde.\nSoy del grupo de Automatización de la Huerta Urbana.\nNos gustaría saber qué día se encuentra César, encargado de la huerta hidropónica, para realizar una visita esta semana."},
-      {id:uid(),estado:"pendiente",de:"Rodolfo",tel:"",tipo:"Taller",org:"Fondacio",titulo:"Taller de habilidades digitales",
-       resumen:"Los invitan al taller y piden confirmar asistencia.",persona:"",plazo:"",
-       fecha:f(3),ini:"15:00",fin:"16:30",lugar:"Sede Fondacio",recibido:new Date(Date.now()-26*3600e3).toISOString(),
-       texto:`Hola, los invitamos al taller de habilidades digitales el ${fechaLarga(f(3))} de 3:00 a 4:30 pm en la sede de Fondacio. Por favor confirmen asistencia.`},
-      {id:uid(),estado:"pendiente",de:"Grupo Voluntarias",tel:"",tipo:"Evento",org:"Grupo de Voluntarias",titulo:"Jornada con las familias del barrio",
-       resumen:"Organizan una jornada con las familias y avisarán la fecha.",persona:"",plazo:"cuando tengan fecha",
-       fecha:"",ini:"",fin:"",lugar:"",recibido:new Date(Date.now()-50*3600e3).toISOString(),
-       texto:"Buenas! Estamos organizando una jornada con las familias del barrio, apenas tengamos fecha les confirmamos."}
-    ],
     cfg:{key:"",prov:"groq",model:"openai/gpt-oss-120b"},
     chat:[]
   };
@@ -227,390 +491,277 @@ const CLAVE_INCLUIDA=window.CLAVE_INCLUIDA||"";
 let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
 if(!S||!S.eventos)S=seed();
-S.cfg=S.cfg||{};if(!PROV[S.cfg.prov]){S.cfg.prov="groq";S.cfg.model=PROV.groq.model}S.cfg.key=S.cfg.key||CLAVE_INCLUIDA;if(S.cfg.model==="llama-3.3-70b-versatile")S.cfg.model=PROV.groq.model;S.chat=S.chat||[];S.pend=S.pend||seed().pend;
-S.pend.forEach(p=>{if(p.tipo!==undefined)return;const a=analizar(p.texto||"",p.recibido?new Date(p.recibido):null);
-  ["tipo","org","persona","plazo","resumen"].forEach(k=>{if(p[k]===undefined)p[k]=a[k]||""});if(!p.titulo&&a.titulo)p.titulo=a.titulo});
+S.cfg=S.cfg||{};if(!PROV[S.cfg.prov]){S.cfg.prov="groq";S.cfg.model=PROV.groq.model}S.cfg.key=S.cfg.key||CLAVE_INCLUIDA;if(S.cfg.model==="llama-3.3-70b-versatile")S.cfg.model=PROV.groq.model;S.chat=S.chat||[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}}
-function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600)}
+function toast(t,lbl,fn){const e=$("#toast");e.innerHTML=`<span></span>${lbl?`<button type="button">${esc(lbl)}</button>`:""}`;e.firstChild.textContent=t;
+  if(lbl)e.querySelector("button").onclick=()=>{e.classList.remove("on");fn()};e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),lbl?6000:3000)}
 
-/* ---------- entender un mensaje de WhatsApp (sin IA, con reglas simples) ---------- */
-function analizar(texto,base){
-  const r={titulo:"",fecha:"",ini:"",fin:"",lugar:"",tipo:"",org:"",persona:"",plazo:"",resumen:""},s=texto.toLowerCase();
-  const MK="(a\\.?\\s?m\\.?|p\\.?\\s?m\\.?|de la mañana|de la tarde|de la noche)";
-  const pm=m=>/p\.?\s?m|tarde|noche/.test(m||""),am=m=>/a\.?\s?m|mañana/.test(m||"");
-  const conv=(h,m,mk)=>{h=+h;if(h>23)return"";if(pm(mk)&&h<12)h+=12;else if(am(mk)&&h===12)h=0;else if(!mk&&h>=1&&h<=6)h+=12;return`${pad(h)}:${pad(+m||0)}`};
-  let m=s.match(new RegExp("(?:de|entre)\\s+(?:las\\s+)?(\\d{1,2})(?:[:.](\\d{2}))?\\s*(?:a|y|hasta|-)\\s*(?:las\\s+)?(\\d{1,2})(?:[:.](\\d{2}))?\\s*"+MK+"?"));
-  if(m&&(/\blas\b/.test(m[0])||m[5]||m[2]||m[4])){r.fin=conv(m[3],m[4],m[5]);r.ini=conv(m[1],m[2],m[5]);if(r.ini&&r.fin&&r.ini>=r.fin&&+r.ini.slice(0,2)>=12)r.ini=pad(+r.ini.slice(0,2)-12)+r.ini.slice(2)}
-  else if((m=s.match(new RegExp("\\b(\\d{1,2})[:.](\\d{2})\\s*"+MK+"?"))))r.ini=conv(m[1],m[2],m[3]);
-  else if((m=s.match(new RegExp("\\b(\\d{1,2})\\s*"+MK+"(?![a-záéíóúñ])"))))r.ini=conv(m[1],0,m[2]);
-  else if((m=s.match(/\ba las\s+(\d{1,2})\b(?!\s*(?:de|\/))/)))r.ini=conv(m[1],0,"");
-  const hoy=base?new Date(base):new Date();hoy.setHours(0,0,0,0);
-  const mas=n=>{const d=new Date(hoy);d.setDate(d.getDate()+n);return iso(d)};
-  const mesRe=MESES.join("|");
-  if((m=s.match(new RegExp("\\b(\\d{1,2})\\s+de\\s+("+mesRe+")(?:\\s+(?:de\\s+)?(\\d{4}))?")))){
-    let d=new Date(m[3]?+m[3]:hoy.getFullYear(),MESES.indexOf(m[2]),+m[1]);if(!m[3]&&d<hoy)d.setFullYear(d.getFullYear()+1);r.fecha=iso(d)}
-  else if((m=s.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/))){
-    let y=m[3]?+m[3]:hoy.getFullYear();if(y<100)y+=2000;let d=new Date(y,+m[2]-1,+m[1]);if(!m[3]&&d<hoy)d.setFullYear(d.getFullYear()+1);r.fecha=iso(d)}
-  else if(/pasado mañana/.test(s))r.fecha=mas(2);
-  else if(/\bhoy\b|\besta (?:tarde|noche|mañana)\b/.test(s))r.fecha=mas(0);
-  else{
-    let i=-1,k=-1;while((i=s.indexOf("mañana",i+1))>=0){if(!/(^|\s)la\s$/.test(s.slice(0,i))&&!/de la $/.test(s.slice(0,i))){k=i;break}}
-    if(k>=0)r.fecha=mas(1);
-    else if((m=s.match(/\b(lunes|martes|miércoles|miercoles|jueves|viernes|sábado|sabado|domingo)\b/))){
-      const wd={domingo:0,lunes:1,martes:2,miércoles:3,miercoles:3,jueves:4,viernes:5,sábado:6,sabado:6}[m[1]];
-      let diff=(wd-hoy.getDay()+7)%7;if(diff===0)diff=7;r.fecha=mas(diff)}
-  }
-  if((m=texto.match(/\b(?:lugar|dirección|direccion|sede)\s*:\s*([^\n.]+)/i)))r.lugar=m[1].trim();
-  else if((m=texto.match(/\ben (?:el |la |los |las )?((?:sede|salón|salon|parque|casa|colegio|iglesia|centro|biblioteca|cancha|sala)[^.,\n]*?)(?=\s+(?:a las|para|por|el|este)\b|[.,\n]|$)/i)))r.lugar=cap(m[1].trim());
-  if((m=texto.match(/\b(taller|reuni[oó]n|jornada|feria|encuentro|capacitaci[oó]n|asamblea|evento|charla|visita)\b(?:\s+(?:de|del|con)\s+(?!\d)[^\s,.]+(?:\s+(?!\d)(?!(?:el|la|los|las|en|a|al|para|por|un|una|este|esta|hoy|mañana|lunes|martes|miércoles|jueves|viernes|sábado|domingo|desde|que|y)\b)[^\s,.]+){0,3})?/i)))r.titulo=cap(m[0].trim());
-  if((m=texto.match(/\b(?:soy|somos|escribo|escribimos)\s+(?:del|de la|de los|de las)\s+([^.,\n]{3,80})/i)))r.org=cap(m[1].trim());
-  if((m=texto.match(/(?:[Ss]aber (?:qué día|cuándo)(?: se encuentra| está| puede)?|[Hh]ablar con|[Bb]uscamos a|[Pp]reguntar por)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:,\s*[^.,\n]{3,60})?)/)))r.persona=m[1].trim();
-  if((m=s.match(/\b(esta semana|la próxima semana|la proxima semana|este mes|lo antes posible|urgente)\b/)))r.plazo=m[1];
-  r.tipo=/visita/.test(s)?"Solicitud de visita":/disponibilidad/.test(s)?"Consulta de disponibilidad":/taller|charla|capacitaci/.test(s)?"Taller":/reuni[oó]n|\bcita\b/.test(s)?"Reunión":/feria|jornada|encuentro|evento/.test(s)?"Evento":/invit/.test(s)?"Invitación":"";
-  return r;
-}
-function choque(p){
-  if(!p.fecha||!p.ini)return null;
-  const a=mins(p.ini),b=p.fin?mins(p.fin):a+60;
-  return S.eventos.find(e=>e.fecha===p.fecha&&e.id!==p.eventoId&&mins(e.ini)<b&&a<(e.fin?mins(e.fin):mins(e.ini)+60))||null;
-}
-function waUrl(tel,txt){let d=String(tel||"").replace(/\D/g,"");if(d.length===10&&d[0]==="3")d="57"+d;return"https://wa.me/"+d+"?text="+encodeURIComponent(txt)}
-const abrirWa=(tel,txt)=>window.open(waUrl(tel,txt),"_blank","noopener");
+/* ---------- íconos ---------- */
+const ic=p=>`<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="${p}"/></svg>`;
+const I={
+  menu:ic("M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"),
+  left:ic("M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"),
+  right:ic("M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"),
+  drop:ic("M7 10l5 5 5-5z"),
+  down:ic("M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"),
+  gear:ic("M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"),
+  inbox:ic("M19 3H4.99c-1.11 0-1.98.89-1.98 2L3 19c0 1.1.88 2 1.99 2H19c1.1 0 2-.9 2-2V5c0-1.11-.9-2-2-2zm0 12h-4c0 1.66-1.35 3-3 3s-3-1.34-3-3H4.99V5H19v10z"),
+  spark:ic("M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"),
+  plus:ic("M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"),
+  addc:ic("M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"),
+  imp:ic("M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"),
+  x:ic("M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"),
+  edit:ic("M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"),
+  del:ic("M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"),
+  clock:ic("M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"),
+  place:ic("M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"),
+  people:ic("M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"),
+  person:ic("M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"),
+  notes:ic("M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"),
+  cal:ic("M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"),
+  chat:ic("M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"),
+  warn:ic("M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"),
+  doc:ic("M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"),
+  up:ic("M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"),
+  copy:ic("M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"),
+  mic:ic("M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"),
+  check:ic("M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"),
+  rep:ic("M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z")
+};
+const X=`<button type="button" class="ib" id="x" aria-label="Cerrar" title="Cerrar">${I.x}</button>`;
 
-/* ---------- importar un chat exportado de WhatsApp (beta) ---------- */
-const RE_LINEA=/^\[?(?:(\d{1,2}\/\d{1,2}\/\d{2,4})[,\s]+(\d{1,2}:\d{2})(?::\d{2})?\s*([ap]\.?\s?m\.?)?|(\d{1,2}:\d{2})(?::\d{2})?\s*([ap]\.?\s?m\.?)?[,\s]+(\d{1,2}\/\d{1,2}\/\d{2,4}))\]?\s*[-–]?\s*([^:\n]{1,60}?):\s?(.*)$/i;
-function parseChat(raw,fmt){
-  const out=[];
-  for(const ln of raw.replace(/[‎‏‪-‮]/g,"").split(/\r?\n/)){
-    const m=ln.match(RE_LINEA);
-    if(m)out.push({f:m[1]||m[6],h:m[2]||m[4],ap:m[3]||m[5]||"",de:m[7].trim(),texto:m[8]});
-    else if(out.length)out[out.length-1].texto+="\n"+ln;
-  }
-  const fs=out.map(x=>x.f.split("/").map(Number));
-  const mdy=fmt==="mdy"||(!fmt&&fs.some(([a,b])=>b>12)&&!fs.some(([a])=>a>12));
-  return out.map(x=>{
-    let[a,b,y]=x.f.split("/").map(Number);if(y<100)y+=2000;
-    const[mo,d]=mdy?[a,b]:[b,a];let[hh,mm]=x.h.split(":").map(Number);const ap=x.ap.toLowerCase();
-    if(/p/.test(ap)&&hh<12)hh+=12;else if(/a/.test(ap)&&hh===12)hh=0;
-    return{ts:new Date(y,mo-1,d,hh,mm),de:x.de,texto:x.texto.trim()}
-  }).filter(x=>x.texto&&!isNaN(x.ts)&&!/omitid[oa]|omitted/i.test(x.texto));
-}
-const ACEPTA=/^(s[ií]\b|claro|perfecto|dale\b|listo|de acuerdo|ok\b|vale\b|bueno\b|confirmo|con gusto|all[aá] nos vemos)|me parece (?:bien|perfecto)|\bconfirmo\b/i;
-const RELEV=/visita|reuni[oó]n|\bcita\b|disponibilidad|taller|jornada|feria|encuentro|invit|agendar|asamblea|evento|charla|capacitaci[oó]n|te parece/i;
-/* Qué mensajes parecen actividades. Si el otro (o tú) respondió que sí, ya está confirmada. */
-function candidatosChat(msgs,yo){
-  const res=[],hoy=iso(new Date());
-  msgs.forEach((m,i)=>{
-    if(ACEPTA.test(m.texto.trim()))return;
-    const a=analizar(m.texto,m.ts);
-    if(!(a.fecha||a.ini||RELEV.test(m.texto)))return;
-    let conf=false,otro=m.de;
-    if(yo&&a.fecha&&a.ini)for(const n of msgs.slice(i+1,i+4)){
-      const t=n.texto.trim();
-      if(n.de!==m.de&&(m.de===yo||n.de===yo)&&ACEPTA.test(t)&&!/^no\b/i.test(t)){conf=true;otro=m.de===yo?n.de:m.de;break}}
-    if(yo&&m.de===yo&&!conf)return;
-    const ref=m.ts.getTime()+"|"+m.de+"|"+m.texto.slice(0,40);
-    res.push({m,a,conf,ref,titulo:a.titulo||(conf?"Reunión con "+otro:""),pasada:!!a.fecha&&a.fecha<hoy,dup:S.pend.some(p=>p.ref===ref),
-      tel:m.de!==yo&&/^\+?[\d\s-]{10,}$/.test(m.de)?m.de.replace(/\D/g,""):""});
-  });
-  return res;
-}
-function chatEjemplo(){
-  const t=new Date(),a=new Date(t);a.setDate(t.getDate()-5);
-  const fe=d=>`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`,f=fe(t),g=fe(a);
-  return `[12:55 PM, ${g}] Andrés: Buenas tardes Rodolfo, cómo estás. Te escribo para preguntarte por la disponibilidad de una visita esta semana con el grupo de formación en habilidades digitales.
-[10:19 AM, ${f}] +57 300 000 0000: Hola Andrés
-Gusto de saludarte
-
-¿Te parece bien esta tarde a las 15:00?
-[10:31 AM, ${f}] Andrés: hola Rodolfo, cómo estás
-[10:31 AM, ${f}] Andrés: sí me parece perfecto
-[10:31 AM, ${f}] Andrés: allá nos vemos a las 3
-[10:40 AM, ${f}] +57 300 000 0000: Vale. Gracias.
-[12:03 PM, ${f}] Valentina: Hola Rodolfo, feliz tarde.
-Soy del grupo de Automatización de la Huerta Urbana.
-Nos gustaría saber qué día se encuentra César, encargado de la huerta hidropónica, para realizar una visita esta semana.`;
-}
-
-function cuandoTs(ts){const d=new Date(ts);return`${fechaLarga(iso(d))}, ${hora(pad(d.getHours())+":"+pad(d.getMinutes()))}`}
-function hace(ts){const m=Math.round((Date.now()-new Date(ts))/60000);if(m<1)return"ahora";if(m<60)return`hace ${m} min`;const h=Math.round(m/60);if(h<24)return`hace ${h} h`;const d=Math.round(h/24);return`hace ${d} ${d===1?"día":"días"}`}
-const palabras=t=>(t||"").trim().split(/\s+/).filter(Boolean).length;
-
-/* ---------- estado de las vistas ---------- */
-let cursor=new Date(),vista="mes",ejeSel="";
-const visibles=()=>S.eventos.filter(e=>!ejeSel||e.eje===ejeSel).sort(ord);
+/* ---------- colores y estado de las vistas ---------- */
+const COL={form:"#039BE5",com:"#33B679",eco:"#F4511E",eq:"#8E24AA"};
+const DOW3=["dom","lun","mar","mié","jue","vie","sáb"];
+const VN={dia:"Día",sem:"Semana",mes:"Mes",agenda:"Agenda",actas:"Actas"};
+const HH=48;
+const TZ=(()=>{const o=-new Date().getTimezoneOffset()/60;return"GMT"+(o<0?"-":"+")+pad(Math.abs(Math.trunc(o)))})();
+S.ui=Object.assign({ocultos:[],panel:null,side:true,vista:"mes"},S.ui||{});
+if(!VN[S.ui.vista])S.ui.vista="mes";
+let cursor=new Date(),vista=S.ui.vista,mini=new Date(cursor.getFullYear(),cursor.getMonth(),1);
+cursor.setHours(0,0,0,0);
+const movil=()=>matchMedia("(max-width:800px)").matches;
 function lunes(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+function irA(d){cursor=new Date(d);cursor.setHours(0,0,0,0);mini=new Date(cursor.getFullYear(),cursor.getMonth(),1)}
+function mover(s){if(vista==="actas"){const l=actasOrden(),i=l.findIndex(a=>a.id===actaSel),j=Math.max(0,Math.min(l.length-1,i+s));if(l[j]){actaSel=l[j].id;filtroActa="todo";renderCal()}return}const d=new Date(cursor);if(vista==="mes"){d.setDate(1);d.setMonth(d.getMonth()+s)}else d.setDate(d.getDate()+s*(vista==="dia"?1:7));irA(d);renderCal()}
+function setVista(v){if(!VN[v])return;vista=v;S.ui.vista=v;if(v!=="actas")S.ui.vistaCal=v;save();renderCal()}
+const visibles=()=>S.eventos.filter(e=>!S.ui.ocultos.includes(e.eje)&&(!S.ui.cal||esDe(e,S.ui.cal))).sort(ord);
+/* ---------- equipo: cada persona tiene su calendario; el general muestra todo ---------- */
+const EQ=()=>S.equipo||[];
+const llave=n=>String(n||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+const PCOL=["#D50000","#E67C73","#F4511E","#F6BF26","#33B679","#0B8043","#039BE5","#3F51B5","#7986CB","#8E24AA","#616161","#795548"];
+const colorDe=n=>{const i=EQ().findIndex(x=>llave(x)===llave(n));return PCOL[(i<0?0:i)%PCOL.length]};
+const avatar=n=>n?`<span class="av" style="--c:${colorDe(n)}" aria-hidden="true">${esc(n.charAt(0).toUpperCase())}</span>`:`<span class="av gen" aria-hidden="true">${I.people}</span>`;
+function paraDe(e){
+  if(Array.isArray(e.para)&&e.para.length)return e.para;
+  const t=e.tareaId&&S.tareas&&S.tareas.find(x=>x.id===e.tareaId),txt=llave((e.con||"")+" "+(t?t.resp:""));
+  return EQ().filter(n=>new RegExp("(^|[^a-zñ])"+llave(n)+"($|[^a-zñ])").test(txt));
+}
+const esDe=(e,n)=>{const p=paraDe(e);return p.includes("Todos")||p.some(x=>llave(x)===llave(n))};
+function delDia(k){
+  const wd=pf(k).getDay();
+  const a=visibles().filter(e=>e.fecha===k||(e.rep==="semanal"&&k>e.fecha&&pf(e.fecha).getDay()===wd&&(!e.hasta||k<=e.hasta))).map(e=>({t:"ev",id:e.id,titulo:e.titulo,ini:e.ini||"",fin:e.fin,lugar:e.lugar,color:COL[e.eje]||COL.eq}));
+  return a.sort((x,y)=>(x.ini||"").localeCompare(y.ini||""));
+}
+/* hora corta, como en los chips del mes: "3 p. m.", "6:30 p. m." */
+const hc=h=>{if(!h)return"";const[a,b]=h.split(":").map(Number);return`${a%12||12}${b?":"+pad(b):""} ${a>=12?"p. m.":"a. m."}`};
+const rango=(i,f)=>{if(!i)return"Todo el día";if(!f)return hora(i);return(+i.slice(0,2)>=12)===(+f.slice(0,2)>=12)?`${hora(i).replace(/ [ap]\. m\.$/,"")} – ${hora(f)}`:`${hora(i)} – ${hora(f)}`};
+const chip=x=>`<button class="ch" data-${x.t}="${x.id}" style="--c:${x.color}" title="${esc(x.titulo)} · ${esc(rango(x.ini,x.fin))}"><i></i><span class="ct">${esc(hc(x.ini))}</span><b>${esc(x.titulo)}</b></button>`;
 
-function render(){renderCal();renderPend();renderFiltro()}
-function renderFiltro(){
-  $("#fEje").innerHTML=`<option value="">Todos los ejes</option>`+Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k===ejeSel?"selected":""}>${v}</option>`).join("");
+/* Reparte en columnas los eventos que se cruzan, como Google Calendar */
+function columnas(items){
+  items.sort((a,b)=>a.s-b.s||b.e-a.e);
+  const grupos=[];let g=[],fin=-1;
+  for(const it of items){if(g.length&&it.s>=fin){grupos.push(g);g=[]}g.push(it);fin=Math.max(fin,it.e)}
+  if(g.length)grupos.push(g);
+  for(const gr of grupos){const cols=[];for(const it of gr){let c=cols.findIndex(t=>t<=it.s);if(c<0){c=cols.length;cols.push(0)}cols[c]=it.e;it.c=c}gr.forEach(it=>it.n=cols.length)}
+}
+
+function render(){renderCal();if($("#pers"))renderPersonas()}
+function renderPersonas(){
+  $("#pers").innerHTML=[["","General (todo el equipo)"],...EQ().map(n=>[n,n])].map(([k,l])=>`<button class="pers ${(S.ui.cal||"")===k?"on":""}" data-cal="${esc(k)}" aria-pressed="${(S.ui.cal||"")===k}">${avatar(k)}<span>${esc(l)}${k&&llave(k)===llave(S.ui.yo)?" (tú)":""}</span></button>`).join("")
+    +`<button class="pers" id="bEq" style="color:var(--muted)"><span class="av gen" style="background:none;color:var(--muted)">${I.edit}</span><span>Editar el equipo</span></button>`;
+  const n=S.ui.cal;$("#yoAv").outerHTML=avatar(n).replace('class="av','id="yoAv" class="av');$("#yoN").textContent=n?"Calendario de "+n:"Calendario general";
+  const box=$("#misComp");if(!n||!S.tareas){box.innerHTML="";return}
+  const l=misCompromisos(n);
+  box.innerHTML=`<div class="mis"><h3>Compromisos de ${esc(n)} (${l.length})</h3>${l.length?l.slice(0,5).map(t=>{const ev=t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
+    return`<button class="mi" data-mc="${t.id}">${esc(t.texto.length>90?t.texto.slice(0,88)+"…":t.texto)}<small>${ev?esc(cap(fechaLarga(ev.fecha))):"<b>Ponerlo en el calendario</b>"} · desde el ${esc(fechaCorta(t.desde))}</small></button>`}).join("")
+    +(l.length>5?`<button class="mi" data-mc="todos"><small><b>Ver los ${l.length} en las actas</b></small></button>`:""):`<p class="hint" style="margin:0">No tiene compromisos abiertos en las actas.</p>`}</div>`;
+}
+function misCompromisos(n){return(S.tareas||[]).filter(t=>t.estado==="abierta"&&llave(t.resp)===llave(n)).sort((a,b)=>ultMencion(b).localeCompare(ultMencion(a))||b.desde.localeCompare(a.desde))}
+function verCal(n){S.ui.cal=n||"";save();renderPersonas();if(vista==="actas")setVista(S.ui.vistaCal||"sem");else renderCal()}
+function pantallaQuien(){
+  const q=$("#quien"),eq=EQ();
+  $("#qCuerpo").innerHTML=eq.length?`<div class="qlist">${eq.map(n=>`<button class="qp ${llave(n)===llave(S.ui.yo)?"ult":""}" data-q="${esc(n)}">${avatar(n)}${esc(n)}</button>`).join("")}</div>`
+    :`<form class="qnew" id="qNew"><input name="n" placeholder="Escribe tu nombre" aria-label="Tu nombre" required><button class="btn pri">Entrar</button></form><p class="hint">Cuando carguen las actas de los viernes, aquí aparecen los nombres del equipo.</p>`;
+  q.hidden=false;(q.querySelector(".qp.ult")||q.querySelector(".qp,input,button")).focus();
+  const f=$("#qNew");if(f)f.onsubmit=e=>{e.preventDefault();const n=cap(f.elements.n.value.trim());if(!n)return;S.equipo=[...EQ(),n];elegir(n)};
+}
+function elegir(n){S.ui.yo=n||S.ui.yo||"";$("#quien").hidden=true;verCal(n);if(n)toast("Hola, "+n+". Este es tu calendario")}
+function formEquipo(){
+  abrir(`<form id="feq"><div class="row between"><h2>Equipo</h2>${X}</div>
+  <p class="hint">Escribe un nombre por línea. Usen el mismo nombre que ponen en las actas (por ejemplo «Soraya»): así la página sabe de quién es cada compromiso.</p>
+  <textarea name="eq" rows="9" aria-label="Nombres del equipo">${esc(EQ().join("\n"))}</textarea>
+  <div class="dact"><span class="sp1"></span><button class="btn pri">Guardar</button></div></form>`);
+  const f=$("#feq");$("#x").onclick=cerrar;
+  f.onsubmit=e=>{e.preventDefault();const v=[...new Set(f.elements.eq.value.split(/\n+/).map(x=>cap(x.trim())).filter(Boolean))];S.equipo=v;
+    if(S.ui.cal&&!v.some(x=>llave(x)===llave(S.ui.cal)))S.ui.cal="";save();cerrar();renderPersonas();render();if(!$("#quien").hidden)pantallaQuien();toast("Equipo guardado")};
+}
+function renderCals(){
+  $("#cals").innerHTML=Object.entries(EJES).map(([k,v])=>`<label class="cb" style="--c:${COL[k]}"><input type="checkbox" data-eje="${k}" ${S.ui.ocultos.includes(k)?"":"checked"}><span class="bx"></span>${v}</label>`).join("");
+}
+function renderMini(){
+  const y=mini.getFullYear(),m=mini.getMonth(),start=lunes(new Date(y,m,1)),hoy=iso(new Date()),sel=iso(cursor);
+  let h=`<div class="mh2"><span>${cap(MESES[m])} de ${y}</span><span><button class="ib sm" data-mn="-1" aria-label="Mes anterior">${I.left}</button><button class="ib sm" data-mn="1" aria-label="Mes siguiente">${I.right}</button></span></div><div class="mgd">`+["L","M","X","J","V","S","D"].map(x=>`<span class="dl">${x}</span>`).join("");
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=iso(d);
+    h+=`<button data-md="${k}" class="${d.getMonth()!==m?"out":""} ${k===hoy?"today":k===sel?"sel":""}" aria-label="${esc(fechaLarga(k))}">${d.getDate()}</button>`}
+  $("#mini").innerHTML=h+"</div>";
 }
 function renderCal(){
-  $("#calMes").hidden=vista!=="mes";$("#calSem").hidden=vista!=="sem";
-  $("#vMes").setAttribute("aria-selected",vista==="mes");$("#vSem").setAttribute("aria-selected",vista==="sem");
-  const hoy=iso(new Date()),evs=visibles();
-  if(vista==="mes"){
-    $("#titulo").textContent=cap(`${MESES[cursor.getMonth()]} ${cursor.getFullYear()}`);
-    const first=new Date(cursor.getFullYear(),cursor.getMonth(),1),start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
-    let h=["lun","mar","mié","jue","vie","sáb","dom"].map(d=>`<div class="dow">${d}</div>`).join("");
-    for(let i=0;i<42;i++){
-      const d=new Date(start);d.setDate(start.getDate()+i);const k=iso(d),de=evs.filter(e=>e.fecha===k);
-      h+=`<div class="day ${d.getMonth()!==first.getMonth()?"out":""} ${k===hoy?"today":""}" data-d="${k}" tabindex="0" role="button" aria-label="${esc(fechaLarga(k))}"><span class="n">${d.getDate()}</span>${de.slice(0,3).map(e=>`<button class="chip" data-ev="${e.id}">${esc(hora(e.ini).replace(" ",""))} ${esc(e.titulo)}</button>`).join("")}${de.length>3?`<div class="more">+${de.length-3} más</div>`:""}</div>`;
-    }
-    $("#calMes").innerHTML=h;
-  }else{
-    const a=lunes(cursor),b=new Date(a);b.setDate(a.getDate()+6);
-    $("#titulo").textContent=`${a.getDate()} ${a.getMonth()!==b.getMonth()?MESES[a.getMonth()].slice(0,3)+" ":""}– ${b.getDate()} ${MESES[b.getMonth()].slice(0,3)} ${b.getFullYear()}`;
-    let h="";
-    for(let i=0;i<7;i++){
-      const d=new Date(a);d.setDate(a.getDate()+i);const k=iso(d),de=evs.filter(e=>e.fecha===k);
-      h+=`<div class="wd ${k===hoy?"today":""}" data-d="${k}"><div class="wh">${DIAS[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></div>${de.map(e=>`<button class="wev" data-ev="${e.id}">${esc(e.titulo)}<span>${esc(hora(e.ini))}${e.lugar?" · "+esc(e.lugar):""}${e.con?" · con "+esc(e.con):""}</span></button>`).join("")}</div>`;
-    }
-    $("#calSem").innerHTML=h;
-  }
+  const y=cursor.getFullYear(),m=cursor.getMonth();let t=`${cap(MESES[m])} de ${y}`;
+  if(vista==="sem"){const a=lunes(cursor),b=new Date(a);b.setDate(a.getDate()+6);
+    if(a.getFullYear()!==b.getFullYear())t=`${cap(MESES[a.getMonth()].slice(0,3))} de ${a.getFullYear()} – ${MESES[b.getMonth()].slice(0,3)} de ${b.getFullYear()}`;
+    else if(a.getMonth()!==b.getMonth())t=`${cap(MESES[a.getMonth()].slice(0,3))} – ${MESES[b.getMonth()].slice(0,3)} de ${b.getFullYear()}`;
+    else t=`${cap(MESES[a.getMonth()])} de ${a.getFullYear()}`}
+  else if(vista==="dia")t=`${cursor.getDate()} de ${MESES[m]} de ${y}`;
+  if(vista==="actas")t="Actas de los viernes";
+  $("#titulo").textContent=t;document.title=`Fondacio Agenda · ${t}`;
+  ["#rActas","#mActas"].forEach(s=>$(s).classList.toggle("on",vista==="actas"));
+  $("#vLbl").textContent=VN[vista];
+  document.querySelectorAll("#mViews [data-mv]").forEach(b=>b.classList.toggle("on",b.dataset.mv===vista));
+  if(vista==="actas")renderActas();else if(vista==="mes")renderMes();else if(vista==="agenda")renderAgenda();else renderTiempo(vista==="sem"?7:1);
+  renderMini();
 }
-function renderPend(){
-  const pend=S.pend.filter(p=>p.estado==="pendiente").sort((a,b)=>(a.fecha?0:1)-(b.fecha?0:1)||(a.fecha+a.ini).localeCompare(b.fecha+b.ini));
-  $("#nPend").textContent=pend.length;
-  $("#listaPend").innerHTML=pend.map(p=>{
-    const posible=!p.fecha||!p.ini,c=choque(p);
-    const cuando=p.fecha?`${cap(fechaLarga(p.fecha))}${p.ini?" · "+hora(p.ini)+(p.fin?" a "+hora(p.fin):""):" · falta la hora"}`:"Sin fecha confirmada"+(p.plazo?" · lo quieren: "+p.plazo:"");
-    const quien=[p.de&&"De "+p.de,p.org].filter(Boolean).join(" · ");
-    return`<div class="pc"><div class="t">${esc(p.titulo||p.tipo||"Mensaje de "+(p.de||"alguien"))}${p.tipo&&p.titulo?`<span class="pill">${esc(p.tipo)}</span>`:""}${posible?`<span class="pill">Posible</span>`:""}${p.preguntado?`<span class="pill">Ya preguntaste</span>`:""}</div>
-    ${p.resumen?`<div class="m">${esc(p.resumen)}</div>`:""}
-    ${quien?`<div class="m">${esc(quien)}</div>`:""}
-    ${p.persona?`<div class="m">Buscan a: ${esc(p.persona)}</div>`:""}
-    <div class="m">${esc(cuando)}${p.lugar?" · "+esc(p.lugar):""}</div>
-    <div class="m">${p.recibido?"Recibido "+esc(cuandoTs(p.recibido))+" ("+esc(hace(p.recibido))+") · ":""}${palabras(p.texto)} palabras</div>
-    ${c?`<p class="warn">Se cruza con «${esc(c.titulo)}» a las ${esc(hora(c.ini))}.</p>`:""}
-    <details><summary>Ver mensaje</summary><div class="msg">${esc(p.texto)}</div></details>
-    <div class="acts"><button class="btn sm pri" data-ac="aceptar" data-p="${p.id}">Aceptar</button><button class="btn sm" data-ac="preguntar" data-p="${p.id}">Preguntar</button><button class="btn sm" data-ac="rechazar" data-p="${p.id}">Rechazar</button><button class="btn sm" data-ac="editar" data-p="${p.id}">Editar</button></div></div>`}).join("")
-    ||`<p class="hint">No tienes pendientes. Cuando te llegue una invitación por WhatsApp, guárdala aquí.</p>`;
-  const rs=S.pend.filter(p=>p.estado!=="pendiente");
-  $("#resp").textContent=`Respondidas (${rs.length})`;
-  $("#listaResp").innerHTML=rs.map(p=>{
-    const quien=[p.de&&"De "+p.de,p.org].filter(Boolean).join(" · ");
-    const cuando=p.fecha?cap(fechaLarga(p.fecha))+(p.ini?" · "+hora(p.ini):""):"";
-    return`<div class="pc"><div class="t">${p.estado==="aceptada"?"✔ Aceptada":"✖ Rechazada"} · ${esc(p.titulo||p.tipo||"Mensaje de "+(p.de||"alguien"))}</div>
-    ${p.resumen?`<div class="m">${esc(p.resumen)}</div>`:""}
-    ${quien||cuando?`<div class="m">${esc([quien,cuando].filter(Boolean).join(" · "))}</div>`:""}
-    ${p.respondido?`<div class="m">Respondida ${esc(cuandoTs(p.respondido))}</div>`:""}
-    <details><summary>Ver mensaje</summary><div class="msg">${esc(p.texto)}</div></details>
-    <div class="acts"><button class="btn sm" data-ac="deshacer" data-p="${p.id}">Deshacer</button></div></div>`}).join("")||`<p class="hint">Aún no has respondido ninguna. Las que aceptes o rechaces aparecerán aquí.</p>`;
+function renderMes(){
+  const y=cursor.getFullYear(),m=cursor.getMonth(),first=new Date(y,m,1),start=lunes(first),dim=new Date(y,m+1,0).getDate();
+  const wk=Math.ceil(((first.getDay()+6)%7+dim)/7),hoy=iso(new Date());
+  let h=`<div class="mg" style="grid-template-rows:repeat(${wk},minmax(0,1fr))">`;
+  for(let i=0;i<wk*7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=iso(d);
+    h+=`<div class="mc ${d.getMonth()!==m?"out":""} ${k===hoy?"today":""}" data-d="${k}">${i<7?`<div class="dw">${DOW3[d.getDay()]}</div>`:""}<button class="dn" data-go="${k}" aria-label="${esc(cap(fechaLarga(k)))}">${d.getDate()===1?`${d.getDate()} ${MESES[d.getMonth()].slice(0,3)}`:d.getDate()}</button><div class="evs">${delDia(k).map(chip).join("")}</div></div>`}
+  $("#cv").innerHTML=h+"</div>";fitMes();
 }
-function panel(asis){
-  $("#pPend").hidden=asis;$("#pAsis").hidden=!asis;
-  $("#tPend").setAttribute("aria-selected",!asis);$("#tAsis").setAttribute("aria-selected",asis);
+/* Muestra solo los chips que caben en cada día y agrega «N más» */
+function fitMes(){
+  document.querySelectorAll("#cv .mc").forEach(c=>{
+    const ev=c.querySelector(".evs");ev.querySelector(".more")?.remove();const ch=[...ev.children];ch.forEach(x=>x.hidden=false);
+    const max=Math.max(0,Math.floor((c.clientHeight-ev.offsetTop-2)/22));
+    if(ch.length>max){const vis=Math.max(0,max-1);ch.forEach((x,i)=>x.hidden=i>=vis);
+      ev.insertAdjacentHTML("beforeend",`<button class="more" data-more="${c.dataset.d}">${ch.length-vis} más</button>`)}
+  });
+}
+function renderTiempo(n){
+  const a=n===7?lunes(cursor):new Date(cursor);
+  const dias=[...Array(n)].map((_,i)=>{const d=new Date(a);d.setDate(a.getDate()+i);return d});
+  const hoy=iso(new Date()),key=vista+iso(a),old=$("#cv .tg"),keep=old&&old.dataset.k===key?old.scrollTop:null;
+  const ahora=new Date(),nm=ahora.getHours()*60+ahora.getMinutes();
+  let h=`<div class="tg" data-k="${key}" style="--n:${n};--hh:${HH}px"><div class="th"><div class="tz">${TZ}</div>`+dias.map(d=>{const k=iso(d);
+    return`<div class="thd ${k===hoy?"today":""}"><span class="dw2">${DOW3[d.getDay()]}</span><button class="dn2" data-go="${k}" aria-label="${esc(cap(fechaLarga(k)))}">${d.getDate()}</button>${(()=>{const t=delDia(k).filter(x=>!x.ini);return t.length?`<div class="allday">${t.map(chip).join("")}</div>`:""})()}</div>`}).join("")+`</div><div class="tbd"><div class="gut">`;
+  for(let i=1;i<24;i++)h+=`<span style="top:${i*HH}px">${i%12||12} ${i<12?"a. m.":"p. m."}</span>`;
+  h+=`</div>`+dias.map(d=>{const k=iso(d);
+    const it=delDia(k).filter(x=>x.ini).map(x=>{const s=mins(x.ini);let e=x.fin?mins(x.fin):s+60;if(e<=s)e=s+60;return{...x,s,e:Math.min(e,1440)}});columnas(it);
+    return`<div class="col" data-d="${k}" style="height:${24*HH}px">${it.map(x=>{const top=x.s/60*HH,hg=Math.max((x.e-x.s)/60*HH-2,18),one=hg<38;
+      return`<button class="te ${one?"one":""}" data-${x.t}="${x.id}" style="top:${top}px;height:${hg}px;left:calc(${x.c/x.n*100}% + 1px);width:calc(${100/x.n}% - ${x.n===1?12:4}px);--c:${x.color}">${one?`<b>${esc(x.titulo)}</b>, ${esc(hc(x.ini))}`:`<b>${esc(x.titulo)}</b><span>${esc(rango(x.ini,x.fin))}</span>${x.lugar?`<span>${esc(x.lugar)}</span>`:""}`}</button>`}).join("")}${k===hoy?`<div class="now" style="top:${nm/60*HH}px"></div>`:""}</div>`}).join("")+`</div></div>`;
+  $("#cv").innerHTML=h;
+  const tg=$("#cv .tg");tg.scrollTop=keep!=null?keep:Math.max(0,(dias.some(d=>iso(d)===hoy)?nm-120:7*60)/60*HH);
+}
+function renderAgenda(){
+  const hoy=iso(new Date());let h="";
+  for(let i=0;i<60;i++){const d=new Date(cursor);d.setDate(cursor.getDate()+i);const k=iso(d),it=delDia(k);if(!it.length)continue;
+    h+=`<div class="agd ${k===hoy?"today":""}"><div class="agn"><button class="dn2" data-go="${k}" aria-label="${esc(cap(fechaLarga(k)))}">${d.getDate()}</button><span class="agm">${MESES[d.getMonth()].slice(0,3)}, ${DOW3[d.getDay()]}</span></div><div>${it.map(x=>`<button class="agr" data-${x.t}="${x.id}" style="--c:${x.color}"><i></i><span class="at">${esc(rango(x.ini,x.fin))}</span><b>${esc(x.titulo)}</b></button>`).join("")}</div></div>`}
+  $("#cv").innerHTML=`<div class="ag">${h||`<p class="hint" style="padding:24px">No hay eventos en los próximos 60 días.</p>`}</div>`;
+}
+
+/* ---------- panel lateral, barra lateral y capa oscura ---------- */
+function aplicarUI(){
+  $("#app").classList.toggle("nosid",!S.ui.side);
+  const p=S.ui.panel==="asis";$("#sp").hidden=!p;
+  ["#rAsis","#mAsis"].forEach(s=>$(s).classList.toggle("on",p));
+  $("#scrim").hidden=!(document.body.classList.contains("drw")||(movil()&&p));
+  if(vista==="mes")fitMes();
+}
+function abrirPanel(n){S.ui.panel=S.ui.panel===n?null:n;save();aplicarUI();if(S.ui.panel)renderChat()}
+
+/* ---------- tarjeta emergente de un evento ---------- */
+const popEl=$("#pop");
+function pop(html,anchor,on,cls){
+  const r=anchor.getBoundingClientRect();
+  popEl.innerHTML=html;popEl._on=on;popEl.className="pop "+(cls||"");popEl.hidden=false;
+  if(innerWidth<600){popEl.classList.add("sheet");popEl.style.left=popEl.style.top=""}
+  else{const w=popEl.offsetWidth,h=popEl.offsetHeight;
+    let x=r.right+8;if(x+w>innerWidth-8)x=r.left-w-8;if(x<8)x=Math.max(8,Math.min(innerWidth-w-8,r.left));
+    if(cls==="narrow")x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2));
+    const y=Math.max(8,Math.min(cls==="narrow"?r.top-40:r.top,innerHeight-h-8));
+    popEl.style.left=x+"px";popEl.style.top=y+"px"}
+  popEl.focus({preventScroll:true});
+}
+function cerrarPop(){popEl.hidden=true;popEl.innerHTML="";popEl._on=null}
+const prow=(icon,html)=>`<div class="prow">${icon}<div>${html}</div></div>`;
+function popEv(e,a){
+  pop(`<div class="ptb"><button class="ib" data-pa="edit" title="Editar evento" aria-label="Editar evento">${I.edit}</button><button class="ib" data-pa="del" title="Eliminar evento" aria-label="Eliminar evento">${I.del}</button><button class="ib" data-pa="x" title="Cerrar" aria-label="Cerrar">${I.x}</button></div>
+  <div class="prow"><span class="sq" style="--c:${COL[e.eje]||COL.eq}"></span><div><div class="ptt">${esc(e.titulo)}</div><div class="psub">${esc(cap(fechaLarga(e.fecha)))} ⋅ ${esc(rango(e.ini,e.fin))}</div></div></div>
+  ${e.lugar?prow(I.place,esc(e.lugar)):""}
+  ${paraDe(e).length?prow(I.person,"De "+esc(paraDe(e).map(x=>x==="Todos"?"todo el equipo":x).join(", "))):""}
+  ${e.con?prow(I.people,"Con "+esc(e.con)):""}
+  ${e.obj?prow(I.notes,esc(e.obj)):""}
+  ${prow(I.cal,esc(EJES[e.eje]||""))}
+  ${e.rep==="semanal"?prow(I.rep,"Cada semana, los "+esc(DIAS[pf(e.fecha).getDay()])):""}
+  ${(()=>{const t=e.tareaId&&S.tareas.find(x=>x.id===e.tareaId);return e.acta?prow(I.doc,`Sale del acta del ${esc(fechaLarga(e.acta))}${t?` · compromiso ${t.estado==="abierta"?"abierto":"cumplido"}${t.resp?" ("+esc(t.resp)+")":""}`:""}`):""})()}`,a,
+  act=>act==="edit"?formEvento(e):act==="del"?borrarEvento(e):0);
+}
+function popDia(k,a){
+  const d=pf(k);
+  pop(`<div class="ptb"><button class="ib" data-pa="x" title="Cerrar" aria-label="Cerrar">${I.x}</button></div><div class="pdh"><div class="dw">${DOW3[d.getDay()]}</div><button class="dn2" data-go="${k}" aria-label="${esc(cap(fechaLarga(k)))}">${d.getDate()}</button></div><div class="pdl">${delDia(k).map(chip).join("")}</div>`,a,null,"narrow");
+}
+function borrarEvento(e){
+  const i=S.eventos.indexOf(e);if(i<0)return;S.eventos.splice(i,1);save();render();
+  toast("Se ha eliminado el evento","Deshacer",()=>{S.eventos.splice(Math.min(i,S.eventos.length),0,e);save();render()});
+}
+
+/* ---------- menús desplegables ---------- */
+const menuEl=$("#menuEl");
+function cerrarMenu(){menuEl.hidden=true;menuEl._a=null}
+function toggleMenu(a,items,on){
+  if(!menuEl.hidden&&menuEl._a===a){cerrarMenu();return}
+  menuEl.innerHTML=items.map(i=>`<button role="menuitem" data-v="${i.v}"><span>${i.t}</span>${i.k?`<kbd>${i.k}</kbd>`:""}</button>`).join("");
+  menuEl.hidden=false;menuEl._a=a;
+  const r=a.getBoundingClientRect();let x=r.left;if(x+menuEl.offsetWidth>innerWidth-8)x=r.right-menuEl.offsetWidth;
+  menuEl.style.left=Math.max(8,x)+"px";menuEl.style.top=(r.bottom+4)+"px";
+  menuEl.onclick=e=>{const b=e.target.closest("[data-v]");if(b){cerrarMenu();on(b.dataset.v)}};
+  menuEl.querySelector("button").focus();
 }
 
 /* ---------- diálogos ---------- */
 const dlg=$("#dlg");
-function abrir(html){dlg.innerHTML=html;dlg.showModal()}
+function abrir(html){cerrarPop();cerrarMenu();dlg.innerHTML=html;if(!dlg.open)dlg.showModal()}
 function cerrar(){dlg.close()}
 
-/* Guardar (o editar) un mensaje recibido. La IA lee el mensaje sola al pegarlo. */
-const CAMPOS_PEND=["tipo","org","titulo","resumen","persona","fecha","lugar","ini","fin","plazo"];
-function formPend(p){
-  const n=!p;p=p||{texto:"",de:"",tel:"",tipo:"",org:"",titulo:"",resumen:"",persona:"",fecha:"",lugar:"",ini:"",fin:"",plazo:""};
-  const CAMPOS=CAMPOS_PEND;
-  abrir(`<form id="fp"><div class="row between"><h2>${n?"Guardar mensaje recibido":"Editar pendiente"}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
-  <label>Mensaje que te llegó (pégalo aquí)<textarea name="texto" rows="5" required placeholder="Pega aquí el texto de WhatsApp">${esc(p.texto)}</textarea></label>
-  <div class="two"><label>¿Quién lo escribe?<input name="de" value="${esc(p.de)}" placeholder="Nombre o grupo de WhatsApp"></label>
-  <label>Su WhatsApp (opcional)<input name="tel" type="tel" value="${esc(p.tel)}" placeholder="3001234567"></label></div>
-  <h3>Lo que entendí <small>· revísalo; deja vacío lo que no esté claro</small> <small id="est"></small></h3>
-  <div class="two"><label>Tipo<input name="tipo" value="${esc(p.tipo)}" placeholder="Invitación, visita, reunión…"></label>
-  <label>Grupo u organización<input name="org" value="${esc(p.org)}"></label></div>
-  <label>Actividad<input name="titulo" value="${esc(p.titulo)}"></label>
-  <label>Resumen<input name="resumen" value="${esc(p.resumen)}" placeholder="Qué piden o proponen"></label>
-  <label>A quién buscan o mencionan<input name="persona" value="${esc(p.persona)}" placeholder="Persona y cargo"></label>
-  <div class="two"><label>Fecha<input type="date" name="fecha" value="${p.fecha}"></label><label>Lugar<input name="lugar" value="${esc(p.lugar)}"></label>
-  <label>Hora de inicio<input type="time" name="ini" value="${p.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${p.fin||""}"></label></div>
-  <label>Plazo (si no dan fecha exacta)<input name="plazo" value="${esc(p.plazo)}" placeholder="Ej: esta semana"></label>
-  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">${n?"Guardar como pendiente":"Guardar cambios"}</button><button type="button" class="btn" id="ia">Leer con IA</button>${n?"":`<button type="button" class="btn del" id="del">Borrar</button>`}</div></form>`);
-  const f=$("#fp"),tocado=new Set(n?[]:CAMPOS);let tm=0,rid=0;
-  async function leerIA(auto){
-    const txt=f.elements.texto.value.trim();
-    if(!txt||(auto&&(!S.cfg.key||txt.length<20)))return;
-    if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
-    const id=++rid,est=$("#est"),b=$("#ia");est.textContent="· leyendo con IA…";b.disabled=true;
-    try{const a=await extraerIA(txt,new Date());if(id!==rid)return;
-      CAMPOS.forEach(k=>{if(a[k]&&(!auto||!tocado.has(k))){f.elements[k].value=a[k];if(!auto)tocado.add(k)}});est.textContent="· revisa lo que entendió la IA"}
-    catch(e){if(id===rid){est.textContent="";if(!auto)toast(e.message)}}
-    finally{if(id===rid)b.disabled=false}
-  }
-  f.addEventListener("input",ev=>{const nm=ev.target.name;
-    if(nm==="texto"){const a=analizar(ev.target.value);CAMPOS.forEach(k=>{if(!tocado.has(k))f.elements[k].value=a[k]||""});
-      if(n){clearTimeout(tm);tm=setTimeout(()=>leerIA(true),1000)}}
-    else if(CAMPOS.includes(nm))tocado.add(nm)});
-  $("#x").onclick=cerrar;
-  $("#ia").onclick=()=>leerIA(false);
-  f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
-    if(n)S.pend.unshift({id:uid(),estado:"pendiente",recibido:new Date().toISOString(),...d});else Object.assign(p,d);
-    save();render();cerrar();panel(false);toast(n?"Guardado en pendientes":"Cambios guardados")};
-  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar este mensaje?")){S.pend=S.pend.filter(x=>x.id!==p.id);save();render();cerrar()}};
-}
-
-function formImportar(){
-  abrir(`<form id="fim"><div class="row between"><h2>Importar chat de WhatsApp <span class="pill">beta</span></h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
-  <p class="hint">En WhatsApp abre el chat, toca ⋮ → Más → Exportar chat → Sin archivos, y pega aquí el texto. También sirve copiar varios mensajes seleccionados.</p>
-  <textarea id="raw" rows="7" placeholder="[12:55 PM, 30/9/2026] Nombre: mensaje..."></textarea>
-  <div class="two" style="margin-top:6px"><label>¿Cuál eres tú en el chat?<select id="yo"></select></label>
-  <label>Formato de fecha<select id="fmt"><option value="">Automático</option><option value="dmy">día/mes</option><option value="mdy">mes/día</option></select></label></div>
-  <div class="row" style="margin-top:6px"><button type="button" class="btn sm" id="iaImp">Leer con IA</button><button type="button" class="btn sm" id="ej">Ver un ejemplo</button></div>
-  <div id="res"></div>
-  <div class="row" style="margin-top:14px"><button class="btn pri" id="add" type="submit" disabled>Agregar</button></div></form>`);
-  const raw=$("#raw"),yoS=$("#yo"),cache={};let cands=[];
-  const fmtF=c=>c.a.fecha?cap(fechaLarga(c.a.fecha))+(c.a.ini?" · "+hora(c.a.ini):""):"Sin fecha"+(c.a.plazo?" · lo quieren: "+c.a.plazo:"");
-  function analizarChat(){
-    const msgs=parseChat(raw.value,$("#fmt").value),quien=[...new Set(msgs.map(x=>x.de))];
-    const sel=yoS.value||S.cfg.yo||"";
-    yoS.innerHTML=`<option value="">No sé / ninguno</option>`+quien.map(q=>`<option ${q===sel?"selected":""}>${esc(q)}</option>`).join("");
-    const yo=yoS.value;cands=candidatosChat(msgs,yo);
-    cands.forEach(c=>{const x=cache[c.ref];if(x){for(const k in x)if(x[k])c.a[k]=x[k];c.titulo=c.a.titulo||c.titulo;c.pasada=!!c.a.fecha&&c.a.fecha<iso(new Date())}});
-    if(!raw.value.trim()){$("#res").innerHTML="";$("#add").disabled=true;return}
-    if(!msgs.length){$("#res").innerHTML=`<p class="hint">No reconocí el formato. Si es un solo mensaje, usa «Guardar un mensaje».</p>`;$("#add").disabled=true;return}
-    $("#res").innerHTML=`<p class="hint">Leí ${msgs.length} mensajes de ${quien.length} personas. ${cands.length} parecen actividades${yo?"":" (elige quién eres para detectar las que ya se confirmaron)"}.</p>`+
-    cands.map((c,k)=>`<label class="imp"><input type="checkbox" data-k="${k}" ${c.pasada||c.dup?"disabled":"checked"}><div><strong>${esc(c.titulo||c.a.tipo||"Mensaje de "+c.m.de)}</strong>
-      <span class="pill">${c.dup?"Ya importado":c.conf?"Va al calendario":"Va a pendientes"}</span>${c.a.tipo&&c.titulo?`<span class="pill">${esc(c.a.tipo)}</span>`:""}${!c.conf&&(!c.a.fecha||!c.a.ini)?`<span class="pill">Posible</span>`:""}${c.pasada?`<span class="pill">Fecha pasada</span>`:""}
-      ${c.a.resumen?`<div class="m">${esc(c.a.resumen)}</div>`:""}
-      <div class="m">De ${esc(c.m.de)}${c.a.org?" · "+esc(c.a.org):""} · ${esc(fmtF(c))}${c.a.lugar?" · "+esc(c.a.lugar):""}</div>
-      ${c.a.persona?`<div class="m">Buscan a: ${esc(c.a.persona)}</div>`:""}
-      <div class="m">Recibido ${esc(cuandoTs(c.m.ts))} · ${palabras(c.m.texto)} palabras</div>
-      <div class="m">«${esc(c.m.texto.replace(/\s+/g," ").slice(0,110))}»</div>${c.conf?`<div class="m">Ya confirmada en el chat.</div>`:""}</div></label>`).join("");
-    $("#add").disabled=!cands.some(c=>!c.pasada&&!c.dup);
-  }
-  raw.addEventListener("input",analizarChat);yoS.onchange=analizarChat;$("#fmt").onchange=analizarChat;
-  $("#ej").onclick=()=>{raw.value=chatEjemplo();analizarChat();yoS.value="+57 300 000 0000";analizarChat()};
-  $("#iaImp").onclick=async()=>{
-    if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
-    const lista=cands.filter(c=>!c.pasada&&!c.dup);if(!lista.length){toast("No hay mensajes para leer");return}
-    const b=$("#iaImp");b.disabled=true;let ok=0;
-    for(const [i,c] of lista.entries()){b.textContent=`Leyendo ${i+1} de ${lista.length}…`;
-      try{cache[c.ref]=await extraerIA(c.m.texto,c.m.ts);ok++}catch(e){toast(e.message);break}}
-    b.disabled=false;b.textContent="Leer con IA";analizarChat();if(ok)toast("Revisa lo que entendió la IA")};
-  $("#x").onclick=cerrar;
-  $("#fim").onsubmit=ev=>{ev.preventDefault();let p=0,e=0;S.cfg.yo=yoS.value;
-    document.querySelectorAll("#res input[type=checkbox]:checked").forEach(cb=>{
-      const c=cands[+cb.dataset.k],a=c.a,pid=uid();
-      const base={id:pid,de:c.m.de,tel:c.tel,titulo:c.titulo,tipo:a.tipo||"",org:a.org||"",persona:a.persona||"",resumen:a.resumen||"",plazo:a.plazo||"",fecha:a.fecha,ini:a.ini,fin:a.fin,lugar:a.lugar,texto:c.m.texto,ref:c.ref,recibido:c.m.ts.toISOString()};
-      if(c.conf){const evn={id:uid(),titulo:c.titulo,eje:"eq",fecha:a.fecha,ini:a.ini,fin:a.fin,lugar:a.lugar,con:[a.org,a.persona].filter(Boolean).join(" · ")||c.m.de,obj:a.resumen||"Confirmada en el chat de WhatsApp.",desde:pid};
-        S.eventos.push(evn);S.pend.unshift({...base,estado:"aceptada",eventoId:evn.id});e++}
-      else{S.pend.unshift({...base,estado:"pendiente"});p++}});
-    save();render();cerrar();panel(false);toast(`${p} a pendientes, ${e} al calendario`)};
-}
-
-/* Aceptar, preguntar o rechazar: siempre con una respuesta lista para WhatsApp */
-function textoRespuesta(modo,p){
-  const sal=`Hola${p.de?" "+p.de:""}, gracias por la invitación${p.titulo?" a *"+p.titulo+"*":""}.`;
-  if(modo==="aceptar")return`${sal} Confirmo mi asistencia${p.fecha?" el "+fechaLarga(p.fecha):""}${p.ini?" a las "+hora(p.ini):""}. ¡Nos vemos!`;
-  if(modo==="rechazar")return`${sal} Lamentablemente no podré asistir. Quedo pendiente de la próxima actividad.`;
-  const falta=[!p.fecha&&"la fecha",!p.ini&&"la hora",!p.lugar&&"el lugar"].filter(Boolean);
-  return`${sal} ¿Me confirmas ${falta.length?falta.join(", ").replace(/, ([^,]*)$/," y $1"):"los detalles"}?`;
-}
-function responder(p,modo){
-  const T={aceptar:"Aceptar invitación",rechazar:"Rechazar invitación",preguntar:"Preguntar los datos que faltan"}[modo];
-  const campos=modo==="aceptar"?`<h3>Datos de la actividad <small>· se agrega al calendario</small></h3>
-  <label>Actividad<input name="titulo" required value="${esc(p.titulo)}"></label>
-  <div class="two"><label>Eje<select name="eje">${Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k==="eq"?"selected":""}>${v}</option>`).join("")}</select></label><label>Lugar<input name="lugar" value="${esc(p.lugar)}"></label>
-  <label>Fecha<input type="date" name="fecha" required value="${p.fecha}"></label><label>Con quién<input name="con" value="${esc([p.org||p.de,p.persona].filter(Boolean).join(" · "))}"></label>
-  <label>Hora de inicio<input type="time" name="ini" required value="${p.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${p.fin||""}"></label></div>
-  <p class="warn" id="warn"></p>`:"";
-  const bt={aceptar:["Aceptar y responder por WhatsApp","Solo agregar al calendario"],rechazar:["Rechazar y responder por WhatsApp","Solo archivar"],preguntar:["Abrir en WhatsApp",""]}[modo];
-  abrir(`<form id="fr"><div class="row between"><h2>${T}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
-  <details class="box"><summary>Mensaje original</summary><p style="white-space:pre-wrap;color:var(--ink-2);margin:8px 0 0">${esc(p.texto)}</p></details>
-  ${campos}
-  <h3>Tu respuesta por WhatsApp</h3>
-  <textarea id="txt" rows="4"></textarea>
-  <div class="row" style="margin-top:6px"><button type="button" class="btn sm" id="ia">Redactar con IA</button>${p.tel?"":`<span class="hint" style="margin:0">Sin número guardado: elegirás el chat en WhatsApp.</span>`}</div>
-  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">${bt[0]}</button>${bt[1]?`<button type="button" class="btn" id="solo">${bt[1]}</button>`:""}</div></form>`);
-  const f=$("#fr"),t=$("#txt");let editado=false;
-  const datos=()=>({...p,...(modo==="aceptar"?Object.fromEntries(new FormData(f)):{})});
-  const sync=()=>{const d=datos();if(!editado)t.value=textoRespuesta(modo,d);
-    if(modo==="aceptar"){const c=choque({...d,eventoId:null});$("#warn").textContent=c?`Ojo: se cruza con «${c.titulo}» a las ${hora(c.ini)}.`:""}};
-  f.addEventListener("input",ev=>{if(ev.target!==t)sync()});t.addEventListener("input",()=>editado=true);sync();
-  $("#x").onclick=cerrar;
-  $("#ia").onclick=async()=>{if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
-    const b=$("#ia");b.textContent="Escribiendo…";
-    try{t.value=await ia([{role:"user",content:promptRespuesta(modo,datos())}]);editado=true}catch(e){toast(e.message)}
-    b.textContent="Redactar con IA"};
-  const fin=(enviar)=>{
-    if(modo==="aceptar"){
-      if(!f.reportValidity())return;const d=Object.fromEntries(new FormData(f));
-      const ev={id:uid(),titulo:d.titulo,eje:d.eje,fecha:d.fecha,ini:d.ini,fin:d.fin||"",lugar:d.lugar||"",con:d.con||"",obj:p.resumen||"",desde:p.id};
-      S.eventos.push(ev);Object.assign(p,{estado:"aceptada",eventoId:ev.id,titulo:d.titulo,fecha:d.fecha,ini:d.ini,fin:d.fin||"",lugar:d.lugar||""});
-      cursor=pf(d.fecha);
-    }else if(modo==="rechazar")p.estado="rechazada";
-    else p.preguntado=true;
-    if(enviar)abrirWa(p.tel,t.value);
-    if(modo!=="preguntar")p.respondido=new Date().toISOString();
-    save();render();cerrar();
-    toast(modo==="aceptar"?"Agregada al calendario":modo==="rechazar"?"Rechazada y archivada":"Pregunta enviada, sigue pendiente");
-  };
-  f.onsubmit=ev=>{ev.preventDefault();fin(true)};
-  if(bt[1])$("#solo").onclick=()=>fin(false);
-}
-function deshacer(p){
-  if(p.eventoId)S.eventos=S.eventos.filter(e=>e.id!==p.eventoId);
-  p.estado="pendiente";delete p.eventoId;save();render();toast("Volvió a pendientes");
-}
-
-/* Detalle de un día: todas sus actividades completas y la opción de agregar otra */
-function verDia(k){
-  const evs=S.eventos.filter(e=>e.fecha===k).sort(ord);
-  abrir(`<div class="row between"><h2>${esc(cap(fechaLarga(k)))}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
-  ${evs.length?`<p class="hint" style="margin:6px 0 0">${evs.length} ${evs.length===1?"actividad":"actividades"}</p>`+evs.map(e=>{
-    const pe=e.desde&&S.pend.find(p=>p.id===e.desde);
-    return`<div class="pc" style="margin-top:10px"><div class="t">${esc(e.titulo)}</div>
-    <div class="m">${esc(hora(e.ini))}${e.fin?" a "+esc(hora(e.fin)):""} · ${esc(EJES[e.eje]||"")}</div>
-    ${e.lugar?`<div class="m">Lugar: ${esc(e.lugar)}</div>`:""}
-    ${e.con?`<div class="m">Con: ${esc(e.con)}</div>`:""}
-    ${e.obj?`<div class="m">${esc(e.obj)}</div>`:""}
-    ${pe?`<details><summary>Mensaje de WhatsApp de donde salió</summary><div class="msg">${esc(pe.texto)}</div></details>`:""}
-    <div class="acts"><button class="btn sm" data-ed="${e.id}">Editar</button></div></div>`}).join(""):`<p class="hint" style="margin-top:12px">No hay actividades este día.</p>`}
-  <div class="row" style="margin-top:14px"><button class="btn pri" id="nuevo">+ Agregar actividad este día</button></div>`);
-  $("#x").onclick=cerrar;
-  $("#nuevo").onclick=()=>formEvento(null,k,true);
-  dlg.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>formEvento(S.eventos.find(x=>x.id===b.dataset.ed),null,true));
-}
 
 /* Crear o editar una actividad del calendario */
-function invitacion(e,tono){
-  const f=`${fechaLarga(e.fecha)}, de ${hora(e.ini)}${e.fin?" a "+hora(e.fin):""}`;
-  const lug=e.lugar?`\nLugar: ${e.lugar}`:"";const obj=e.obj?`\n${e.obj}`:"";
-  if(tono==="cercano")return`¡Hola! 👋 Te esperamos en *${e.titulo}* el ${f}.${lug}${obj}\n¿Nos confirmas si vienes? 🙌`;
-  if(tono==="recordatorio")return`Recordatorio: *${e.titulo}* es el ${f}.${lug}\nPor favor confirma tu asistencia.`;
-  return`Cordial saludo.\nFondacio los invita a *${e.titulo}*, el ${f}.${lug}${obj}\nAgradecemos confirmar su asistencia.`;
-}
-function formEvento(e,fecha,desdeDia){
-  const n=!e;e=e||{titulo:"",eje:"form",fecha:fecha||iso(new Date()),ini:"15:00",fin:"16:00",lugar:"",obj:""};
-  abrir(`<form id="fe"><div class="row between"><h2>${n?"Nueva actividad":"Actividad"}</h2><button type="button" class="btn sm" id="x">Cerrar</button></div>
-  <label>Nombre<input name="titulo" required value="${esc(e.titulo)}" placeholder="Ej: Taller de habilidades digitales"></label>
-  <div class="two"><label>Eje<select name="eje">${Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k===e.eje?"selected":""}>${v}</option>`).join("")}</select></label>
-  <label>Fecha<input type="date" name="fecha" required value="${e.fecha}"></label>
-  <label>Hora de inicio<input type="time" name="ini" required value="${e.ini}"></label><label>Hora de fin<input type="time" name="fin" value="${e.fin||""}"></label></div>
-  <label>Lugar<input name="lugar" value="${esc(e.lugar)}"></label>
-  <label>Con quién (grupo, organización o persona)<input name="con" value="${esc(e.con||"")}"></label>
-  <label>Notas<textarea name="obj" rows="2">${esc(e.obj)}</textarea></label>
-  <details class="box"><summary>Invitación para el grupo (opcional)</summary>
-    <div class="row" style="margin:8px 0"><select id="tono" style="width:auto"><option value="formal">Formal</option><option value="cercano">Cercano</option><option value="recordatorio">Recordatorio</option></select><button type="button" class="btn sm" id="ia">Redactar con IA</button></div>
-    <textarea id="txt" rows="5"></textarea>
-    <div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="wa">Abrir en WhatsApp</button><button type="button" class="btn sm" id="cp">Copiar</button></div></details>
-  <div class="row" style="margin-top:14px"><button class="btn pri" type="submit">Guardar</button>${n?"":`<button type="button" class="btn del" id="del">Borrar</button>`}</div></form>`);
-  const f=$("#fe"),t=$("#txt");let editado=false;
-  const leer=()=>({...e,...Object.fromEntries(new FormData(f))});
-  const sync=()=>{if(!editado)t.value=invitacion(leer(),$("#tono").value)};
-  f.addEventListener("input",ev=>{if(ev.target!==t)sync()});t.addEventListener("input",()=>editado=true);
-  $("#tono").onchange=()=>{editado=false;sync()};sync();
-  $("#x").onclick=()=>{cerrar();if(desdeDia)verDia(e.fecha)};
-  f.onsubmit=ev=>{ev.preventDefault();const d=Object.fromEntries(new FormData(f));
-    if(n)S.eventos.push({id:uid(),...d});else Object.assign(e,d);save();render();cerrar();toast("Actividad guardada");if(desdeDia)verDia(d.fecha)};
-  $("#wa").onclick=()=>abrirWa("",t.value);
-  $("#cp").onclick=()=>navigator.clipboard.writeText(t.value).then(()=>toast("Copiado"),()=>toast("No se pudo copiar"));
-  $("#ia").onclick=async()=>{if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
-    const b=$("#ia"),v=leer();b.textContent="Escribiendo…";
-    try{t.value=await ia([{role:"user",content:`Redacta una invitación para un grupo de WhatsApp en español de Colombia, máximo 110 palabras, tono ${$("#tono").value}. Pide confirmación de asistencia y no inventes datos. Actividad: ${v.titulo}. Fecha: ${v.fecha?fechaLarga(v.fecha):"por definir"}. Hora: ${hora(v.ini)}${v.fin?" a "+hora(v.fin):""}. Lugar: ${v.lugar||"por definir"}. Notas: ${v.obj||"ninguna"}.`}]);editado=true}catch(err){toast(err.message)}
-    b.textContent="Redactar con IA"};
-  if(!n)$("#del").onclick=()=>{if(confirm("¿Borrar esta actividad?")){S.eventos=S.eventos.filter(x=>x.id!==e.id);save();render();cerrar();if(desdeDia)verDia(e.fecha)}};
+const sumar=(h,m)=>{const t=Math.min(mins(h)+m,1439);return`${pad(Math.floor(t/60))}:${pad(t%60)}`};
+function formEvento(e,fecha,ini,base){
+  cerrarPop();cerrarMenu();
+  const n=!e;
+  if(n){const i0=ini||`${pad(Math.min(new Date().getHours()+1,22))}:00`;
+    e={titulo:"",eje:"form",fecha:fecha||iso(vista==="dia"?cursor:new Date()),ini:i0,fin:sumar(i0,60),lugar:"",obj:"",con:"",para:S.ui.cal?[S.ui.cal]:[],...(base||{})}}
+  const para=paraDe(e);
+  abrir(`<form id="fe"><div class="row between"><h2>${n?"Nuevo evento":"Editar evento"}</h2>${X}</div>
+  <input class="ttl" name="titulo" required value="${esc(e.titulo)}" placeholder="Añade un título" aria-label="Título">
+  <div class="fr">${I.clock}<div class="dt"><input type="date" name="fecha" required value="${e.fecha}" aria-label="Fecha"><input type="time" name="ini" value="${e.ini||""}" aria-label="Hora de inicio (vacío = todo el día)"><span>–</span><input type="time" name="fin" value="${e.fin||""}" aria-label="Hora de fin"></div></div>
+  <div class="fr">${I.rep}<select name="rep" aria-label="Repetir" style="width:auto"><option value="">No se repite</option><option value="semanal" ${e.rep==="semanal"?"selected":""}>Cada semana, el mismo día</option></select></div>
+  <div class="fr">${I.place}<input name="lugar" value="${esc(e.lugar)}" placeholder="Añade una ubicación" aria-label="Lugar"></div>
+  ${EQ().length?`<div class="fr top">${I.person}<div><div class="hint" style="margin:0 0 6px">¿De quién del equipo es? Aparece en su calendario.</div><div class="eqs">${["Todos",...EQ()].map(x=>`<label class="eqc"><input type="checkbox" name="para" value="${esc(x)}" ${para.some(y=>llave(y)===llave(x))?"checked":""}><span>${x==="Todos"?"Todo el equipo":esc(x)}</span></label>`).join("")}</div></div></div>`:""}
+  <div class="fr">${I.people}<input name="con" value="${esc(e.con||"")}" placeholder="Con quién (grupo, organización o persona)" aria-label="Con quién"></div>
+  <div class="fr top">${I.notes}<textarea name="obj" rows="3" placeholder="Añade una descripción" aria-label="Notas">${esc(e.obj)}</textarea></div>
+  <div class="fr">${I.cal}<div class="dt"><select name="eje" aria-label="Eje" style="flex:1;width:auto">${Object.entries(EJES).map(([k,v])=>`<option value="${k}" ${k===e.eje?"selected":""}>${v}</option>`).join("")}</select><span class="sq" id="ejeSq" style="--c:${COL[e.eje]||COL.eq}"></span></div></div>
+  <div class="dact">${n?"":`<button type="button" class="btn txt del" id="del">Eliminar</button>`}<span class="sp1"></span><button class="btn pri" type="submit">Guardar</button></div></form>`);
+  const f=$("#fe");
+  f.elements.eje.onchange=()=>$("#ejeSq").style.setProperty("--c",COL[f.elements.eje.value]);
+  $("#x").onclick=cerrar;
+  f.onsubmit=ev=>{ev.preventDefault();const fd=new FormData(f),d=Object.fromEntries(fd);d.para=fd.getAll("para");
+    if(n){const nu={id:uid(),...(base&&base.tareaId?{tareaId:base.tareaId,acta:base.acta||""}:{}),...d};S.eventos.push(nu);const t=nu.tareaId&&S.tareas.find(x=>x.id===nu.tareaId);if(t)t.eventoId=nu.id}
+    else Object.assign(e,d);irA(pf(d.fecha));save();render();cerrar();toast(n?"Evento guardado":"Cambios guardados")};
+  if(!n)$("#del").onclick=()=>{cerrar();borrarEvento(e)};
+  if(n)f.elements.titulo.focus();
 }
 function ajustes(){
   const c=S.cfg;
@@ -632,12 +783,12 @@ function ajustes(){
 
 /* ---------- IA ---------- */
 function contexto(){
-  const ev=[...S.eventos].sort(ord).map(e=>({id:e.id,titulo:e.titulo,eje:e.eje,fecha:e.fecha,ini:e.ini,fin:e.fin,lugar:e.lugar,con:e.con||""}));
-  const pe=S.pend.filter(p=>p.estado==="pendiente").map(p=>({de:p.de,grupo:p.org,tipo:p.tipo,titulo:p.titulo,resumen:p.resumen,buscan_a:p.persona,fecha:p.fecha,ini:p.ini,lugar:p.lugar,plazo:p.plazo,recibido:p.recibido?cuandoTs(p.recibido):"",palabras:palabras(p.texto),mensaje:p.texto.slice(0,300)}));
-  return`Eres el asistente de Fondacio, una fundación en Altos de Cazucá (Colombia). Responde en español de Colombia, breve y claro, en texto plano: sin tablas ni markdown, con listas simples usando guiones. Escribe las fechas como «viernes 9 de octubre» y las horas como «3:00 p. m.». Hoy es ${iso(new Date())} (${DIAS[new Date().getDay()]}).
+  const ev=[...S.eventos].sort(ord).map(e=>({id:e.id,titulo:e.titulo,eje:e.eje,fecha:e.fecha,ini:e.ini,fin:e.fin,lugar:e.lugar,con:e.con||"",rep:e.rep||"",para:paraDe(e).join(", ")}));
+  return`Eres el asistente de Fondacio, una fundación en Altos de Cazucá (Colombia). Responde en español de Colombia, breve y claro, en texto plano: sin tablas ni markdown, con listas simples usando guiones. Escribe las fechas como «viernes 9 de octubre» y las horas como «3:00 p. m.». Hoy es ${iso(new Date())} (${DIAS[new Date().getDay()]}).${S.ui.yo?` Quien te escribe es ${S.ui.yo}, del equipo (${EQ().join(", ")}). Cada actividad tiene un campo "para" con las personas del equipo a cargo.`:""}
 Ejes válidos: form (Formación), com (Comunidad), eco (Economía circular), eq (Equipo).
-Calendario (solo actividades aceptadas): ${JSON.stringify(ev)}
-Pendientes por responder (mensajes de WhatsApp aún no aceptados): ${JSON.stringify(pe)}
+Calendario: ${JSON.stringify(ev)}
+Compromisos abiertos de las actas de los viernes (tema, texto, responsable, desde, última vez que se mencionó): ${JSON.stringify(S.tareas.filter(t=>t.estado==="abierta").sort((x,y)=>ultMencion(y).localeCompare(ultMencion(x))).slice(0,80).map(t=>[t.tema,t.texto.slice(0,100),t.resp,t.desde,ultMencion(t)]))}
+Los eventos con "rep":"semanal" se repiten cada semana.
 Si el usuario pide crear o borrar actividades del calendario, explica en una frase y agrega AL FINAL un bloque \`\`\`json con {"acciones":[{"tipo":"crear","titulo":"","eje":"form","fecha":"AAAA-MM-DD","ini":"HH:MM","fin":"HH:MM","lugar":"","obj":""},{"tipo":"borrar","id":"..."}]}. No inventes datos que el usuario no dio: pregunta lo que falte. Si no piden cambios, no incluyas el bloque.`;
 }
 async function ia(msgs,sistema){
@@ -650,16 +801,6 @@ async function ia(msgs,sistema){
   if(!r.ok){let m="Error "+r.status;try{const j=await r.json();m+=": "+(j.error?.message||j.error||"")}catch(e){}throw new Error(m.slice(0,200))}
   const j=await r.json();return j.choices?.[0]?.message?.content?.trim()||"(sin respuesta)";
 }
-async function extraerIA(texto,base){
-  base=base||new Date();
-  const sis=`El mensaje de WhatsApp se envió el ${iso(base)} (${DIAS[base.getDay()]}) a las ${pad(base.getHours())}:${pad(base.getMinutes())}. Extrae sus datos y responde SOLO un JSON con esta forma exacta: {"tipo":"invitación | solicitud de visita | consulta de disponibilidad | reunión | taller | evento | otro","titulo":"nombre corto de la actividad","resumen":"una frase con lo que piden o proponen","org":"grupo, organización o institución de quien escribe","persona":"persona por la que preguntan o con quien quieren hablar, con su cargo si lo dicen","fecha":"AAAA-MM-DD","ini":"HH:MM","fin":"HH:MM","lugar":"","plazo":"cuándo lo quieren si no dan fecha exacta, por ejemplo esta semana"}. Usa "" en lo que no esté claro. No inventes datos. Las fechas relativas (hoy, mañana, el viernes, esta tarde) se cuentan desde el día en que se envió el mensaje.`;
-  const raw=await ia([{role:"user",content:texto}],sis);
-  let j;try{j=JSON.parse(raw.match(/\{[\s\S]*\}/)[0])}catch(e){throw new Error("La IA no devolvió datos legibles")}
-  const t=(v,n=120)=>typeof v==="string"?v.trim().slice(0,n):"";
-  return{tipo:cap(t(j.tipo,40)),titulo:cap(t(j.titulo,80)),resumen:t(j.resumen,160),org:t(j.org,90),persona:t(j.persona,90),
-    fecha:/^\d{4}-\d{2}-\d{2}$/.test(j.fecha||"")?j.fecha:"",ini:/^\d{2}:\d{2}$/.test(j.ini||"")?j.ini:"",fin:/^\d{2}:\d{2}$/.test(j.fin||"")?j.fin:"",lugar:t(j.lugar,90),plazo:t(j.plazo,60)};
-}
-const promptRespuesta=(modo,p)=>`Redacta una respuesta corta de WhatsApp en español de Colombia (máximo 60 palabras), cordial y respetuosa. Intención: ${{aceptar:"aceptar la invitación y confirmar asistencia",rechazar:"declinar la invitación con amabilidad",preguntar:"pedir los datos que faltan (fecha, hora o lugar)"}[modo]}. Mensaje recibido: «${p.texto}». Tipo: ${p.tipo||"no indicado"}. Resumen: ${p.resumen||"no indicado"}. Actividad: ${p.titulo||"sin nombre"}. Fecha: ${p.fecha?fechaLarga(p.fecha):"no indicada"}. Hora: ${p.ini?hora(p.ini):"no indicada"}. Lugar: ${p.lugar||"no indicado"}. Plazo: ${p.plazo||"no indicado"}. Remitente: ${p.de||"desconocido"}${p.org?" del grupo "+p.org:""}. Persona por la que preguntan: ${p.persona||"ninguna"}. No inventes datos que no estén aquí.`;
 function acciones(txt){
   const m=txt.match(/```json\s*([\s\S]*?)```/);if(!m)return{texto:txt,acc:null};
   let acc=null;try{acc=JSON.parse(m[1]).acciones}catch(e){}
@@ -677,7 +818,7 @@ function aplicar(acc){
 }
 function renderChat(){
   const el=$("#msgs");
-  if(!S.chat.length){el.innerHTML=`<div class="m2 s">Pregúntame por la agenda o por tus pendientes, o pídeme crear actividades y textos para redes.${S.cfg.key?"":"<br>Para activarme, pega tu clave en <strong>Ajustes IA</strong>."}</div>`}
+  if(!S.chat.length){el.innerHTML=`<div class="m2 s">Pregúntame por la agenda o pídeme crear actividades y textos para redes.${S.cfg.key?"":"<br>Para activarme, pega tu clave en <strong>Ajustes IA</strong>."}</div>`}
   else el.innerHTML=S.chat.map((m,i)=>`<div class="m2 ${m.role==="user"?"u":m.role==="error"?"s":"a"}">${esc(m.texto??m.content)}${m.acc&&!m.hecho?`<div class="act">${m.acc.map(a=>"• "+esc(descr(a))).join("<br>")}<div class="row" style="margin-top:6px"><button class="btn sm pri" data-ap="${i}">Aplicar</button><button class="btn sm" data-no="${i}">Descartar</button></div></div>`:""}</div>`).join("");
   el.scrollTop=el.scrollHeight;
 }
@@ -693,42 +834,797 @@ async function enviar(txt){
   save();renderChat();
 }
 
+/* =====================================================================
+   ACTAS DE LOS VIERNES
+   - Se leen las actas en Word (.docx) dentro del navegador: nada se sube a internet.
+   - Cada compromiso se sigue de acta en acta: cuándo apareció, en cuáles se habló,
+     cuándo se cerró. Si nadie lo vuelve a mencionar, queda marcado "quedó en el aire".
+   - Cada viernes se crea sola un acta nueva que trae todo lo que sigue abierto.
+   - Las fechas que aparecen en las actas se proponen como actividades del calendario.
+   ===================================================================== */
+S.actas=S.actas||[];S.tareas=S.tareas||[];
+let actaSel=null,filtroActa="todo";
+const sinTilde=s=>String(s??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const MESN=MESES.map(sinTilde);
+const DSEM={domingo:0,lunes:1,martes:2,miercoles:3,jueves:4,viernes:5,sabado:6,sabados:6,domingos:0};
+const normTema=s=>sinTilde(String(s||"").toLowerCase()).replace(/[^a-z0-9]+/g," ").trim();
+const STOP=new Set("de la el los las para con por que del una uno unos unas se y a en al lo su sus mas ya este esta estos estas como sobre entre hay muy nos les le o u e es son fue ser sin tambien desde hasta cada todo toda todos todas otro otra otros otras pero porque cuando donde esto eso enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre lunes martes miercoles jueves viernes sabado sabados domingo domingos manana tarde".split(" "));
+function fichas(s){return new Set(sinTilde(String(s).toLowerCase()).replace(/https?:\S+/g," ").split(/[^a-z0-9ñ]+/).filter(w=>w.length>=3&&!STOP.has(w)).map(w=>w.slice(0,4)))}
+const actasOrden=()=>[...S.actas].sort((a,b)=>a.fecha.localeCompare(b.fecha));
+const fechaCorta=f=>{const d=pf(f);return`${d.getDate()} ${MESES[d.getMonth()].slice(0,3)} ${d.getFullYear()}`};
+
+/* ---------- 1. leer el .docx (es un zip) sin librerías ---------- */
+async function leerDocx(file){
+  const buf=new Uint8Array(await file.arrayBuffer()),dv=new DataView(buf.buffer),dec=new TextDecoder();
+  let e=buf.length-22;while(e>=0&&dv.getUint32(e,true)!==0x06054b50)e--;
+  if(e<0)throw new Error("no parece un archivo de Word (.docx)");
+  let p=dv.getUint32(e+16,true);const n=dv.getUint16(e+10,true);
+  for(let i=0;i<n;i++){
+    const met=dv.getUint16(p+10,true),cs=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    if(dec.decode(buf.subarray(p+46,p+46+nl))==="word/document.xml"){
+      const st=off+30+dv.getUint16(off+26,true)+dv.getUint16(off+28,true),data=buf.subarray(st,st+cs);
+      if(met===0)return dec.decode(data);
+      return await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+    }
+    p+=46+nl+xl+cl;
+  }
+  throw new Error("el archivo no tiene el contenido de Word esperado");
+}
+const WNS="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+function parseActa(xml,nombre){
+  const doc=new DOMParser().parseFromString(xml,"application/xml");
+  const q=(el,tag)=>[...el.getElementsByTagNameNS(WNS,tag)];
+  const hijos=(el,tag)=>[...el.children].filter(c=>c.localName===tag);
+  const val=(el,tag,at="val")=>{const x=q(el,tag)[0];return x?x.getAttributeNS(WNS,at)||"":""};
+  const pars=tc=>q(tc,"p").map(p=>{
+    const t=q(p,"t").map(x=>x.textContent).join("").replace(/\s+/g," ").trim();if(!t)return null;
+    let azul=false,pend=false,tach=false,arr=false,resp="",tt=t,bul=q(p,"numPr").length>0;
+    q(p,"r").forEach(r=>{const c=val(r,"color").toLowerCase(),h=val(r,"highlight"),s=val(r,"shd","fill").toLowerCase(),k=q(r,"strike")[0];
+      if(c==="0000ff")azul=true;if((h&&h!=="none")||/^(ffff00|fff2cc|ff00ff)$/.test(s))pend=true;
+      if(k&&!/^(0|false)$/.test(k.getAttributeNS(WNS,"val")||"")&&q(r,"t").some(x=>x.textContent.trim()))tach=true});
+    const mb=tt.match(/^[•·▪◦●○■\-–]\s*/);if(mb){bul=true;tt=tt.slice(mb[0].length)}
+    tt=tt.replace(/\s*✔\s*(cumplido|archivado|se decidi[oó] no hacerlo)\b.*$/i,()=>{tach=true;return""});
+    tt=tt.replace(/\s*\((nuevo|desde el [^()]*|nadie lo menciona desde[^()]*)\)\s*$/i,(m,g)=>{if(!/^nuevo/i.test(g))arr=true;return""});
+    tt=tt.replace(/\s+—\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s*\/\s*[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)?)$/,(m,g)=>{resp=g;return""}).trim();
+    if(!tt)return null;
+    if(tach&&!/^(ya\s|no se)/i.test(tt))tt="Ya se hizo: "+tt;
+    return{t:tt,bul,azul,pend,arr,resp}}).filter(Boolean);
+  const body=q(doc,"body")[0];if(!body)throw new Error("documento vacío");
+  const tablas=hijos(body,"tbl").map(t=>hijos(t,"tr").map(tr=>hijos(tr,"tc").map(tc=>({ps:pars(tc),cont:val(tc,"vMerge")===""&&q(tc,"vMerge").length>0}))));
+  const txt=c=>c?c.ps.map(p=>p.t).join(" "):"";
+  const a={id:uid(),archivo:nombre,fecha:"",modera:"",apunta:"",part:[],temas:[]};
+  for(const t of tablas){
+    const cab=sinTilde(t[0]?.map(txt).join(" ").toUpperCase()||"");
+    if(t.some(r=>/^FECHA/.test(sinTilde(txt(r[0]).toUpperCase())))){
+      for(const r of t){const k=sinTilde(txt(r[0]).toUpperCase()),v=txt(r[1]);
+        if(k.startsWith("FECHA"))a.fecha=leerFecha(v)||"";else if(k.includes("MODERA"))a.modera=v;else if(k.includes("APUNTA"))a.apunta=v}
+    }else if(cab.includes("PARTICIPANTES")){
+      for(const r of t.slice(1)){const nm=txt(r[0]);if(!nm)continue;a.part.push({n:cap(nm.toLowerCase()),logros:(r[1]?.ps||[]).map(p=>p.t),mejorar:(r[2]?.ps||[]).map(p=>p.t)})}
+    }else if(cab.includes("TEMA")&&cab.includes("COMPROMISO")){
+      const H=t[0].map(c=>sinTilde(txt(c).toUpperCase()));
+      const ix=k=>H.findIndex(h=>h.includes(k));
+      const iP=Math.max(0,ix("PRINCIPAL")),iS=ix("SECUNDARIO"),iQ=ix("QUIEN"),iD=ix("DESARROLLO"),iC=ix("COMPROMISO");
+      let prin="";
+      for(const r of t.slice(1)){
+        const util=c=>(c?.ps||[]).filter(p=>!/^(ficha de seguimiento|seguimiento proyecto)/i.test(p.t));
+        const pc=r[iP];const p0=pc&&!pc.cont?util(pc).map(p=>p.t).join(" ").replace(/\s*\/\s*/g,"/").trim():"";if(p0)prin=p0;
+        if(/^ejemplo/i.test(prin))continue;
+        const sc=util(r[iS]);let sub=sc[0]?.t||"",k0=1;while(/\/$/.test(sub)&&sc[k0])sub+=" "+sc[k0++].t;
+        const tema={tema:cap((prin||"Otros").toLowerCase()),sub:sub?cap(sub.toLowerCase()):"",quien:txt(r[iQ]),extra:sc.slice(k0).map(p=>p.t),avances:(r[iD]?.ps||[]).map(p=>({t:p.t,azul:p.azul,pend:p.pend})),items:[]};
+        tema.tk=normTema(tema.tema)+"|"+normTema(tema.sub);
+        let grupo="";
+        for(const p of r[iC]?.ps||[]){
+          if(!p.bul&&(/:$/.test(p.t)||/^pendientes futuros$/i.test(p.t))){grupo=p.t.replace(/:$/,"");continue}
+          if(!p.bul&&tema.items.length&&p.t.split(" ").length<9){tema.items[tema.items.length-1].t+=" · "+p.t;continue}
+          tema.items.push({t:p.t,azul:p.azul,pend:p.pend,grupo,arr:p.arr,resp:p.resp});
+        }
+        if(tema.items.length||tema.avances.length||tema.extra.length)a.temas.push(tema);
+      }
+    }
+  }
+  if(!a.fecha){const m=nombre.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)a.fecha=`${m[1]}-${pad(+m[2])}-${pad(+m[3])}`}
+  if(!a.fecha)throw new Error("no encontré la fecha del acta");
+  if(!a.temas.length)throw new Error("no encontré la tabla de temas y compromisos");
+  return a;
+}
+function leerFecha(s){const m=sinTilde(s.toLowerCase()).match(/(\d{1,2})\s+de\s+([a-z]+)\s+(?:de(?:l)?\s+)?(\d{4})/);if(!m)return"";const mi=MESN.indexOf(m[2]);return mi<0?"":`${m[3]}-${pad(mi+1)}-${pad(+m[1])}`}
+
+/* ---------- 2. seguir los compromisos de acta en acta ---------- */
+const esCierre=s=>{const x=sinTilde(s.toLowerCase()).trim();
+  return /^(ya\s|listo|hecho|no se (hara|va a hacer)\b|se (cancelo|descarto)\b|se\s+(realizo|hizo|entrego|envio|termino|concluyo|firmo|compro|compraron|sembro|sembraron|subio|hicieron|realizaron|entregaron|enviaron|logro|organizo|lavaron)\b)|ya (esta|se) |quedo (listo|hecho)|esta subido/.test(x)&&!/pendiente|falta|todavia no|aun no|no se ha(n)?\b/.test(x)};
+const estadoCierre=s=>/^(no se|se cancel|se descart)/.test(sinTilde(s.toLowerCase()).trim())?"descartada":"hecha";
+function parecido(A,B){if(!A.size||!B.size)return{s:0,n:0};let n=0;A.forEach(w=>{if(B.has(w))n++});return{s:n/Math.min(A.size,B.size),n}}
+function mejor(cands,tk,texto,u=.6){
+  const A=fichas(texto);let best=null,bs=0;
+  for(const t of cands){const mismo=t.tk===tk,{s,n}=parecido(A,fichas(t.texto));
+    const ok=mismo?(n>=Math.min(2,A.size)&&s>=u):(n>=4&&s>=.85);
+    if(ok&&s>bs){bs=s;best=t}}
+  return best;
+}
+function nombresEquipo(){const s=new Set();S.actas.forEach(a=>{a.part.forEach(p=>p.n.split(/\s+y\s+|\//).forEach(x=>s.add(x.trim())));a.temas.forEach(t=>(t.quien||"").split(/\s*(?:\/|,|\by\b)\s*/).forEach(x=>x.trim().length>2&&s.add(cap(x.trim().toLowerCase()))))});return[...s].filter(Boolean)}
+function respDe(texto,quien,nombres){
+  const x=sinTilde(texto.toLowerCase());
+  let best="",bi=1e9;for(const n of nombres){const m=x.search(new RegExp("\\b"+sinTilde(n.toLowerCase())+"\\b"));if(m>=0&&m<bi){bi=m;best=cap(n)}}if(best)return best;
+  return(quien||"").split(/\s*(?:\/|,|\by\b)\s*/)[0]?.trim()?cap(quien.split(/\s*(?:\/|,|\by\b)\s*/)[0].trim().toLowerCase()):"";
+}
+function cumplir(t,f,nota,manual,estado="hecha"){t.estado=estado;t.cierre={f,nota:nota||"",manual:!!manual}}
+function reabrir(t){t.estado="abierta";t.cierre=null}
+function integrar(a,nombres){
+  const usados=new Set();
+  const abiertas=()=>S.tareas.filter(t=>t.estado==="abierta"&&t.desde<a.fecha&&!usados.has(t.id));
+  for(const tm of a.temas){
+    tm.avAuto=[];
+    for(const it of tm.items){
+      const m=mejor(abiertas(),tm.tk,it.t);
+      if(m){usados.add(m.id);if(!it.arr){m.menciones.push({f:a.fecha,t:it.t});m.texto=it.t}if(it.resp)m.resp=it.resp;if(it.pend)m.marcada=a.fecha;if(esCierre(it.t))cumplir(m,a.fecha,it.t,false,estadoCierre(it.t))}
+      else if(esCierre(it.t))tm.avAuto.push(it.t);
+      else S.tareas.push({id:uid(),tk:tm.tk,tema:tm.tema,sub:tm.sub,texto:it.t,orig:it.t,resp:it.resp||respDe(it.t,tm.quien,nombres),desde:a.fecha,
+        menciones:[{f:a.fecha,t:it.t}],estado:"abierta",cierre:null,grupo:it.grupo||"",marcada:it.pend?a.fecha:""});
+    }
+    for(const av of tm.avances)if(esCierre(av.t)){
+      const m=mejor(S.tareas.filter(t=>t.estado==="abierta"&&t.desde<a.fecha),tm.tk,av.t);
+      if(m){if(!usados.has(m.id)){usados.add(m.id);m.menciones.push({f:a.fecha,t:av.t})}cumplir(m,a.fecha,av.t,false,estadoCierre(av.t))}
+    }
+  }
+}
+/* Recalcula todo desde las actas importadas, conservando lo que el equipo cambió a mano */
+function reconstruir(){
+  const viejas=S.tareas,nombres=nombresEquipo();S.tareas=[];
+  for(const a of actasOrden())if(!a.auto)integrar(a,nombres);
+  const por=new Map(viejas.filter(v=>!v.manual).map(v=>[v.tk+"|"+v.orig,v]));
+  for(const t of S.tareas){const v=por.get(t.tk+"|"+t.orig);if(!v)continue;
+    t.id=v.id;if(v.eventoId)t.eventoId=v.eventoId;
+    v.menciones.filter(m=>m.manual).forEach(m=>{if(!t.menciones.some(x=>x.f===m.f))t.menciones.push(m)});
+    if(v.cierre&&v.cierre.manual){t.estado=v.estado;t.cierre=v.cierre}
+    if(v.reabierta){t.estado="abierta";t.cierre=null;t.reabierta=true}
+    if(v.editado)["texto","resp","tema","sub","tk","editado"].forEach(k=>t[k]=v[k]);
+  }
+  viejas.filter(v=>v.manual).forEach(v=>S.tareas.push(v));
+  [...(S.uniones||[])].sort((x,y)=>x.f.localeCompare(y.f)).forEach(aplicarUnion);
+  S.tareas.forEach(t=>t.menciones.sort((x,y)=>x.f.localeCompare(y.f)));
+}
+/* ---------- 2b. la IA revisa qué compromisos son el mismo aunque los hayan escrito distinto ----------
+   La comparación de palabras no reconoce «Ordenar el material de lectura» = «Organizar cartillas».
+   La IA propone parejas, una persona las confirma, y la unión se guarda para que sobreviva al volver a cargar actas. */
+const ordenM=t=>t.menciones.sort((x,y)=>x.f.localeCompare(y.f));
+function candidatosUnion(a){
+  const f=a.fecha,lim=iso(new Date(pf(f)-150*864e5));
+  const nuevas=S.tareas.filter(t=>t.desde===f&&!t.manual);
+  const viejas=S.tareas.filter(t=>t.desde<f&&t.estado!=="archivada"&&(!t.cierre||t.cierre.f>f)&&ultMencionHasta(t,f)<f&&ultMencionHasta(t,f)>=lim);
+  const cierres=a.temas.flatMap(tm=>(tm.avAuto||[]).map(t=>({t,tema:tm.tema})));
+  return{nuevas,viejas,cierres};
+}
+/* se manda por tema y en lotes pequeños, para no pasar el límite gratuito de la IA */
+function lotesUnion(c){
+  const g=new Map(),add=(k,tipo,x)=>{k=normTema(k);if(!g.has(k))g.set(k,{n:[],v:[],c:[]});g.get(k)[tipo].push(x)};
+  c.nuevas.forEach(t=>add(t.tema,"n",t));c.viejas.forEach(t=>add(t.tema,"v",t));c.cierres.forEach(x=>add(x.tema,"c",x));
+  const lotes=[];let cur=null,tam=0;
+  for(const x of g.values()){if(!x.v.length||(!x.n.length&&!x.c.length))continue;
+    const s=[...x.n,...x.v].reduce((m,t)=>m+Math.min(t.texto.length,140)+30,0)+x.c.reduce((m,y)=>m+Math.min(y.t.length,140)+30,0);
+    if(!cur||tam+s>9000){cur={n:[],v:[],c:[]};lotes.push(cur);tam=0}cur.n.push(...x.n);cur.v.push(...x.v);cur.c.push(...x.c);tam+=s}
+  return lotes;
+}
+async function unirIA(a,l){
+  const cor=s=>String(s).replace(/\s+/g," ").slice(0,140),tm=t=>t.tema+(t.sub?" / "+t.sub:"");
+  const txt=`COMPROMISOS QUE YA VENÍAN DE ACTAS ANTERIORES:\n${l.v.map((t,i)=>`V${i+1} | ${tm(t)} | ${cor(t.texto)}`).join("\n")}\n\nCOMPROMISOS DEL ACTA DEL ${a.fecha} QUE PARECEN NUEVOS:\n${l.n.map((t,i)=>`N${i+1} | ${tm(t)} | ${cor(t.texto)}`).join("\n")||"(ninguno)"}\n\nFRASES DEL ACTA QUE DICEN QUE ALGO SE CUMPLIÓ:\n${l.c.map((x,i)=>`C${i+1} | ${x.tema} | ${cor(x.t)}`).join("\n")||"(ninguna)"}`;
+  const sis=`Ayudas a seguir los compromisos de las actas semanales del equipo de una fundación. De una semana a otra, las personas reescriben el mismo compromiso con otras palabras. Di cuáles compromisos que parecen nuevos (N) son en realidad el mismo que uno que ya venía (V), y qué frases de cumplimiento (C) cierran un compromiso que ya venía (V). Empareja solo si es la misma tarea (misma acción sobre lo mismo), no si solo comparten el tema o la persona. Cada V se usa una sola vez. Responde SOLO un JSON: {"mismos":[{"n":"N1","v":"V3","seguro":true}],"cierres":[{"c":"C1","v":"V2","seguro":true}]}. Usa "seguro": false si tienes dudas. Si no hay, deja las listas vacías.`;
+  const raw=await ia([{role:"user",content:txt}],sis);
+  let j;try{j=JSON.parse(raw.match(/\{[\s\S]*\}/)[0])}catch(e){throw new Error("La IA no devolvió datos legibles. Intenta de nuevo")}
+  const ix=(s,p,arr)=>{const m=String(s||"").trim().match(new RegExp("^"+p+"(\\d+)$","i"));return m?arr[+m[1]-1]||null:null};
+  const usados=new Set(),out=[];
+  for(const x of j.mismos||[]){const n=ix(x.n,"N",l.n),v=ix(x.v,"V",l.v);if(n&&v&&!usados.has(v.id)){usados.add(v.id);out.push({tipo:"mismo",f:a.fecha,n,v,seguro:x.seguro!==false})}}
+  for(const x of j.cierres||[]){const c=ix(x.c,"C",l.c),v=ix(x.v,"V",l.v);if(c&&v&&!usados.has(v.id)){usados.add(v.id);out.push({tipo:"cierre",f:a.fecha,c,v,seguro:x.seguro!==false})}}
+  return out;
+}
+/* une el compromiso n dentro de v: v se queda con todo el recorrido */
+function unirTareas(v,n){
+  n.menciones.forEach(m=>{if(!v.menciones.some(x=>x.f===m.f))v.menciones.push(m)});ordenM(v);
+  v.texto=n.texto;if(n.resp)v.resp=n.resp;
+  if(n.cierre&&!v.cierre){v.estado=n.estado;v.cierre=n.cierre}
+  if(n.eventoId&&!v.eventoId){v.eventoId=n.eventoId;const ev=S.eventos.find(e=>e.id===n.eventoId);if(ev)ev.tareaId=v.id}
+  S.tareas.splice(S.tareas.indexOf(n),1);
+}
+function aplicarUnion(u){
+  const v=S.tareas.find(t=>t.id===u.vid);if(!v)return;
+  if(u.tipo==="mismo"){const n=S.tareas.find(t=>t.desde===u.f&&t.tk+"|"+t.orig===u.nk);if(n&&n!==v)unirTareas(v,n)}
+  else{if(!v.menciones.some(m=>m.f===u.f)){v.menciones.push({f:u.f,t:u.ctxt});ordenM(v)}if(!v.cierre||v.cierre.f>u.f)cumplir(v,u.f,u.ctxt,false,estadoCierre(u.ctxt))}
+}
+async function revisarIA(actas,luego){
+  const reales=actas.filter(a=>!a.auto).sort((x,y)=>x.fecha.localeCompare(y.fecha)),sigue=()=>{if(luego)luego()};
+  abrir(`<form id="fia"><div class="row between"><h2>La IA revisa los compromisos</h2>${X}</div>
+  <p class="hint">Busca compromisos que se escribieron distinto de un acta a otra pero son el mismo, para que no queden como olvidados. Se envía el texto de los compromisos a ${esc(PROV[S.cfg.prov].n.split(" (")[0])}.</p>
+  <div id="uia"><p class="hint" id="uiaE">Revisando…</p></div>
+  <div class="row"><button type="button" class="btn txt" id="omit">Saltar</button><button class="btn pri" id="uiaOk" hidden>Unir los marcados</button></div></form>`);
+  let fuera=false;const salir=()=>{fuera=true;cerrar();sigue()};$("#x").onclick=$("#omit").onclick=salir;
+  const props=[];
+  try{for(const a of reales)for(const l of lotesUnion(candidatosUnion(a))){if(fuera)return;$("#uiaE").textContent=`Revisando el acta del ${fechaCorta(a.fecha)}…`;props.push(...await unirIA(a,l))}}
+  catch(e){if(!fuera){$("#uiaE").textContent="No se pudo revisar: "+e.message;$("#omit").textContent="Seguir"}return}
+  if(fuera)return;
+  if(!props.length){cerrar();toast("La IA no encontró compromisos repetidos");sigue();return}
+  const caja=(p,i,h)=>`<label class="imp"><input type="checkbox" data-u="${i}" ${p.seguro?"checked":""}><div>${h}${p.seguro?"":`<div class="m warn2">La IA no está segura: revísalo</div>`}</div></label>`;
+  const M=props.map((p,i)=>[p,i]).filter(([p])=>p.tipo==="mismo"),C=props.map((p,i)=>[p,i]).filter(([p])=>p.tipo==="cierre");
+  $("#uia").innerHTML=`${M.length?`<h3>Son el mismo compromiso (${M.length})</h3>`+M.map(([p,i])=>caja(p,i,`<div class="m">Venía desde el ${esc(fechaCorta(p.v.desde))}:</div><b>${esc(p.v.texto)}</b><div class="m" style="margin-top:6px">En el acta del ${esc(fechaCorta(p.f))} lo escribieron así:</div><b>${esc(p.n.texto)}</b>`)).join(""):""}
+    ${C.length?`<h3>Se cumplieron (${C.length})</h3>`+C.map(([p,i])=>caja(p,i,`<div class="m">En el acta del ${esc(fechaCorta(p.f))} dice:</div><b>${esc(p.c.t)}</b><div class="m" style="margin-top:6px">Eso cierra el compromiso que venía desde el ${esc(fechaCorta(p.v.desde))}:</div><b>${esc(p.v.texto)}</b>`)).join(""):""}`;
+  $("#uiaOk").hidden=false;$("#omit").textContent="Ahora no";
+  $("#fia").onsubmit=e=>{e.preventDefault();
+    const nuevas=[...document.querySelectorAll("#fia [data-u]:checked")].map(c=>{const p=props[+c.dataset.u];
+      return p.tipo==="mismo"?{tipo:"mismo",f:p.f,vid:p.v.id,nk:p.n.tk+"|"+p.n.orig}:{tipo:"cierre",f:p.f,vid:p.v.id,ctxt:p.c.t}});
+    S.uniones=[...(S.uniones||[]),...nuevas];nuevas.forEach(aplicarUnion);RF=null;save();cerrar();render();
+    if(nuevas.length)toast(`${nuevas.length} compromisos unidos a su historia`,"Deshacer",()=>{S.uniones=S.uniones.filter(u=>!nuevas.includes(u));reconstruir();RF=null;save();render()});
+    sigue()};
+}
+
+function equipoInicial(){const a=actasOrden().filter(x=>!x.auto&&x.part.length).at(-1);
+  return a?[...new Set(a.part.flatMap(p=>p.n.split(/\s+y\s+|\s*\/\s*|,\s*/)).map(x=>cap(x.trim().toLowerCase())).filter(x=>x.length>1))]:[]}
+const viernesDe=d=>{const l=lunes(d);l.setDate(l.getDate()+4);return iso(l)};
+function crearActaViernes(){
+  if(!S.actas.length)return false;
+  const f=viernesDe(new Date()),ult=actasOrden().at(-1);
+  if(ult.fecha>=f)return false;
+  S.actas.push({id:uid(),fecha:f,auto:true,modera:"",apunta:"",part:[],temas:[]});return true;
+}
+/* ---------- estado de un compromiso visto desde un acta ---------- */
+const ultMencion=t=>t.menciones.length?t.menciones[t.menciones.length-1].f:t.desde;
+function realF(){const r=new Set(S.actas.filter(a=>!a.auto).map(a=>a.fecha));for(const t of S.tareas){t.menciones.forEach(m=>r.add(m.f));if(t.cierre)r.add(t.cierre.f)}return r}
+let RF=null;const esReal=a=>(RF||realF()).has(a.fecha);
+function enActa(t,a){
+  if(t.desde>a.fecha)return null;
+  if(t.estado==="archivada"&&t.cierre&&t.cierre.f<=a.fecha)return{arch:true};
+  if(t.cierre&&t.cierre.f<a.fecha)return null;
+  const cerradaAqui=t.cierre&&t.cierre.f===a.fecha,real=esReal(a);
+  const sinMencion=t.estado==="abierta"||(t.cierre&&t.cierre.f>a.fecha)?S.actas.filter(x=>x.fecha>ultMencionHasta(t,a.fecha)&&x.fecha<=a.fecha&&(x.fecha<a.fecha||(real&&a.fecha<iso(new Date())))&&esReal(x)).length:0;
+  return{cerradaAqui,nueva:t.desde===a.fecha,hablada:t.menciones.some(m=>m.f===a.fecha),aire:!cerradaAqui&&sinMencion>0,sinMencion};
+}
+function ultMencionHasta(t,f){let u=t.desde;for(const m of t.menciones)if(m.f<=f)u=m.f;return u}
+function resumenActa(a){RF=RF||realF();let ab=0,ce=0,ai=0,nu=0,ar=0;for(const t of S.tareas){const e=enActa(t,a);if(!e)continue;if(e.arch){ar++;continue}if(e.cerradaAqui)ce++;else{ab++;if(e.aire)ai++}if(e.nueva)nu++}return{abiertas:ab,cerradas:ce,aire:ai,nuevas:nu,archivadas:ar}}
+
+/* ---------- 3. fechas dentro del texto de un acta → actividades del calendario ---------- */
+function horaDe(h,m,p){h=+h;m=+m||0;p=(p||"").replace(/[\s.]/g,"");if(h>23)return"";if(/^p/.test(p)&&h<12)h+=12;else if(/^a/.test(p)&&h===12)h=0;else if(!p&&h>=1&&h<=6)h+=12;return`${pad(h)}:${pad(m)}`}
+function horasDe(s){
+  const P="(a\\.?\\s?m\\.?|p\\.?\\s?m\\.?|am|pm|m\\b)";
+  let m=s.match(new RegExp("(\\d{1,2})(?::(\\d{2}))?\\s*"+P+"?\\s*(?:a|-|hasta)\\s*(\\d{1,2})(?::(\\d{2}))?\\s*"+P+"?"));
+  if(m&&(m[2]||m[3]||m[5]||m[6])){const fin=m[6]||(s.match(new RegExp(P+"(?!.*"+P+")"))||[])[1]||"";
+    let ini=horaDe(m[1],m[2],m[3]||fin),f2=horaDe(m[4],m[5],m[6]||fin);if(ini&&f2&&ini>f2&&+ini.slice(0,2)>=12)ini=pad(+ini.slice(0,2)-12)+ini.slice(2);return{ini,fin:f2}}
+  m=s.match(new RegExp("(?:a las|desde las|\\b)(\\d{1,2}):(\\d{2})\\s*"+P+"?"))||s.match(new RegExp("\\b(\\d{1,2})()\\s*"+P));
+  return m?{ini:horaDe(m[1],m[2],m[3]),fin:""}:{ini:"",fin:""};
+}
+function resolverDia(dia,mes,wd,base){
+  const cand=[];
+  if(mes>=0){let d=new Date(base.getFullYear(),mes,dia);if(d-base<-120*864e5)d=new Date(base.getFullYear()+1,mes,dia);cand.push(d)}
+  else for(const k of[0,1,-1]){const d=new Date(base.getFullYear(),base.getMonth()+k,dia);if(d.getDate()===dia)cand.push(d)}
+  const ok=cand.filter(d=>wd==null||d.getDay()===wd).sort((a,b)=>{const da=a-base,db=b-base;return(da<-7*864e5)-(db<-7*864e5)||Math.abs(da)-Math.abs(db)});
+  if(ok.length){const d=ok[0];return{fecha:iso(d),dudosa:d<base&&mes<0}}
+  return{fecha:iso(cand[0]),dudosa:true};
+}
+function fechasDe(texto,base){
+  const s=sinTilde(texto.toLowerCase()),out=[],usados=[];
+  const mesRe=MESN.join("|"),wdRe="lunes|martes|miercoles|jueves|viernes|sabado|domingo";
+  const h=horasDe(s);
+  let m;const re1=new RegExp("\\b("+wdRe+")\\s+(\\d{1,2})\\b(?![:.]\\d)(?:\\s+(?:de\\s+)?("+mesRe+"))?","g");
+  while((m=re1.exec(s))){usados.push([m.index,m.index+m[0].length]);const r=resolverDia(+m[2],m[3]?MESN.indexOf(m[3]):-1,DSEM[m[1]],base);out.push({...r,...h})}
+  const re2=new RegExp("\\b(\\d{1,2})\\s+(?:de\\s+)?("+mesRe+")\\b","g");
+  while((m=re2.exec(s))){if(usados.some(([a,b])=>m.index>=a&&m.index<b))continue;const r=resolverDia(+m[1],MESN.indexOf(m[2]),null,base);out.push({...r,...h})}
+  if(!out.length&&h.ini){const r=s.match(/\b(?:los\s+)?(lunes|martes|miercoles|jueves|viernes|sabados?|domingos?)\b(?!\s+\d{1,2}(?![:.\d]))/);
+    if(r&&(/^(sabados|domingos)$/.test(r[1])||/\blos\s/.test(r[0])||/\b(lunes|martes|miercoles|jueves|viernes|sabados?|domingos?)\s*:?\s*(?:de\s+)?\d{1,2}(?::\d{2})?\s*(?:a\.?\s?m\.?|p\.?\s?m\.?|am|pm)?\s*(?:a|-)\s*\d/.test(s))){
+      const wd=DSEM[r[1]],d=new Date(base);d.setDate(d.getDate()+((wd-d.getDay()+7)%7));out.push({fecha:iso(d),...h,rep:"semanal"})}}
+  const vistos=new Set();return out.filter(x=>{const k=x.fecha+x.ini;if(vistos.has(k))return false;vistos.add(k);return true});
+}
+const EJE_TEMA=[[/empoder|club|refuerzo|liderazgo|formacion|clases|idiomas|habilidades|liceo|biblioteca/,"form"],[/agricult|huerta|semilla|sede sostenible|filtro|economia circular|tienda|residuo|reciclaje|jabon|textil|bricolaje|compost|agua/,"eco"],[/bienestar|coro|danza|aliados|otros|varios|espiritual|comunitario|restauracion|universidad|catolica|servicio social|comunicaciones|newsletter/,"com"]];
+const ejeDe=t=>{const s=normTema(t);for(const[r,e]of EJE_TEMA)if(r.test(s))return e;return"eq"};
+function tituloCorto(t){const sinFecha=t.replace(/^\s*(el\s+)?(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bado|domingo)?\s*\d{1,2}\s*(de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)?\s*[,:]?\s*(a las\s+)?(\d{1,2}(:\d{2})?\s*(a\.?\s?m\.?|p\.?\s?m\.?|am|pm)?)?\s*[,:\-–]?\s*/i,"");if(sinFecha!==t&&sinFecha.split(" ").length>=3)t=sinFecha;const sinCola=t.replace(/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s*:\s*/,"").replace(/[\s,]+(?:(?:el|los|todos los|cada)\s+)?(?:lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bados?|domingos?|\d{1,2}\s+de\s+(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre))\b.*$/i,"").replace(/[\s:,;–-]+$/,"");if(sinCola!==t&&sinCola.split(/\s+/).length>=3&&!/\b(d[ií]as?|fechas?|el|los|la|las|de|del|para|a|en|con|y|pr[oó]xim[oa])$/i.test(sinCola))t=sinCola;let s=t.replace(/https?:\S+/g,"").replace(/^(pendiente|hay que|se va a|queda la tarea con el orientador de)\s+/i,"").replace(/\s+/g," ").trim();s=cap(s);return s.length>70?s.slice(0,s.lastIndexOf(" ",68)).replace(/[,;:.]$/,"")+"…":s}
+function candidatosFechas(actas){
+  const res=[],ultimaActa=actasOrden().filter(a=>!a.auto).at(-1).fecha;
+  for(const a of actas){const base=pf(a.fecha);
+    for(const tm of a.temas)for(const x of[...tm.extra,...tm.avances.map(v=>v.t),...tm.items.map(v=>v.t)]){
+      for(const f of fechasDe(x,base)){
+        const titulo=tituloCorto(/^\s*(lunes|martes|mi[eé]rcoles|jueves|viernes|s[aá]bados?|domingos?)\b/i.test(x)&&x.length<40?(tm.sub||tm.tema)+": "+x:x);
+        res.push({...f,titulo,texto:x,tema:tm.tema,sub:tm.sub,tk:tm.tk,quien:tm.quien,acta:a.fecha});
+      }}
+  }
+  const out=[];
+  for(const c of res.sort((x,y)=>(x.dudosa?1:0)-(y.dudosa?1:0)||y.acta.localeCompare(x.acta)||(y.ini?1:0)-(x.ini?1:0))){
+    const A=fichas(c.texto);
+    const mismoDia=(f,g,r1,r2)=>f===g||(r1&&r2&&pf(f).getDay()===pf(g).getDay());
+    if(out.some(o=>{const q=parecido(A,fichas(o.texto));return mismoDia(o.fecha,c.fecha,o.rep,c.rep)&&!o.rep===!c.rep&&(o.ini===c.ini&&(q.s>=.6||normTema(o.texto)===normTema(c.texto))||q.n>=2)}))continue;
+    c.ya=S.eventos.some(e=>mismoDia(e.fecha,c.fecha,e.rep,c.rep)&&parecido(A,fichas(e.titulo+" "+(e.obj||""))).s>=.6);
+    c.vieja=(pf(ultimaActa)-pf(c.acta))>180*864e5;
+    out.push(c);
+  }
+  return out.sort((x,y)=>(x.fecha+x.ini).localeCompare(y.fecha+y.ini));
+}
+
+/* ---------- 4. importar ---------- */
+async function importarActas(files){
+  const nuevas=[],avisos=[];
+  for(const f of files){
+    try{const a=parseActa(await leerDocx(f),f.name);
+      if(S.actas.some(x=>x.fecha===a.fecha&&!x.auto)){avisos.push(`El acta del ${fechaCorta(a.fecha)} ya estaba cargada.`);continue}
+      if(nuevas.some(x=>x.fecha===a.fecha)){avisos.push(`${f.name} es una copia del acta del ${fechaCorta(a.fecha)}.`);continue}
+      S.actas=S.actas.filter(x=>!(x.fecha===a.fecha&&x.auto));nuevas.push(a)}
+    catch(e){avisos.push(`${f.name}: ${e.message}.`)}
+  }
+  if(!nuevas.length){toast(avisos[0]||"No se cargó ningún acta");return}
+  S.actas.push(...nuevas);reconstruir();crearActaViernes();if(EQ().length<3){const v=[...EQ()];for(const n of equipoInicial())if(!v.some(x=>llave(x)===llave(n)))v.push(n);S.equipo=v}save();
+  actaSel=actasOrden().at(-1).id;vista="actas";S.ui.vista="actas";render();
+  if(S.cfg.key&&S.actas.filter(a=>!a.auto).length>1)revisarIA(nuevas,()=>revisarFechas(nuevas,avisos));else revisarFechas(nuevas,avisos);
+}
+function revisarFechas(actas,avisos){
+  const c=candidatosFechas(actas),hoy=iso(new Date());
+  abrir(`<form id="frf"><div class="row between"><h2>Actividades encontradas en las actas</h2>${X}</div>
+  <p class="hint">Cargué ${actas.length} ${actas.length===1?"acta":"actas"}. Estas son las fechas que se mencionan. Revisa el nombre, el día y la hora; desmarca lo que no deba ir al calendario.</p>
+  ${avisos.length?`<div class="aviso">${avisos.map(esc).join("<br>")}</div>`:""}
+  ${c.length?c.map((x,i)=>`<div class="cf ${x.ya?"ya":""}"><input type="checkbox" data-i="${i}" ${x.ya||x.vieja||x.dudosa?"":"checked"} aria-label="Agregar al calendario">
+    <div><input class="cft" data-k="titulo" data-i="${i}" value="${esc(x.titulo)}" aria-label="Nombre">
+    <div class="dt"><input type="date" data-k="fecha" data-i="${i}" value="${x.fecha}" aria-label="Fecha"><input type="time" data-k="ini" data-i="${i}" value="${x.ini}" aria-label="Inicio"><span>–</span><input type="time" data-k="fin" data-i="${i}" value="${x.fin}" aria-label="Fin">
+    <select data-k="rep" data-i="${i}" aria-label="Repetir"><option value="">Una vez</option><option value="semanal" ${x.rep?"selected":""}>Cada semana</option></select></div>
+    <div class="m">${esc(x.sub||x.tema)}${x.quien?" · "+esc(x.quien):""} · acta del ${esc(fechaCorta(x.acta))}${x.ya?" · <b>ya está en el calendario</b>":""}${x.dudosa?" · <b class=\"warn2\">revisa la fecha: el acta no coincide con el día de la semana o ya había pasado</b>":""}${!x.ini?" · sin hora (todo el día)":""}${x.vieja?" · acta de hace más de 6 meses: puede estar desactualizado":""}${x.fecha<hoy&&!x.rep?" · ya pasó":""}</div>
+    <details><summary>Texto del acta</summary><div class="msg">${esc(x.texto)}</div></details></div></div>`).join(""):`<p class="hint">No encontré fechas concretas en estas actas.</p>`}
+  <div class="row"><button type="button" class="btn txt" id="omit">Ahora no</button><button class="btn pri" type="submit">${c.length?"Agregar al calendario":"Listo"}</button></div></form>`);
+  const f=$("#frf");$("#x").onclick=$("#omit").onclick=cerrar;
+  f.addEventListener("input",e=>{const i=e.target.dataset.i,k=e.target.dataset.k;if(i!=null&&k)c[i][k]=e.target.value});
+  f.onsubmit=e=>{e.preventDefault();let n=0;
+    f.querySelectorAll("input[type=checkbox]:checked").forEach(cb=>{const x=c[+cb.dataset.i];if(!x.fecha||!x.titulo)return;
+      const t=mejor(S.tareas.filter(y=>y.tk===x.tk),x.tk,x.texto,.6);
+      const ev={id:uid(),titulo:x.titulo,eje:ejeDe(x.tema+" "+x.sub),fecha:x.fecha,ini:x.ini||"",fin:x.fin||"",lugar:"",con:x.quien||"",obj:x.texto,acta:x.acta,rep:x.rep||"",tema:x.sub||x.tema};
+      if(t){ev.tareaId=t.id;t.eventoId=t.eventoId||ev.id}
+      S.eventos.push(ev);n++});
+    save();render();cerrar();toast(n?`${n} actividades agregadas al calendario`:"No se agregó nada al calendario")};
+}
+
+/* ---------- 5. la vista de actas ---------- */
+const temaAbierto=new Map(),n1=(n,s,p)=>`${n} ${n===1?s:p}`;
+function estadoTxt(t,a,e){
+  if(e.arch)return`<span class="tag">Archivado el ${esc(fechaCorta(t.cierre.f))}</span>`;
+  if(e.cerradaAqui){const k=t.estado==="descartada"?"Se decidió no hacerlo":t.estado==="archivada"?"Archivado":"Ya se hizo";
+    return`<span class="tag ok">${I.check}${k}${t.estado==="hecha"&&t.cierre.nota&&t.cierre.nota!==t.texto?": "+esc(t.cierre.nota):""}</span>`}
+  if(e.aire)return`<span class="tag aire">Nadie lo menciona desde el ${esc(fechaCorta(ultMencionHasta(t,a.fecha)))}</span>`;
+  if(e.hablada&&!e.nueva)return`<span class="tag habl">Se habló en esta reunión</span>`;
+  return"";
+}
+function filaTarea(t,a,e){
+  const ev=t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
+  return`<div class="tr ${e.cerradaAqui?"hecha":""} ${e.aire?"aire":""}" data-t="${t.id}">
+    <div class="tx"><div class="tt">${esc(t.texto)}</div>
+      <div class="tm">${t.resp?`<span class="who">${I.people}${esc(t.resp)}</span>`:""}<span>${e.nueva?"Nuevo en esta reunión":"Anotado desde el "+esc(fechaCorta(t.desde))}</span>${estadoTxt(t,a,e)}
+      ${ev?`<button class="tag cal" data-ta="cal">${I.cal}${esc(cap(fechaLarga(ev.fecha)))}${ev.rep?" · cada semana":""}</button>`:""}</div></div>
+    <div class="tacts">${e.arch?`<button class="btn sm" data-ta="desarch">Volver a abrir</button>`
+      :e.cerradaAqui?`<button class="btn sm" data-ta="hecho">Deshacer</button>`
+      :`<button class="btn sm ok" data-ta="hecho">${I.check}Ya se hizo</button><button class="btn sm habl ${e.hablada?"on":""}" data-ta="hablo" title="Se habló de esto en la reunión y todavía no está listo">${e.hablada?"Sigue pendiente ✓":"Sigue pendiente"}</button>`}
+      <button class="btn sm txt" data-ta="edit" title="Ver en qué actas apareció y editar">Historia</button></div></div>`;
+}
+function renderActas(){
+  RF=realF();
+  const lista=actasOrden().reverse(),hoy=iso(new Date());
+  if(!lista.some(a=>a.id===actaSel))actaSel=lista[0]?.id||null;
+  const a=lista.find(x=>x.id===actaSel);
+  const side=`<aside class="al"><div class="alh"><button class="btn pri sm" id="aImp">${I.up}Cargar actas (.docx)</button><input type="file" id="aFile" accept=".docx" multiple hidden><button class="btn sm txt" id="aPlant" style="margin-top:6px">${I.doc}Plantilla e instructivo</button>${lista.length?`<button class="btn sm txt" id="aBorrar" style="margin-top:2px" title="Quita de la página todas las actas cargadas y sus compromisos. Tus archivos de Word no se tocan.">${I.del}Quitar todas las actas</button>`:""}</div>
+    ${lista.map(x=>{const r=resumenActa(x);return`<button class="ali ${x.id===actaSel?"on":""}" data-acta="${x.id}"><b>${esc(cap(DIAS[pf(x.fecha).getDay()]))} ${esc(fechaCorta(x.fecha))}</b><span>${x.auto&&x.fecha>=hoy?"Próxima reunión · ":""}${n1(r.abiertas,"pendiente","pendientes")}${r.aire?` · ${r.aire} en el aire`:""}${r.cerradas?` · ${n1(r.cerradas,"cumplido","cumplidos")}`:""}</span></button>`}).join("")}</aside>`;
+  if(!a){$("#cv").innerHTML=`<div class="actas">${side}<section class="ad"><div class="vacio">${I.doc}<h2>Todavía no hay actas</h2><p>Carga las actas de las reuniones de los viernes (los archivos de Word). La página las lee aquí mismo, sin subirlas a internet, y sigue cada compromiso de acta en acta.</p><button class="btn pri" id="aImp2">${I.up}Cargar actas (.docx)</button></div></section></div>`;return}
+  const r=resumenActa(a),grupos=new Map();
+  for(const t of S.tareas){const e=enActa(t,a);if(!e||!!e.arch!==(filtroActa==="archivados"))continue;
+    if(filtroActa==="abiertos"&&e.cerradaAqui||filtroActa==="aire"&&!e.aire||filtroActa==="cumplidos"&&!e.cerradaAqui||filtroActa==="nuevos"&&!e.nueva)continue;
+    const k=t.tema;if(!grupos.has(k))grupos.set(k,new Map([["",[]]]));const g=grupos.get(k),s=t.sub||"";if(!g.has(s))g.set(s,[]);g.get(s).push([t,e])}
+  const av=new Map();for(const tm of a.temas)av.set(tm.tema+"|"+(tm.sub||""),tm.avances.map(v=>v.t));
+  const orden=[...new Set([...a.temas.map(t=>t.tema),...S.tareas.map(t=>t.tema)])].filter(k=>grupos.has(k));
+  const total=[...grupos.values()].reduce((n,g)=>n+[...g.values()].reduce((m,l)=>m+l.length,0),0);
+  const viejas=viejasAire(a),proxima=a.auto&&a.fecha>=hoy;
+  const F=[["todo","Todo",r.abiertas+r.cerradas,"lo que trae esta acta"],["abiertos","Pendientes",r.abiertas,"siguen por hacer"],["aire","En el aire",r.aire,"nadie los volvió a mencionar"],["cumplidos","Cumplidos",r.cerradas,"en esta reunión"],["nuevos","Nuevos",r.nuevas,"salieron en esta reunión"]];
+  const grupo=k=>{const g=grupos.get(k),it=[...g.values()].flat();
+    const pen=it.filter(([,e])=>!e.cerradaAqui&&!e.arch).length,air=it.filter(([,e])=>e.aire).length,hec=it.filter(([,e])=>e.cerradaAqui).length;
+    const op=temaAbierto.has(k)?temaAbierto.get(k):total<=25;
+    const cuerpo=[...g].filter(([s,ts])=>ts.length||(av.get(k+"|"+s)||[]).length).map(([s,ts])=>{const d=filtroActa==="todo"?av.get(k+"|"+s)||[]:[];
+      return`${s?`<div class="th3">${esc(s)}</div>`:""}${d.length?`<div class="avs"><b>Lo que se dijo:</b> ${d.map(esc).join(" · ")}</div>`:""}${ts.map(([t,e])=>filaTarea(t,a,e)).join("")}`}).join("");
+    return`<details class="tg2" ${op?"open":""}><summary data-tema="${esc(k)}"><span class="tn">${esc(k)}</span><span class="tc">${[pen?n1(pen,"pendiente","pendientes"):"",air?`<b class="ca">${air} en el aire</b>`:"",hec?n1(hec,"cumplido","cumplidos"):"",filtroActa==="archivados"?n1(it.length,"archivado","archivados"):""].filter(Boolean).join(" · ")}</span></summary>${cuerpo}</details>`};
+  $("#cv").innerHTML=`<div class="actas">${side}<section class="ad">
+    <div class="ah"><div><div class="spt">${proxima?"Próxima reunión · esta acta se armó sola":a.auto?"Acta que se armó sola":"Acta de reunión técnica"}</div>
+      <h2 class="ah2">Reunión del ${esc(fechaLarga(a.fecha))} de ${a.fecha.slice(0,4)}</h2></div>
+      <div class="row"><button class="btn sm" id="aReu">${I.mic}Agregar lo de la reunión</button><button class="btn sm" id="aNew">${I.plus}Nuevo compromiso</button><button class="btn sm" id="aDocs">${I.doc}Abrir en Google Docs</button><button class="btn sm txt" id="aDown">${I.imp}Descargar Word</button>${a.auto?"":`<button class="btn sm txt" id="aIA" title="La IA busca compromisos que se escribieron distinto pero son el mismo">${I.spark}Revisar repetidos con IA</button>`}${a.auto?`<button class="ib sm" id="aDel" title="Eliminar esta acta" aria-label="Eliminar esta acta">${I.del}</button>`:""}</div></div>
+    <div class="ameta"><label>Modera<input id="aMod" value="${esc(a.modera)}" placeholder="¿Quién modera?"></label><label>Apunta<input id="aApu" value="${esc(a.apunta)}" placeholder="¿Quién toma nota?"></label></div>
+    ${a.auto?`<details class="box guia" ${proxima?"open":""}><summary>¿Cómo usar esta acta en la reunión?</summary><ol>
+      <li>Esta acta trae todo lo que quedó pendiente en las actas anteriores, ordenado por tema.</li>
+      <li>Si algo ya está listo, toquen <b>Ya se hizo</b>. Deja de aparecer en las próximas actas, pero queda en la historia.</li>
+      <li>Si se habló y todavía falta, toquen <b>Sigue pendiente</b>.</li>
+      <li>Lo que nadie toque queda <b>en el aire</b> (en amarillo), para que no se olvide en la siguiente reunión.</li>
+      <li>Lo nuevo se agrega con <b>Nuevo compromiso</b>, o pegando la transcripción de Meet en <b>Agregar lo de la reunión</b>.</li>
+      <li>Al terminar, <b>Abrir en Google Docs</b> para guardar el acta con el formato de siempre.</li></ol><p style="margin:8px 0 0"><button class="btn sm txt" id="aGuia">Ver cómo llenar las actas nuevas</button></p></details>`:""}
+    ${viejas.length&&filtroActa!=="archivados"?`<div class="aviso row between" style="margin-top:12px"><span>${viejas.length} compromisos llevan más de 3 meses sin que nadie los mencione. Si ya no aplican, archívenlos para que no estorben. No se borran.</span><button class="btn sm" id="aArch">Archivar ${viejas.length}</button></div>`:""}
+    <div class="cards">${F.map(([k,l,n,d])=>`<button class="card ${k===filtroActa?"on":""} ${k==="aire"&&n?"warn":""} ${k==="cumplidos"&&n?"ok":""}" data-f="${k}" aria-pressed="${k===filtroActa}"><b>${n}</b><span>${l}</span><small>${d}</small></button>`).join("")}</div>
+    <div class="tbar"><span class="hint" style="margin:0">${filtroActa==="archivados"?"Archivados: compromisos viejos que nadie mencionaba. Se pueden volver a abrir.":orden.length?"Toca un tema para ver sus compromisos.":""}</span>
+      <span class="row">${orden.length>1?`<button class="btn sm txt" data-all="1">Abrir todos</button><button class="btn sm txt" data-all="0">Cerrar todos</button>`:""}${r.archivadas?`<button class="btn sm txt" data-f="${filtroActa==="archivados"?"todo":"archivados"}">${filtroActa==="archivados"?"Volver":"Ver archivados ("+r.archivadas+")"}</button>`:""}</span></div>
+    ${orden.map(grupo).join("")||`<p class="hint" style="padding:16px 0">No hay compromisos en este grupo.</p>`}
+    ${a.part.length?`<details class="box"><summary>Éxitos y cosas por mejorar (${a.part.length} personas)</summary>${a.part.map(p=>`<div class="pp"><b>${esc(p.n)}</b>${p.logros.length?`<div class="m">👍 ${p.logros.map(esc).join("<br>👍 ")}</div>`:""}${p.mejorar.length?`<div class="m">🔧 ${p.mejorar.map(esc).join("<br>🔧 ")}</div>`:""}</div>`).join("")}</details>`:""}
+    ${a.transcripcion?`<details class="box"><summary>Transcripción de la reunión</summary><div class="msg">${esc(a.transcripcion.slice(0,20000))}</div></details>`:""}
+  </section></div>`;
+}
+function viejasAire(a){const lim=iso(new Date(pf(a.fecha)-90*864e5));RF=RF||realF();return S.tareas.filter(t=>{const e=enActa(t,a);return e&&e.aire&&ultMencionHasta(t,a.fecha)<lim})}
+function tareaDe(el){const r=el.closest("[data-t]");return r&&S.tareas.find(t=>t.id===r.dataset.t)}
+function clicActas(e){
+  const sm=e.target.closest("summary[data-tema]");if(sm){const d=sm.parentElement;setTimeout(()=>temaAbierto.set(sm.dataset.tema,d.open));return}
+  const a=S.actas.find(x=>x.id===actaSel),b=e.target.closest("button");if(!b)return;
+  if(b.dataset.all){const v=b.dataset.all==="1";document.querySelectorAll("#cv summary[data-tema]").forEach(x=>temaAbierto.set(x.dataset.tema,v));renderActas();return}
+  if(b.dataset.acta){actaSel=b.dataset.acta;filtroActa="todo";renderActas();$("#cv .ad")?.scrollTo(0,0);return}
+  if(b.dataset.f){filtroActa=b.dataset.f;renderActas();return}
+  if(b.id==="aImp"||b.id==="aImp2"){$("#aFile").click();return}
+  if(b.id==="aPlant"||b.id==="aGuia")return formPlantilla();
+  if(b.id==="aBorrar"){const prev=JSON.stringify({actas:S.actas,tareas:S.tareas,uniones:S.uniones||[],eventos:S.eventos}),n=S.actas.length;
+    S.eventos=S.eventos.filter(e=>!e.acta&&!e.tareaId);S.actas=[];S.tareas=[];S.uniones=[];actaSel=null;RF=null;save();render();renderActas();
+    toast(`Se quitaron ${n} actas y sus compromisos`,"Deshacer",()=>{Object.assign(S,JSON.parse(prev));RF=null;save();render();renderActas()});return}
+  if(!a)return;
+  if(b.id==="aReu")return formReunion(a);
+  if(b.id==="aNew")return formTarea(null,a);
+  if(b.id==="aIA"){if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}return revisarIA([a],null)}
+  if(b.id==="aDocs")return abrirEnDocs(actaHTML(a),"el acta");
+  if(b.id==="aDown")return descargarActa(a);
+  if(b.id==="aArch"){const l=viejasAire(a),prev=l.map(t=>[t,t.estado,t.cierre]);l.forEach(t=>cumplir(t,a.fecha,"Archivado: no se mencionaba desde el "+fechaCorta(ultMencion(t)),true,"archivada"));save();RF=null;renderActas();
+    toast(`${l.length} compromisos archivados`,"Deshacer",()=>{prev.forEach(([t,e,c])=>{t.estado=e;t.cierre=c});save();RF=null;renderActas()});return}
+  if(b.id==="aDel"){const i=S.actas.indexOf(a);S.actas.splice(i,1);save();renderActas();toast("Se eliminó el acta","Deshacer",()=>{S.actas.splice(i,0,a);save();renderActas()});return}
+  const t=tareaDe(b),ac=b.dataset.ta;if(!t||!ac)return;
+  if(ac==="hecho"){if(t.cierre&&t.cierre.f===a.fecha){reabrir(t);t.reabierta=true}else{cumplir(t,a.fecha,"",true);t.reabierta=false}}
+  else if(ac==="desarch"){reabrir(t);t.reabierta=true}
+  else if(ac==="hablo"){const i=t.menciones.findIndex(m=>m.f===a.fecha);if(i>=0){if(t.menciones[i].manual)t.menciones.splice(i,1)}else{t.menciones.push({f:a.fecha,t:t.texto,manual:true});t.menciones.sort((x,y)=>x.f.localeCompare(y.f))}}
+  else if(ac==="edit")return formTarea(t,a);
+  else if(ac==="cal"){const ev=S.eventos.find(x=>x.id===t.eventoId);if(ev){irA(pf(ev.fecha));setVista("dia")}return}
+  save();renderActas();
+}
+function formTarea(t,a){
+  const n=!t,temas=[...new Set([...S.tareas.map(x=>x.tema),...a.temas.map(x=>x.tema)])].sort();
+  const ev=t&&t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
+  t=t||{texto:"",tema:temas[0]||"Otros",sub:"",resp:""};
+  abrir(`<form id="ft"><div class="row between"><h2>${n?"Nuevo compromiso":"Compromiso"}</h2>${X}</div>
+  <label>Qué hay que hacer<textarea name="texto" rows="3" required>${esc(t.texto)}</textarea></label>
+  <div class="two"><label>Tema<input name="tema" list="ltemas" value="${esc(t.tema)}" required><datalist id="ltemas">${temas.map(x=>`<option value="${esc(x)}">`).join("")}</datalist></label>
+  <label>Subtema (opcional)<input name="sub" value="${esc(t.sub)}"></label>
+  <label>Responsable<input name="resp" list="lresp" value="${esc(t.resp)}"><datalist id="lresp">${nombresEquipo().map(x=>`<option value="${esc(x)}">`).join("")}</datalist></label>
+  <label>Fecha en el calendario (opcional)<input type="date" name="fecha" value="${ev?ev.fecha:""}"></label>
+  <label>Hora de inicio<input type="time" name="ini" value="${ev?ev.ini:""}"></label><label>Hora de fin<input type="time" name="fin" value="${ev?ev.fin:""}"></label></div>
+  ${n?"":`<h3>Recorrido</h3><div class="hist">${t.menciones.map(m=>`<div><b>${esc(fechaCorta(m.f))}</b> · ${m.manual?"se habló en la reunión":esc(m.t)}</div>`).join("")}${t.cierre?`<div><b>${esc(fechaCorta(t.cierre.f))}</b> · ✔ ${t.estado==="archivada"?"archivado":t.estado==="descartada"?"descartado":"cumplido"}${t.cierre.nota&&t.cierre.nota!==t.texto?": "+esc(t.cierre.nota):""}</div>`:""}</div>`}
+  <div class="dact">${n?"":`<button type="button" class="btn txt del" id="desc">${t.estado==="descartada"?"Volver a abrir":"Descartar"}</button>`}<span class="sp1"></span><button class="btn pri">Guardar</button></div></form>`);
+  const f=$("#ft");$("#x").onclick=cerrar;
+  if(!n)$("#desc").onclick=()=>{if(t.estado==="descartada"){reabrir(t);t.reabierta=true}else cumplir(t,a.fecha,"Se decidió no hacerlo",true,"descartada");save();cerrar();renderActas()};
+  f.onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(f));
+    if(n){t={id:uid(),manual:true,desde:a.fecha,menciones:[{f:a.fecha,t:d.texto,manual:true}],estado:"abierta",cierre:null,grupo:"",orig:d.texto};S.tareas.push(t)}
+    else t.editado=true;
+    Object.assign(t,{texto:d.texto.trim(),tema:d.tema.trim(),sub:d.sub.trim(),resp:d.resp.trim()});t.tk=normTema(t.tema)+"|"+normTema(t.sub);
+    sincronizarEvento(t,d,a);save();cerrar();render();toast(n?"Compromiso agregado":"Cambios guardados")};
+}
+function sincronizarEvento(t,d,a){
+  let ev=t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
+  if(!d.fecha){return}
+  if(!ev){ev={id:uid(),eje:ejeDe(t.tema+" "+t.sub),lugar:"",obj:t.texto,acta:a.fecha,tareaId:t.id,rep:""};S.eventos.push(ev);t.eventoId=ev.id}
+  Object.assign(ev,{titulo:tituloCorto(t.texto),fecha:d.fecha,ini:d.ini||"",fin:d.fin||"",con:t.resp||"",tema:t.sub||t.tema});
+}
+
+/* ---------- 6. lo de la reunión: transcripción de Meet, notas o audio → IA ---------- */
+async function transcribirAudio(file){
+  if(!S.cfg.key)throw new Error("Pega tu clave en Ajustes IA");
+  if(S.cfg.prov!=="groq")throw new Error("Para pasar audio a texto elige Groq en Ajustes IA");
+  if(file.size>25e6)throw new Error("El archivo pesa más de 25 MB. Usa la transcripción que guarda Google Meet o un audio más corto");
+  const fd=new FormData();fd.append("file",file);fd.append("model","whisper-large-v3-turbo");fd.append("language","es");fd.append("response_format","text");
+  let r;try{r=await fetch("https://api.groq.com/openai/v1/audio/transcriptions",{method:"POST",headers:{Authorization:"Bearer "+S.cfg.key},body:fd})}catch(e){throw new Error("No se pudo conectar con Groq")}
+  if(!r.ok){let m="Error "+r.status;try{const j=await r.json();m+=": "+(j.error?.message||"")}catch(e){}throw new Error(m.slice(0,200))}
+  return(await r.text()).trim();
+}
+function formReunion(a){
+  const abiertas=S.tareas.filter(t=>{const e=enActa(t,a);return e&&!e.arch&&!e.cerradaAqui});
+  abrir(`<form id="fre"><div class="row between"><h2>Agregar lo de la reunión</h2>${X}</div>
+  <p class="hint">Pega el texto de la reunión: la transcripción que Google Meet guarda en Drive (actívala en Meet con «Transcripción»), las notas de quien apunta o un resumen. La IA lo compara con los ${abiertas.length} compromisos abiertos y propone qué se cumplió, de qué se habló y qué es nuevo. Tú revisas antes de guardar.</p>
+  <textarea id="trx" rows="9" placeholder="Pega aquí la transcripción o las notas de la reunión">${esc(a.transcripcion||"")}</textarea>
+  <div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="aud">${I.up}Pasar un audio a texto</button><input type="file" id="audF" accept="audio/*,video/mp4,video/webm" hidden><span class="hint" id="audE" style="margin:0">Groq, máx. 25 MB</span></div>
+  <p class="hint">El texto se envía al proveedor de IA que elegiste en Ajustes IA. Si mencionan a niños o datos personales, quítalos antes.</p>
+  <div id="rres"></div>
+  <div class="row"><button type="button" class="btn" id="anal">${I.spark}Analizar con IA</button><button class="btn pri" id="apl" disabled>Guardar en el acta</button></div></form>`);
+  const f=$("#fre");let res=null;$("#x").onclick=cerrar;
+  $("#aud").onclick=()=>$("#audF").click();
+  $("#audF").onchange=async e=>{const file=e.target.files[0];if(!file)return;const s=$("#audE");s.textContent="Pasando el audio a texto…";
+    try{const t=await transcribirAudio(file);$("#trx").value=($("#trx").value?$("#trx").value+"\n\n":"")+t;s.textContent="Listo: revisa el texto"}catch(err){s.textContent=err.message}};
+  $("#anal").onclick=async()=>{
+    const txt=$("#trx").value.trim();if(!txt){toast("Primero pega el texto de la reunión");return}
+    if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
+    const b=$("#anal");b.disabled=true;b.textContent="Analizando…";
+    try{res=await analizarReunion(a,abiertas,txt);pintarRes()}catch(err){toast(err.message)}
+    b.disabled=false;b.innerHTML=I.spark+"Analizar con IA"};
+  function pintarRes(){
+    const L=(arr,tipo,fn)=>arr.map((x,i)=>`<label class="imp"><input type="checkbox" data-g="${tipo}" data-i="${i}" checked><div>${fn(x)}</div></label>`).join("");
+    const T=id=>S.tareas.find(t=>t.id===id);
+    $("#rres").innerHTML=`${res.cerrados.length?`<h3>Se cumplieron (${res.cerrados.length})</h3>`+L(res.cerrados,"c",x=>`<b>${esc(T(x.id).texto)}</b>${x.nota?`<div class="m">${esc(x.nota)}</div>`:""}`):""}
+    ${res.avances.length?`<h3>Se habló, siguen abiertos (${res.avances.length})</h3>`+L(res.avances,"a",x=>`<b>${esc(T(x.id).texto)}</b>${x.nota?`<div class="m">${esc(x.nota)}</div>`:""}`):""}
+    ${res.nuevos.length?`<h3>Compromisos nuevos (${res.nuevos.length})</h3>`+L(res.nuevos,"n",x=>`<b>${esc(x.texto)}</b><div class="m">${esc(x.tema)}${x.responsable?" · "+esc(x.responsable):""}${x.fecha?" · "+esc(cap(fechaLarga(x.fecha)))+(x.ini?" "+esc(hora(x.ini)):"")+" → al calendario":""}</div>`):""}
+    ${!res.cerrados.length&&!res.avances.length&&!res.nuevos.length?`<p class="hint">La IA no encontró cambios en los compromisos.</p>`:""}`;
+    $("#apl").disabled=false;
+  }
+  f.onsubmit=e=>{e.preventDefault();if(!res)return;
+    const sel=g=>[...f.querySelectorAll(`input[data-g="${g}"]:checked`)].map(c=>+c.dataset.i);
+    a.transcripcion=$("#trx").value.trim();
+    for(const i of sel("c")){const x=res.cerrados[i],t=S.tareas.find(y=>y.id===x.id);if(!t)continue;if(!t.menciones.some(m=>m.f===a.fecha))t.menciones.push({f:a.fecha,t:x.nota||t.texto,manual:true});cumplir(t,a.fecha,x.nota,true)}
+    for(const i of sel("a")){const x=res.avances[i],t=S.tareas.find(y=>y.id===x.id);if(!t)continue;if(!t.menciones.some(m=>m.f===a.fecha))t.menciones.push({f:a.fecha,t:x.nota||t.texto,manual:true})}
+    let ne=0;for(const i of sel("n")){const x=res.nuevos[i];const t={id:uid(),manual:true,tema:x.tema||"Otros",sub:"",texto:x.texto,orig:x.texto,resp:x.responsable||"",desde:a.fecha,menciones:[{f:a.fecha,t:x.texto,manual:true}],estado:"abierta",cierre:null,grupo:""};
+      t.tk=normTema(t.tema)+"|";S.tareas.push(t);if(x.fecha){sincronizarEvento(t,{fecha:x.fecha,ini:x.ini,fin:x.fin},a);ne++}}
+    S.tareas.forEach(t=>t.menciones.sort((x,y)=>x.f.localeCompare(y.f)));
+    save();cerrar();render();toast("Acta actualizada"+(ne?` · ${ne} al calendario`:""))};
+}
+async function analizarReunion(a,abiertas,txt){
+  const temas=[...new Set(S.tareas.map(t=>t.tema))].join(", ");
+  const lista=abiertas.map(t=>`${t.id} | ${t.tema}${t.sub?" / "+t.sub:""} | ${t.texto.slice(0,140)}${t.resp?" | "+t.resp:""}`).join("\n");
+  const sis=`Eres quien toma nota en la reunión técnica semanal del equipo de Altos del Cabo by Fondacio. La reunión es del ${fechaLarga(a.fecha)} de ${a.fecha.slice(0,4)}. Te doy los compromisos abiertos de actas anteriores (id | tema | texto | responsable) y el texto de la reunión. Responde SOLO un JSON con esta forma: {"cerrados":[{"id":"","nota":"qué se dijo"}],"avances":[{"id":"","nota":"qué se dijo"}],"nuevos":[{"tema":"","texto":"","responsable":"","fecha":"AAAA-MM-DD","ini":"HH:MM","fin":"HH:MM"}]}. "cerrados": compromisos que en la reunión se dijeron terminados. "avances": compromisos de los que se habló pero siguen abiertos. "nuevos": tareas o actividades nuevas que se acordaron. Usa solo ids de la lista. Para "tema" usa uno de estos cuando aplique: ${temas}. No inventes: si un dato no está claro, deja "". Las fechas relativas se cuentan desde el día de la reunión.`;
+  const raw=await ia([{role:"user",content:`COMPROMISOS ABIERTOS:\n${lista}\n\nTEXTO DE LA REUNIÓN:\n${txt.slice(0,30000)}`}],sis);
+  let j;try{j=JSON.parse(raw.match(/\{[\s\S]*\}/)[0])}catch(e){throw new Error("La IA no devolvió datos legibles. Intenta de nuevo")}
+  const ids=new Set(abiertas.map(t=>t.id)),s=(v,n=300)=>typeof v==="string"?v.trim().slice(0,n):"";
+  const okF=v=>/^\d{4}-\d{2}-\d{2}$/.test(v||"")?v:"",okH=v=>/^\d{2}:\d{2}$/.test(v||"")?v:"";
+  const uniq=arr=>{const v=new Set();return arr.filter(x=>!v.has(x.id)&&v.add(x.id))};
+  const cerr=uniq((j.cerrados||[]).filter(x=>ids.has(x.id)).map(x=>({id:x.id,nota:s(x.nota)}))),cs=new Set(cerr.map(x=>x.id));
+  return{cerrados:cerr,avances:uniq((j.avances||[]).filter(x=>ids.has(x.id)&&!cs.has(x.id)).map(x=>({id:x.id,nota:s(x.nota)}))),
+    nuevos:(j.nuevos||[]).filter(x=>s(x.texto)).map(x=>({tema:s(x.tema,60),texto:s(x.texto),responsable:s(x.responsable,60),fecha:okF(x.fecha),ini:okH(x.ini),fin:okH(x.fin)}))};
+}
+
+/* ---------- 7. el acta para Google Docs o Word, con el formato de Fondacio ---------- */
+function filasActa(a){
+  const filas=new Map(),fila=(tema,sub)=>{const k=normTema(tema)+"|"+normTema(sub||"");if(!filas.has(k))filas.set(k,{tema,sub:sub||"",quien:new Set(),des:[],comp:[]});return filas.get(k)};
+  for(const tm of a.temas){const f=fila(tm.tema,tm.sub);if(tm.quien)f.quien.add(tm.quien);tm.avances.forEach(v=>f.des.push({t:v.t}))}
+  for(const t of S.tareas){const e=enActa(t,a);if(!e||e.arch)continue;const f=fila(t.tema,t.sub);if(t.resp)f.quien.add(t.resp);
+    if(e.cerradaAqui)f.des.push({t:t.texto,hecho:t.estado==="descartada"?"se decidió no hacerlo":t.estado==="archivada"?"archivado":"cumplido",nota:t.cierre.nota&&t.cierre.nota!==t.texto&&t.estado==="hecha"?t.cierre.nota:""});
+    else f.comp.push({t:t.texto,resp:t.resp,nueva:e.nueva,aire:e.aire,desde:t.desde,ult:ultMencionHasta(t,a.fecha)})}
+  return[...filas.values()].filter(f=>f.des.length||f.comp.length);
+}
+/* el paréntesis gris al final dice de dónde viene cada compromiso; al volver a cargar el acta, la página lo reconoce */
+const notaComp=c=>c.nueva?"nuevo":c.aire?"nadie lo menciona desde el "+fechaCorta(c.ult):"desde el "+fechaCorta(c.desde);
+const LEYENDA=[["TEXTO EN COLOR NEGRO: LO QUE SE MANTIENE IGUAL",{}],["TEXTO EN COLOR AZUL: LO NUEVO",{color:"0000FF"}],["TEXTO RESALTADO EN AMARILLO: LO QUE QUEDÓ EN EL AIRE (NADIE LO VOLVIÓ A MENCIONAR)",{hl:"yellow"}],["TEXTO TACHADO: LO QUE SE CUMPLIÓ",{strike:true}]];
+const OBJ="ORGANIZAR, ACTUALIZAR, SEGUIMIENTO, COMUNICAR, PLANEAR, PONER AL DÍA";
+const CAB=["TEMA PRINCIPAL","TEMA SECUNDARIO","QUIEN HABLA","DESARROLLO DEL TEMA","COMPROMISO/ TAREA"];
+const H={td:"border:1px solid #999;padding:4px 6px;vertical-align:top",ul:"margin:0;padding-left:18px"};H.th=H.td+";background:#d9d9d9;font-weight:bold";
+const hSpan=(t,o)=>`<span style="${o.color?"color:#"+o.color+";":""}${o.hl?"background:#ffff00;":""}${o.strike?"text-decoration:line-through;":""}">${esc(t)}</span>`;
+function actaHTML(a){
+  const r=resumenActa(a);
+  return`<h2 style="text-align:center">ACTAS DE REUNIONES TÉCNICAS ${a.fecha.slice(0,4)}</h2>
+  <p><b>OBJETIVOS:</b> ${OBJ}</p>
+  <table style="border-collapse:collapse"><tr><td style="${H.th}">FECHA</td><td style="${H.td}">${esc(fechaLarga(a.fecha))} de ${a.fecha.slice(0,4)}</td></tr><tr><td style="${H.th}">QUIEN MODERA</td><td style="${H.td}">${esc(a.modera)}</td></tr><tr><td style="${H.th}">QUIEN ES EL APUNTADOR</td><td style="${H.td}">${esc(a.apunta)}</td></tr></table>
+  <p><b>Seguimiento:</b> ${r.abiertas} pendientes · ${r.aire} en el aire · ${r.cerradas} cumplidos en esta reunión.</p>
+  <p>${LEYENDA.map(([t,o])=>hSpan(t,o)).join("<br>")}</p>
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed"><colgroup><col style="width:12%"><col style="width:12%"><col style="width:10%"><col style="width:28%"><col style="width:38%"></colgroup>
+  <tr>${CAB.map(c=>`<td style="${H.th}">${c}</td>`).join("")}</tr>
+  ${filasActa(a).map(f=>`<tr><td style="${H.td}"><b>${esc(f.tema.toUpperCase())}</b></td><td style="${H.td}">${esc(f.sub.toUpperCase())}</td><td style="${H.td}">${esc([...f.quien].join(" / "))}</td>
+    <td style="${H.td}">${f.des.length?`<ul style="${H.ul}">${f.des.map(d=>`<li>${d.hecho?`<s>${esc(d.t)}</s> <b style="color:#188038">✔ ${d.hecho}</b>${d.nota?": "+esc(d.nota):""}`:esc(d.t)}</li>`).join("")}</ul>`:""}</td>
+    <td style="${H.td}">${f.comp.length?`<ul style="${H.ul}">${f.comp.map(c=>`<li style="${c.nueva?"color:#0000ff":""}"><span style="${c.aire?"background:#ffff00":""}">${esc(c.t)}</span>${c.resp?" — "+esc(c.resp):""} <span style="color:#777;font-size:8pt">(${esc(notaComp(c))})</span></li>`).join("")}</ul>`:""}</td></tr>`).join("")}</table>`;
+}
+const textoDe=html=>{const d=document.createElement("div");d.innerHTML=html.replace(/<\/(tr|p|h1|h2|h3|li)>/g,"\n$&").replace(/<br>/g,"\n").replace(/<\/td>/g," | $&");return d.textContent.replace(/\n{3,}/g,"\n\n").trim()};
+const actaTexto=a=>textoDe(actaHTML(a));
+function copiarHTML(html){return navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([textoDe(html)],{type:"text/plain"})})])}
+async function copiarActa(a){
+  try{await copiarHTML(actaHTML(a));toast("Acta copiada: pégala en Google Docs")}
+  catch(e){try{await navigator.clipboard.writeText(actaTexto(a));toast("Acta copiada como texto")}catch(e2){toast("No se pudo copiar")}}
+}
+/* Google Docs: se copia el acta con formato y se abre un documento nuevo; solo falta pegar */
+function abrirEnDocs(html,que){
+  copiarHTML(html).then(()=>{window.open("https://docs.new","_blank","noopener");
+    abrir(`<div class="row between"><h2>Pega ${que} en Google Docs</h2>${X}</div>
+    <p>Se abrió un documento nuevo de Google Docs en otra pestaña y ${que} ya está copiada.</p>
+    <ol style="line-height:1.7;padding-left:20px"><li>Ve a la pestaña de Google Docs.</li><li>Pega con <b>Ctrl + V</b> (en Mac, <b>⌘ + V</b>).</li><li>Ponle de nombre la fecha y la palabra acta, por ejemplo <b>2026-11-20 acta</b>.</li><li>Si la tabla se ve apretada: <b>Archivo → Configurar página → Horizontal</b>.</li></ol>
+    <p class="hint">¿No se abrió la pestaña? Entra a <b>docs.new</b> y pega.</p><div class="dact"><span class="sp1"></span><button class="btn pri" id="ok">Listo</button></div>`);
+    $("#x").onclick=$("#ok").onclick=cerrar})
+  .catch(()=>toast("No se pudo copiar. Usa «Descargar Word» y súbelo a Google Drive"));
+}
+
+/* ---------- Word de verdad (.docx): hoja horizontal, columnas de ancho fijo y viñetas que siguen al dar Enter ---------- */
+function crc32(u){let c=-1;for(let i=0;i<u.length;i++){c^=u[i];for(let k=0;k<8;k++)c=c>>>1^(0xEDB88320&-(c&1))}return(c^-1)>>>0}
+function zipArchivos(files,tipo){
+  const en=new TextEncoder(),partes=[],cen=[];let off=0;
+  for(const[nombre,txt]of files){const n=en.encode(nombre),d=en.encode(txt),c=crc32(d);
+    const h=new DataView(new ArrayBuffer(30));h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x800,true);h.setUint16(12,0x21,true);h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,n.length,true);
+    partes.push(h,n,d);
+    const z=new DataView(new ArrayBuffer(46));z.setUint32(0,0x02014b50,true);z.setUint16(4,20,true);z.setUint16(6,20,true);z.setUint16(8,0x800,true);z.setUint16(14,0x21,true);z.setUint32(16,c,true);z.setUint32(20,d.length,true);z.setUint32(24,d.length,true);z.setUint16(28,n.length,true);z.setUint32(42,off,true);
+    cen.push(z,n);off+=30+n.length+d.length}
+  const cs=cen.reduce((s,x)=>s+x.byteLength,0),e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+  return new Blob([...partes,...cen,e],{type:tipo});
+}
+const DX={
+  x:s=>String(s??"").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),
+  R:(t,o={})=>`<w:r><w:rPr>${o.b?"<w:b/>":""}${o.i?"<w:i/>":""}${o.strike?"<w:strike/>":""}${o.color?`<w:color w:val="${o.color}"/>`:""}${o.sz?`<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>`:""}${o.hl?`<w:highlight w:val="${o.hl}"/>`:""}</w:rPr><w:t xml:space="preserve">${DX.x(t)}</w:t></w:r>`,
+  P:(runs,o={})=>`<w:p><w:pPr>${o.vineta?`<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr>`:""}<w:spacing w:before="${o.antes||0}" w:after="${o.despues??60}"/>${o.centro?`<w:jc w:val="center"/>`:""}</w:pPr>${runs}</w:p>`,
+  tabla(anchos,filas,cab){
+    const borde=`<w:tblBorders>${["top","left","bottom","right","insideH","insideV"].map(b=>`<w:${b} w:val="single" w:sz="4" w:space="0" w:color="999999"/>`).join("")}</w:tblBorders>`;
+    const celda=(w,c)=>`<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${c.gris?`<w:shd w:val="clear" w:color="auto" w:fill="D9D9D9"/>`:""}</w:tcPr>${c.ps||DX.P("",{despues:0})}</w:tc>`;
+    return`<w:tbl><w:tblPr><w:tblW w:w="${anchos.reduce((s,v)=>s+v,0)}" w:type="dxa"/>${borde}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="50" w:type="dxa"/><w:left w:w="90" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/><w:right w:w="90" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${anchos.map(v=>`<w:gridCol w:w="${v}"/>`).join("")}</w:tblGrid>${filas.map((f,i)=>`<w:tr>${i===0&&cab?"<w:trPr><w:tblHeader/></w:trPr>":""}${f.map((c,j)=>celda(anchos[j],c)).join("")}</w:tr>`).join("")}</w:tbl>`},
+  G:t=>({ps:DX.P(DX.R(t,{b:true}),{despues:0}),gris:true}),
+  T:(t,o)=>({ps:DX.P(DX.R(t,o),{despues:0})}),
+  L:(items,fn)=>({ps:items.map(it=>DX.P(fn(it),{vineta:true,despues:40})).join("")}),
+  ANCHOS:[1750,1650,1500,3900,5600],
+  /* encabezado igual al de las actas de Fondacio: título, objetivos, fecha, quien modera y quien apunta */
+  encabezado(anio,fecha,modera,apunta){const{P,R,tabla,G,T}=DX;
+    return P(R(`ACTAS DE REUNIONES TÉCNICAS ${anio}`,{b:true,sz:28}),{centro:true,despues:160})+P(R("OBJETIVOS: ",{b:true})+R(OBJ),{despues:160})
+      +tabla([3200,6000],[[G("FECHA"),T(fecha)],[G("QUIEN MODERA"),T(modera)],[G("QUIEN ES EL APUNTADOR"),T(apunta)]])},
+  leyenda:()=>LEYENDA.map(([t,o],i)=>DX.P(DX.R(t,o),{despues:i===LEYENDA.length-1?160:0,antes:i?0:160})).join(""),
+  empacar(cuerpo){
+    const W='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"',X0='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',RL="http://schemas.openxmlformats.org/officeDocument/2006/relationships/";
+    return zipArchivos([
+      ["[Content_Types].xml",`${X0}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/></Types>`],
+      ["_rels/.rels",`${X0}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${RL}officeDocument" Target="word/document.xml"/></Relationships>`],
+      ["word/_rels/document.xml.rels",`${X0}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${RL}styles" Target="styles.xml"/><Relationship Id="rId2" Type="${RL}numbering" Target="numbering.xml"/></Relationships>`],
+      ["word/styles.xml",`${X0}<w:styles ${W}><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/><w:sz w:val="19"/><w:szCs w:val="19"/><w:lang w:val="es-CO"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="60" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults></w:styles>`],
+      ["word/numbering.xml",`${X0}<w:numbering ${W}><w:abstractNum w:abstractNumId="0"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="230" w:hanging="200"/></w:pPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num></w:numbering>`],
+      ["word/document.xml",`${X0}<w:document ${W}><w:body>${cuerpo}<w:sectPr><w:pgSz w:w="15840" w:h="12240" w:orient="landscape"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`]],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+  }
+};
+function actaDocx(a){
+  const{P,R,tabla,G,T,L}=DX,r=resumenActa(a);
+  const filas=[CAB.map(G),...filasActa(a).map(f=>[T(f.tema.toUpperCase(),{b:true}),T(f.sub.toUpperCase()),T([...f.quien].join(" / ")),
+    L(f.des,d=>d.hecho?R(d.t,{strike:true,color:"666666"})+R(" ✔ "+d.hecho,{b:true,color:"188038"})+(d.nota?R(": "+d.nota):""):R(d.t)),
+    L(f.comp,c=>{const az=c.nueva?"0000FF":"";return R(c.t,{color:az,hl:c.aire?"yellow":""})+(c.resp?R(" — "+c.resp,{color:az}):"")+R(" ("+notaComp(c)+")",{color:"777777",sz:16})})])];
+  const part=a.part.length?P(R("PARTICIPANTES: ÉXITOS Y COSAS POR MEJORAR",{b:true}),{antes:240})+tabla([3000,5700,5700],[["PARTICIPANTES","ÉXITOS","COSAS POR MEJORAR"].map(G),
+    ...a.part.map(p=>[T(p.n),L(p.logros,R),L(p.mejorar,R)])],true):"";
+  return DX.empacar(DX.encabezado(a.fecha.slice(0,4),fechaLarga(a.fecha)+" de "+a.fecha.slice(0,4),a.modera,a.apunta)
+    +P(R("Seguimiento: ",{b:true})+R(`${r.abiertas} pendientes · ${r.aire} en el aire · ${r.cerradas} cumplidos en esta reunión.`),{antes:160})
+    +DX.leyenda()+tabla(DX.ANCHOS,filas,true)+part);
+}
+function bajar(blob,nombre){const u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download=nombre;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+const descargarActa=a=>bajar(actaDocx(a),`${a.fecha} acta.docx`);
+
+/* ---------- 8. instructivo y plantilla para llenar las actas nuevas ---------- */
+const GUIA=[
+  ["Antes de la reunión",["En la página, entren a <b>Actas</b>. El acta del viernes ya está armada con todo lo que sigue pendiente de las actas anteriores.",
+    "Toquen <b>Abrir en Google Docs</b> y peguen con Ctrl + V en el documento nuevo. Si prefieren empezar en blanco, usen esta plantilla.",
+    "Nombre del documento: año-mes-día y la palabra acta. Ejemplo: <b>2026-11-20 acta</b>."]],
+  ["Datos de la reunión",["<b>FECHA</b> con el día, el mes en letras y el año: <b>viernes 20 de noviembre de 2026</b>.",
+    "<b>QUIEN MODERA</b> y <b>QUIEN ES EL APUNTADOR</b>: el nombre de cada persona.",
+    "No cambien los títulos de las tablas (FECHA, PARTICIPANTES, TEMA PRINCIPAL, COMPROMISO/ TAREA…). La página los busca para leer el acta."]],
+  ["Temas y compromisos",["Una fila por tema. En <b>TEMA PRINCIPAL</b> el tema grande (EMPODERAMIENTO) y en <b>TEMA SECUNDARIO</b> el detalle (MÓDULO 3).",
+    "En <b>COMPROMISO/ TAREA</b>, un compromiso por viñeta. Nunca dos cosas en la misma viñeta.",
+    "Empiecen con el nombre de quien lo va a hacer: <b>«Soraya: enviar los listados de los cursos»</b>. Así llega al calendario de esa persona.",
+    "Usen siempre el mismo nombre para cada persona (Soraya, no «Sora» ni «la profe»).",
+    "Lo nuevo va en <span style=\"color:#0000ff\">azul</span>."]],
+  ["Fechas y horas: así llegan al calendario",["Día de la semana, número y mes: <b>«martes 17 de noviembre, de 2:00 p. m. a 4:00 p. m.»</b>",
+    "Lo que se repite: <b>«todos los sábados de 9:00 a. m. a 12:00 m.»</b>",
+    "Eviten «la otra semana» o «el martes» sin número: la página no sabe qué día es."]],
+  ["Cuando algo se cumple",["Escríbanlo en <b>DESARROLLO DEL TEMA</b> empezando con <b>«Ya se hizo:»</b>. Ejemplo: «Ya se hizo: se enviaron los listados a la orientadora».",
+    "O tachen el compromiso. No lo borren sin decir nada: si desaparece, nadie sabe si se cumplió o se olvidó.",
+    "Si deciden no hacerlo, escriban <b>«No se hará:»</b> y el motivo."]],
+  ["Lo que sigue pendiente",["Si se habló y todavía falta, déjenlo y escriban el avance en DESARROLLO DEL TEMA.",
+    "En el acta que arma la página, el paréntesis gris al final, como <span style=\"color:#777\">(desde el 2 oct 2026)</span>, dice que viene de actas anteriores. Si se habló de eso en la reunión, <b>borren el paréntesis</b>. Si nadie lo menciona, déjenlo: la página lo marcará <span style=\"background:#ffff00\">en el aire</span>."]],
+  ["Después de la reunión",["En Google Docs: <b>Archivo → Descargar → Microsoft Word (.docx)</b>.",
+    "En la página: <b>Actas → Cargar actas (.docx)</b> y elijan el archivo. La página actualiza los compromisos y propone las fechas para el calendario."]],
+  ["Cuidado con los datos",["No escriban nombres completos, teléfonos ni direcciones de niños y niñas. Usen iniciales o el nombre del grupo (por ejemplo, curso 802)."]]
+];
+const EJEMPLO={tema:"EJEMPLO (BORRAR ESTA FILA)",sub:"MÓDULO 3",quien:"Soraya",des:["Ya se hizo: se enviaron los listados a la orientadora."],
+  comp:["Soraya: organizar las cartillas en orden alfabético.","Claudia: taller de jabones el martes 17 de noviembre de 2:00 p. m. a 4:00 p. m.","Coro: todos los sábados de 9:00 a. m. a 12:00 m."]};
+function temasPlantilla(){const v=new Map();for(const a of actasOrden().filter(x=>!x.auto).slice(-1))for(const t of a.temas){const k=normTema(t.tema)+"|"+normTema(t.sub);if(!v.has(k))v.set(k,[t.tema,t.sub||""])}
+  return v.size?[...v.values()]:[["Empoderamiento",""],["Club de tareas",""],["Economía circular",""],["Administrativo",""],["Otros",""]]}
+function guiaHTML(){
+  return`<h2>Cómo llenar el acta de la reunión técnica</h2>
+  <p>La Agenda Fondacio lee estas actas para seguir cada compromiso de una semana a otra y pasar las fechas al calendario de cada persona. Si el acta se llena siempre igual, nada se queda en el aire.</p>
+  ${GUIA.map(([t,l],i)=>`<h3>${i+1}. ${t}</h3><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("")}`;
+}
+function plantillaHTML(){
+  const eq=EQ(),anio=new Date().getFullYear();
+  return guiaHTML()+`<hr><h2 style="text-align:center">ACTAS DE REUNIONES TÉCNICAS ${anio}</h2><p><b>OBJETIVOS:</b> ${OBJ}</p>
+  <table style="border-collapse:collapse"><tr><td style="${H.th}">FECHA</td><td style="${H.td}">viernes __ de ________ de ${anio}</td></tr><tr><td style="${H.th}">QUIEN MODERA</td><td style="${H.td}"></td></tr><tr><td style="${H.th}">QUIEN ES EL APUNTADOR</td><td style="${H.td}"></td></tr></table>
+  <p>${LEYENDA.map(([t,o])=>hSpan(t,o)).join("<br>")}</p>
+  <table style="border-collapse:collapse;width:100%"><tr><td style="${H.th}">PARTICIPANTES</td><td style="${H.th}">ÉXITOS</td><td style="${H.th}">COSAS POR MEJORAR</td></tr>${(eq.length?eq:["",""]).map(n=>`<tr><td style="${H.td}">${esc(n)}</td><td style="${H.td}"><ul style="${H.ul}"><li></li></ul></td><td style="${H.td}"><ul style="${H.ul}"><li></li></ul></td></tr>`).join("")}</table><p></p>
+  <table style="border-collapse:collapse;width:100%;table-layout:fixed"><colgroup><col style="width:12%"><col style="width:12%"><col style="width:10%"><col style="width:28%"><col style="width:38%"></colgroup>
+  <tr>${CAB.map(c=>`<td style="${H.th}">${c}</td>`).join("")}</tr>
+  <tr style="color:#777"><td style="${H.td}"><i>${EJEMPLO.tema}</i></td><td style="${H.td}"><i>${EJEMPLO.sub}</i></td><td style="${H.td}"><i>${EJEMPLO.quien}</i></td><td style="${H.td}"><ul style="${H.ul}">${EJEMPLO.des.map(x=>`<li><i>${esc(x)}</i></li>`).join("")}</ul></td><td style="${H.td}"><ul style="${H.ul}">${EJEMPLO.comp.map(x=>`<li><i>${esc(x)}</i></li>`).join("")}</ul></td></tr>
+  ${temasPlantilla().map(([t,s])=>`<tr><td style="${H.td}"><b>${esc(t.toUpperCase())}</b></td><td style="${H.td}">${esc(s.toUpperCase())}</td><td style="${H.td}"></td><td style="${H.td}"><ul style="${H.ul}"><li></li></ul></td><td style="${H.td}"><ul style="${H.ul}"><li></li></ul></td></tr>`).join("")}</table>`;
+}
+function plantillaDocx(){
+  const{P,R,tabla,G,T,L}=DX,eq=EQ(),anio=new Date().getFullYear();
+  const runs=html=>{const d=document.createElement("div");d.innerHTML=html;let out="";
+    const walk=(n,o)=>{for(const c of n.childNodes){if(c.nodeType===3){if(c.textContent)out+=R(c.textContent,o);continue}
+      const st=c.getAttribute("style")||"",o2={...o};if(c.tagName==="B")o2.b=true;if(/#0000ff/.test(st))o2.color="0000FF";if(/#777/.test(st))o2.color="777777";if(/#ffff00/.test(st))o2.hl="yellow";walk(c,o2)}};
+    walk(d,{});return out};
+  const guia=P(R("Cómo llenar el acta de la reunión técnica",{b:true,sz:32}),{despues:120})
+    +P(R("La Agenda Fondacio lee estas actas para seguir cada compromiso de una semana a otra y pasar las fechas al calendario de cada persona. Si el acta se llena siempre igual, nada se queda en el aire."),{despues:120})
+    +GUIA.map(([t,l],i)=>P(R(`${i+1}. ${t}`,{b:true,sz:22}),{antes:160,despues:60})+l.map(x=>P(runs(x),{vineta:true,despues:40})).join("")).join("")
+    +`<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+  const vacia=()=>L([""],()=>"");
+  const filas=[CAB.map(G),
+    [T(EJEMPLO.tema,{i:true,color:"777777"}),T(EJEMPLO.sub,{i:true,color:"777777"}),T(EJEMPLO.quien,{i:true,color:"777777"}),L(EJEMPLO.des,x=>R(x,{i:true,color:"777777"})),L(EJEMPLO.comp,x=>R(x,{i:true,color:"777777"}))],
+    ...temasPlantilla().map(([t,s])=>[T(t.toUpperCase(),{b:true}),T(s.toUpperCase()),T(""),vacia(),vacia()])];
+  const part=tabla([3000,5700,5700],[["PARTICIPANTES","ÉXITOS","COSAS POR MEJORAR"].map(G),...(eq.length?eq:["",""]).map(n=>[T(n),vacia(),vacia()])],true);
+  return DX.empacar(guia+DX.encabezado(anio,`viernes __ de ________ de ${anio}`,"","")+DX.leyenda()+part+P("",{despues:160})+tabla(DX.ANCHOS,filas,true));
+}
+function formPlantilla(){
+  abrir(`<div class="row between"><h2>Cómo llenar las actas nuevas</h2>${X}</div>
+  <div class="guia-txt">${guiaHTML().replace(/^<h2>.*?<\/h2>/,"")}</div>
+  <p class="hint">La plantilla trae este instructivo, las tablas del acta con los títulos correctos, una fila de ejemplo y los temas de la última acta.</p>
+  <div class="dact"><button type="button" class="btn" id="plW">${I.imp}Descargar Word</button><span class="sp1"></span><button type="button" class="btn pri" id="plD">${I.doc}Abrir plantilla en Google Docs</button></div>`);
+  $("#x").onclick=cerrar;
+  $("#plW").onclick=()=>bajar(plantillaDocx(),"Plantilla e instructivo de actas.docx");
+  $("#plD").onclick=()=>abrirEnDocs(plantillaHTML(),"la plantilla");
+}
+
 /* ---------- eventos de la interfaz ---------- */
-$("#tPend").onclick=()=>panel(false);
-$("#tAsis").onclick=()=>panel(true);
-$("#vMes").onclick=()=>{vista="mes";renderCal()};
-$("#vSem").onclick=()=>{vista="sem";renderCal()};
-$("#hoy").onclick=()=>{cursor=new Date();renderCal()};
-$("#prev").onclick=()=>{vista==="mes"?cursor.setMonth(cursor.getMonth()-1,1):cursor.setDate(cursor.getDate()-7);renderCal()};
-$("#next").onclick=()=>{vista==="mes"?cursor.setMonth(cursor.getMonth()+1,1):cursor.setDate(cursor.getDate()+7);renderCal()};
-$("#fEje").onchange=e=>{ejeSel=e.target.value;renderCal()};
-$("#bNew").onclick=()=>formEvento();
-$("#bPend").onclick=()=>formPend();
-$("#bImp").onclick=formImportar;
+document.querySelectorAll("i[data-i]").forEach(el=>el.outerHTML=I[el.dataset.i]);
+const quitarDrawer=()=>{document.body.classList.remove("drw");aplicarUI()};
+$("#menu").onclick=()=>{if(movil())document.body.classList.toggle("drw");else{S.ui.side=!S.ui.side;save()}aplicarUI()};
+$("#scrim").onclick=()=>{document.body.classList.remove("drw");if(movil()&&S.ui.panel){S.ui.panel=null;save()}aplicarUI()};
+$("#hoy").onclick=()=>{if(vista==="actas"){actaSel=actasOrden().at(-1)?.id;filtroActa="todo"}irA(new Date());renderCal()};
+$("#prev").onclick=()=>mover(-1);
+$("#next").onclick=()=>mover(1);
+$("#vBtn").onclick=e=>toggleMenu(e.currentTarget,[{v:"dia",t:"Día",k:"D"},{v:"sem",t:"Semana",k:"W"},{v:"mes",t:"Mes",k:"M"},{v:"agenda",t:"Agenda",k:"A"},{v:"actas",t:"Actas",k:"R"}],setVista);
+$("#rActas").onclick=$("#mActas").onclick=$("#sideActas").onclick=()=>{quitarDrawer();setVista(vista==="actas"?(S.ui.vistaCal||"mes"):"actas")};
+$("#cv").addEventListener("change",e=>{const t=e.target,a=S.actas.find(x=>x.id===actaSel);
+  if(t.id==="aFile"&&t.files.length){importarActas([...t.files]);t.value=""}
+  else if(a&&(t.id==="aMod"||t.id==="aApu")){a[t.id==="aMod"?"modera":"apunta"]=t.value.trim();save()}});
+$("#crear").onclick=()=>{quitarDrawer();formEvento()};
+$("#mViews").onclick=e=>{const b=e.target.closest("[data-mv]");if(b){setVista(b.dataset.mv);quitarDrawer()}};
 $("#bSet").onclick=ajustes;
+$("#sideSet").onclick=()=>{quitarDrawer();ajustes()};
+$("#rAsis").onclick=$("#mAsis").onclick=()=>abrirPanel("asis");
+$("#bYo").onclick=e=>toggleMenu(e.currentTarget,[{v:"__gen",t:"Calendario general"},...EQ().map(n=>({v:esc(n),t:"Calendario de "+esc(n)})),{v:"__quien",t:"Cambiar de persona"},{v:"__eq",t:"Editar el equipo"}],
+  v=>v==="__quien"?pantallaQuien():v==="__eq"?formEquipo():verCal(v==="__gen"?"":v));
+$("#pers").onclick=e=>{const b=e.target.closest("[data-cal]");if(b){verCal(b.dataset.cal);if(movil())quitarDrawer();return}if(e.target.closest("#bEq"))formEquipo()};
+$("#misComp").onclick=e=>{const b=e.target.closest("[data-mc]");if(!b)return;if(movil())quitarDrawer();
+  if(b.dataset.mc==="todos"){filtroActa="abiertos";actaSel=actasOrden().at(-1)?.id;setVista("actas");return}
+  const t=S.tareas.find(x=>x.id===b.dataset.mc);if(!t)return;const ev=t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
+  if(ev)return formEvento(ev);
+  formEvento(null,null,null,{titulo:tituloCorto(t.texto),obj:t.texto,para:t.resp?[t.resp]:[],tareaId:t.id,acta:ultMencion(t),eje:ejeDe(t.tema+" "+(t.sub||""))})};
+$("#quien").onclick=e=>{const b=e.target.closest("[data-q]");if(b)elegir(b.dataset.q);else if(e.target.closest("#qEq"))formEquipo()};
+$("#spX").onclick=()=>{S.ui.panel=null;save();aplicarUI()};
+$("#mini").onclick=e=>{
+  const n=e.target.closest("[data-mn]");if(n){mini.setMonth(mini.getMonth()+ +n.dataset.mn);renderMini();return}
+  const d=e.target.closest("[data-md]");if(d){irA(pf(d.dataset.md));renderCal();if(movil())quitarDrawer()}};
+document.querySelectorAll(".gh").forEach(b=>b.onclick=()=>{const o=b.getAttribute("aria-expanded")!=="true";b.setAttribute("aria-expanded",o);b.nextElementSibling.hidden=!o});
+$("#side").addEventListener("change",e=>{const t=e.target;
+  if(t.dataset.eje){const o=new Set(S.ui.ocultos);t.checked?o.delete(t.dataset.eje):o.add(t.dataset.eje);S.ui.ocultos=[...o]}
+  else return;
+  save();renderCal()});
 $("#bClr").onclick=()=>{S.chat=[];save();renderChat()};
+
 function clicCal(e){
-  const ev=e.target.closest("[data-ev]");if(ev){e.stopPropagation();const x=S.eventos.find(y=>y.id===ev.dataset.ev);return x&&verDia(x.fecha)}
-  const d=e.target.closest("[data-d]");if(d)verDia(d.dataset.d)}
-$("#calMes").onclick=clicCal;$("#calSem").onclick=clicCal;
-$("#calMes").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.dataset.d){e.preventDefault();verDia(e.target.dataset.d)}};
-function clicPend(e){
-  const b=e.target.closest("[data-ac]");if(!b)return;
-  const p=S.pend.find(x=>x.id===b.dataset.p);if(!p)return;const a=b.dataset.ac;
-  if(a==="editar")formPend(p);else if(a==="deshacer")deshacer(p);else responder(p,a)}
-$("#resp").parentElement.addEventListener("toggle",e=>{if(e.target.open)setTimeout(()=>{const c=$("#pPend");c.scrollTop=c.scrollHeight},30)});
-$("#listaPend").onclick=clicPend;$("#listaResp").onclick=clicPend;
+  if(vista==="actas"&&!popEl.contains(e.target))return clicActas(e);
+  const t=e.target;
+  const go=t.closest("[data-go]");if(go){cerrarPop();irA(pf(go.dataset.go));setVista("dia");return}
+  const mo=t.closest("[data-more]");if(mo){popDia(mo.dataset.more,mo);return}
+  const ev=t.closest("[data-ev]");if(ev){const x=S.eventos.find(y=>y.id===ev.dataset.ev);if(x)popEv(x,ev);return}
+  if(!popEl.hidden){cerrarPop();return}
+  if(Date.now()-popCerrado<400)return;
+  if(t.classList.contains("col")){const m=Math.min(Math.floor(e.offsetY/HH*2)*30,23*60+30);formEvento(null,t.dataset.d,`${pad(Math.floor(m/60))}:${pad(m%60)}`);return}
+  const mc=t.closest(".mc");if(mc)formEvento(null,mc.dataset.d);
+}
+$("#cv").onclick=clicCal;
+popEl.addEventListener("click",e=>{
+  const b=e.target.closest("[data-pa]");if(b){const on=popEl._on;cerrarPop();if(b.dataset.pa!=="x"&&on)on(b.dataset.pa);return}
+  if(e.target.closest("[data-go],[data-ev]"))clicCal(e);
+});
+/* deslizar a los lados en el teléfono para cambiar de mes, semana o día */
+let toque=null;
+$("#cv").addEventListener("touchstart",e=>{const p=e.touches[0];toque={x:p.clientX,y:p.clientY}},{passive:true});
+$("#cv").addEventListener("touchend",e=>{if(!toque)return;const p=e.changedTouches[0],dx=p.clientX-toque.x,dy=p.clientY-toque.y;toque=null;
+  if(Math.abs(dx)>60&&Math.abs(dx)>2*Math.abs(dy))mover(dx<0?1:-1)});
+
+let popCerrado=0;
+document.addEventListener("mousedown",e=>{
+  if(!menuEl.hidden&&!menuEl.contains(e.target)&&!(menuEl._a&&menuEl._a.contains(e.target)))cerrarMenu();
+  if(!popEl.hidden&&!dlg.open&&!popEl.contains(e.target)&&!e.target.closest("[data-ev],[data-more]")){cerrarPop();popCerrado=Date.now()}
+});
+/* atajos de teclado como en Google Calendar */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){if(!menuEl.hidden){cerrarMenu();return}if(!popEl.hidden){cerrarPop();return}if(document.body.classList.contains("drw")){quitarDrawer();return}}
+  if(dlg.open||!$("#quien").hidden||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+  const k=e.key.toLowerCase(),V={d:"dia",w:"sem",m:"mes",a:"agenda",r:"actas"};
+  if(V[k])setVista(V[k]);else if(k==="t"){irA(new Date());renderCal()}else if(k==="j"||k==="n")mover(1);else if(k==="k"||k==="p")mover(-1);else if(k==="c")formEvento();else return;
+  e.preventDefault();
+});
+let rz=0;addEventListener("resize",()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(()=>{if(!movil())document.body.classList.remove("drw");aplicarUI()})});
+setInterval(()=>{if(vista==="sem"||vista==="dia")renderCal()},60000);
+
 $("#chatForm").onsubmit=e=>{e.preventDefault();enviar($("#chatIn").value)};
 $("#msgs").onclick=e=>{
   const ap=e.target.dataset.ap,no=e.target.dataset.no;
   if(ap!=null){const m=S.chat[ap];aplicar(m.acc);m.hecho=true;save();renderChat()}
   if(no!=null){S.chat[no].hecho=true;save();renderChat()}};
-$("#sug").innerHTML=["¿Qué tengo pendiente por responder?","¿Qué hay esta semana?","¿De quiénes son mis pendientes?"].map(t=>`<button type="button">${t}</button>`).join("");
+$("#sug").innerHTML=["¿Qué hay esta semana?","¿Qué tengo hoy?","Crea una reunión de equipo el viernes a las 3 p. m."].map(t=>`<button type="button">${t}</button>`).join("");
 $("#sug").onclick=e=>{if(e.target.tagName==="BUTTON")enviar(e.target.textContent)};
 
-dlg.addEventListener("click",e=>{if(e.target===dlg)cerrar()});
+/* cerrar el diálogo solo al hacer clic fuera de él */
+dlg.addEventListener("mousedown",e=>{if(e.target!==dlg)return;const r=dlg.getBoundingClientRect();
+  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)cerrar()});
 
-render();renderChat();
+if(movil()||S.ui.panel!=="asis")S.ui.panel=null;
+if(crearActaViernes())save();
+if(!S.equipo){S.equipo=equipoInicial();save()}
+if(S.ui.cal&&!EQ().some(n=>llave(n)===llave(S.ui.cal)))S.ui.cal="";
+renderCals();aplicarUI();render();renderChat();
+pantallaQuien();
 </script>
 </body>
 </html>
