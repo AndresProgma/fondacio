@@ -11,6 +11,17 @@ Un calendario con el aspecto de Google Calendar, hecho para la fundación Fondac
 5. **Tablero de cada persona** (botón de columnas a la derecha, o tecla B): tres columnas, **Por hacer**, **Haciendo** y **Hecho**, con los compromisos de las actas y las tareas que se agreguen ahí. Se pasan de una columna a otra con los botones o arrastrándolas. «Todo el equipo» muestra cuánto lleva cada persona.
 6. Un **asistente con IA** contesta preguntas sobre la agenda y los compromisos, y puede crear o borrar actividades.
 
+## Compartir con el equipo (Google Drive)
+
+Todo el equipo ve lo mismo desde cualquier computador o celular abriendo **el link del equipo**. No hay que instalar nada.
+
+- Los datos quedan en la carpeta **Agenda Fondacio** del Google Drive de Fondacio. Los guarda un programa pequeño de Google Apps Script ([servidor-drive.gs](servidor-drive.gs)), y cada computador escribe su propio archivo `agenda-datos-….json`.
+- La página junta los cambios de todos: gana el cambio más reciente de cada actividad, acta o compromiso. Lo que alguien borra también desaparece en los demás.
+- Si ponen un acta (Word o Google Docs con «acta» en el nombre) en esa carpeta, la página avisa para cargarla.
+- **Para crear el link (una sola vez):** en la página, en **Compartir con el equipo**, están los pasos para pegar el programa en script.google.com con la cuenta de Fondacio y publicarlo como aplicación web.
+- El link del equipo funciona como una contraseña: quien lo tenga puede ver y cambiar la agenda.
+- La clave de la IA no se comparte: se queda en cada computador.
+
 ## Actas de los viernes
 
 El equipo hace una reunión técnica cada viernes y deja un acta en Word. Muchas cosas que se dicen se quedan en el aire de un acta a otra. Esta parte de la página sirve para que eso no pase:
@@ -19,9 +30,12 @@ El equipo hace una reunión técnica cada viernes y deja un acta en Word. Muchas
 2. **Seguimiento de acta en acta**: cada compromiso guarda su recorrido: desde cuándo existe, en qué actas se mencionó y cuándo se cumplió. Si un acta dice «Ya se realizó…», el compromiso se cierra solo y deja de aparecer en las siguientes. Si nadie lo vuelve a mencionar, queda marcado como **«quedó en el aire»**. Para reconocer un compromiso de un acta a otra, la página compara las palabras importantes dentro del mismo tema. Si hay clave de IA, al cargar actas la IA revisa los que se escribieron distinto pero son el mismo, y una persona confirma cada pareja antes de unirla (también con el botón «Revisar repetidos con IA»).
 3. **Acta automática cada viernes**: la página crea sola el acta de la reunión de la semana con todo lo que sigue abierto. En la reunión se marca lo cumplido, lo que se habló y lo nuevo.
 4. **Al calendario**: las fechas que aparecen en las actas (talleres, reuniones, ensayos semanales, el concierto…) se proponen como actividades. Se revisan antes de agregarlas.
-5. **Lo de la reunión**: se pega la transcripción de Google Meet (o las notas) y la IA propone qué se cumplió, de qué se habló y qué es nuevo. También se puede pasar un audio a texto con Groq (máx. 25 MB).
+5. **Lo de la reunión**: se pega la transcripción de Google Meet (o las notas) y la IA propone qué se cumplió, de qué se habló y qué es nuevo. También se puede **grabar la reunión de Meet desde la página** (Chrome graba el sonido de la pestaña de Meet y el micrófono) o subir un audio. El paso a texto es gratis, sin clave y en el mismo computador: usa Whisper dentro de Chrome (la primera vez descarga unos 250 MB).
 6. **Abrir en Google Docs**: copia el acta con el formato de Fondacio (lo nuevo en azul, lo que quedó en el aire en amarillo, lo cumplido tachado) y abre un documento nuevo para pegarla. También se puede descargar en Word (.docx, hoja horizontal).
 7. **Plantilla e instructivo**: explica cómo llenar las actas nuevas para que la página las entienda (un compromiso por viñeta, el nombre de quien lo hace al inicio, fechas con día y mes, «Ya se hizo:» cuando algo se cumple) y trae las tablas listas. El acta que se lleva a Google Docs se puede volver a cargar: la página reconoce lo que venía de actas anteriores y lo que se habló.
+8. **Lo que tal vez faltó en el acta**: si la reunión se grabó (o se pegó la transcripción), al cargar el acta que escribió el equipo la página compara las dos. Busca lo que se dijo con señales de compromiso, fecha, persona o decisión y que no quedó escrito, o quedó sin la fecha o la cantidad que se dijo. La lista aparece al final del acta en la página, en Word y en Google Docs, y cada cosa se puede **agregar como compromiso** o **quitar**. Funciona gratis y sin clave; con clave de IA está el botón «Revisar mejor con IA».
+9. **Historial**: «Juntar actas en un Word» arma un solo documento con las últimas N actas (por defecto las 2 últimas), una por página. También se abre en Google Docs o se guarda en Drive.
+10. **Borrar un acta**: cualquier acta se puede borrar (pregunta antes y deja deshacer). Con el link del equipo, el Word de cada acta queda guardado en la carpeta de Drive (subcarpeta «actas»), así que nunca se pierde.
 
 Las actas tienen nombres de personas, incluidos niños. No se suben al repositorio: quedan solo en el navegador de quien las carga. Antes de enviar una transcripción a la IA, quita los datos personales.
 

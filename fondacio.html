@@ -99,6 +99,11 @@ svg{width:24px;height:24px;fill:currentColor;flex:none}
 .cb input:focus-visible+.bx{outline:2px solid var(--focus);outline-offset:2px}
 .slink{display:flex;align-items:center;gap:14px;width:100%;border:0;background:none;padding:0 16px;height:40px;border-radius:20px;cursor:pointer;color:var(--ink-2);margin-top:10px;text-align:left}
 .slink:hover{background:var(--hover)}
+.sync{margin:10px 8px 0;padding:10px 12px;border-radius:12px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}
+.sync b{display:flex;align-items:center;gap:8px;font-weight:500;color:var(--ink)}
+.sync .pt{width:8px;height:8px;border-radius:50%;background:var(--c,#9AA0A6);flex:none}
+.sync p{margin:4px 0 8px;color:var(--muted)}
+.sync .btn{height:30px;padding:0 12px;font-size:13px}
 .slink svg{width:20px;height:20px}
 .foot{font-size:12px;color:var(--muted);padding:8px 16px 0;margin:0}
 /* ---------- equipo: quién eres y calendario de cada persona ---------- */
@@ -358,6 +363,18 @@ dialog form>.row:last-child{justify-content:flex-end;margin-top:20px!important}
 .msg{white-space:pre-wrap;background:var(--field);border-radius:8px;padding:8px 10px;margin:6px 0 0;color:var(--ink-2);font-size:13px;text-align:left;max-height:300px;overflow:auto}
 .allday{display:flex;flex-direction:column;gap:2px;padding:4px 4px 0;text-align:left}
 .allday .ch{width:100%;margin:0;background:color-mix(in srgb,var(--c) 18%,transparent)}
+.grab{position:fixed;left:50%;top:72px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 24px);background:var(--snack);color:var(--on-snack);border-radius:24px;padding:6px 8px 6px 16px;box-shadow:var(--shadow);font-size:14px}
+.grab .pt{width:10px;height:10px;border-radius:50%;background:#EA4335;animation:lat 1.2s infinite}
+@keyframes lat{50%{opacity:.25}}
+.grab button{border:0;background:none;color:var(--snack-act);font:inherit;font-weight:500;padding:6px 10px;border-radius:16px;cursor:pointer}
+.grab button:hover{background:rgba(127,127,127,.2)}
+.grab .stop{background:#EA4335;color:#fff}.grab .stop:hover{background:#C5221F}
+.gpaso{background:var(--surface-2);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.gpaso ol{margin:6px 0 10px;padding-left:20px;font-size:14px}.gpaso li{margin:3px 0}
+.falt{border-left:4px solid #F9AB00}
+.fi{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:start;padding:10px 0;border-top:1px solid var(--line)}
+.fi p{margin:0 0 2px;font-size:14px}.fi small{color:var(--muted);font-size:12px}
+@media(max-width:800px){.fi{grid-template-columns:1fr}}
 .tab{height:100%;overflow:auto;padding:16px 24px 32px;background:var(--surface);border-radius:16px}
 .tpers{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .tpers button{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:20px;padding:4px 14px 4px 4px;background:none;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
@@ -453,7 +470,8 @@ dialog form>.row:last-child{justify-content:flex-end;margin-top:20px!important}
     <button class="slink" id="sideTab"><i data-i="tablero"></i>Tablero: hecho y por hacer</button>
     <button class="slink" id="sideActas" style="margin-top:0"><i data-i="doc"></i>Actas de los viernes</button>
     <button class="slink" id="sideSet" style="margin-top:0"><i data-i="gear"></i>Ajustes IA</button>
-    <p class="foot">Altos de Cazucá · los datos se guardan solo en este navegador.</p>
+    <div id="sync"></div>
+    <p class="foot">Altos de Cazucá</p>
   </aside>
 
   <main class="cv" id="cv" aria-label="Calendario"></main>
@@ -475,6 +493,7 @@ dialog form>.row:last-child{justify-content:flex-end;margin-top:20px!important}
   </nav>
 </div>
 
+<div class="grab" id="grab" role="status" aria-live="polite" hidden></div>
 <div class="pop" id="pop" role="dialog" tabindex="-1" hidden></div>
 <div class="menu" id="menuEl" role="menu" hidden></div>
 <div id="scrim" hidden></div>
@@ -526,7 +545,7 @@ let S;
 try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
 if(!S||!S.eventos)S=seed();
 S.cfg=S.cfg||{};if(!PROV[S.cfg.prov]){S.cfg.prov="groq";S.cfg.model=PROV.groq.model}S.cfg.key=S.cfg.key||CLAVE_INCLUIDA;if(S.cfg.model==="llama-3.3-70b-versatile")S.cfg.model=PROV.groq.model;S.chat=S.chat||[];
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}}
+function save(){try{sello()}catch(e){}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("No se pudo guardar en este navegador")}if(typeof SY!=="undefined"&&SY.url&&!SY.callado)programarSync()}
 function toast(t,lbl,fn){const e=$("#toast");e.innerHTML=`<span></span>${lbl?`<button type="button">${esc(lbl)}</button>`:""}`;e.firstChild.textContent=t;
   if(lbl)e.querySelector("button").onclick=()=>{e.classList.remove("on");fn()};e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),lbl?6000:3000)}
 
@@ -1242,19 +1261,37 @@ function candidatosFechas(actas){
 }
 
 /* ---------- 4. importar ---------- */
-async function importarActas(files){
+async function importarActas(files,op={}){
   const nuevas=[],avisos=[];
   for(const f of files){
     try{const a=parseActa(await leerDocx(f),f.name);
-      if(S.actas.some(x=>x.fecha===a.fecha&&!x.auto)){avisos.push(`El acta del ${fechaCorta(a.fecha)} ya estaba cargada.`);continue}
+      const ya=S.actas.find(x=>x.fecha===a.fecha&&!x.auto);
+      a.archivo=f;
+      const au=S.actas.find(x=>x.fecha===a.fecha&&x.auto);if(au&&au.transcripcion&&!a.transcripcion)a.transcripcion=au.transcripcion;
+      if(ya&&op.reemplazar&&nuevas.every(x=>x.fecha!==a.fecha)){a.id=ya.id;["transcripcion","faltanNo","faltanIA"].forEach(k=>{if(ya[k]&&!a[k])a[k]=ya[k]});S.actas.splice(S.actas.indexOf(ya),1);nuevas.push(a);avisos.push(`El acta del ${fechaCorta(a.fecha)} se actualizó con el archivo de la carpeta.`);continue}
+      if(ya){avisos.push(`El acta del ${fechaCorta(a.fecha)} ya estaba cargada.`);continue}
       if(nuevas.some(x=>x.fecha===a.fecha)){avisos.push(`${f.name} es una copia del acta del ${fechaCorta(a.fecha)}.`);continue}
       S.actas=S.actas.filter(x=>!(x.fecha===a.fecha&&x.auto));nuevas.push(a)}
     catch(e){avisos.push(`${f.name}: ${e.message}.`)}
   }
   if(!nuevas.length){toast(avisos[0]||"No se cargó ningún acta");return}
+  const originales=nuevas.map(a=>{const f=a.archivo;delete a.archivo;return[a,f]});
   S.actas.push(...nuevas);reconstruir();crearActaViernes();if(EQ().length<3){const v=[...EQ()];for(const n of equipoInicial())if(!v.some(x=>llave(x)===llave(n)))v.push(n);S.equipo=v}save();
   actaSel=actasOrden().at(-1).id;vista="actas";S.ui.vista="actas";render();
+  const conF=nuevas.filter(a=>a.transcripcion&&faltanDe(a).length);
+  if(conF.length)avisos.push(`Comparé la grabación con el acta del ${fechaCorta(conF[0].fecha)}: hay ${faltanDe(conF[0]).length} cosas que se dijeron y tal vez faltaron. Están al final del acta.`);
+  if(SY.url&&!op.desdeDrive)guardarOriginales(originales);
   if(S.cfg.key&&S.actas.filter(a=>!a.auto).length>1)revisarIA(nuevas,()=>revisarFechas(nuevas,avisos));else revisarFechas(nuevas,avisos);
+}
+/* el Word original de cada acta queda guardado en la carpeta de Drive (subcarpeta «actas») */
+async function guardarOriginales(pares){
+  let n=0;for(const[a,f]of pares){if(!f)continue;try{const j=await subirDrive(f,`${a.fecha} acta.docx`,"actas");S.archivos={...(S.archivos||{}),[j.id]:j.m};n++}catch(e){toast("No se pudo guardar el acta en Drive: "+e.message);return}}
+  if(n){save();toast(n===1?"El acta quedó guardada en la carpeta de Drive":`Las ${n} actas quedaron guardadas en la carpeta de Drive`)}
+}
+async function subirDrive(blob,nombre,carpeta){
+  if(!SY.url)throw new Error("primero conecten el link del equipo");
+  const b=new Uint8Array(await blob.arrayBuffer());let bin="";for(let i=0;i<b.length;i+=32768)bin+=String.fromCharCode(...b.subarray(i,i+32768));
+  return pedir(null,{pc:PC,subir:{nombre,carpeta,b64:btoa(bin)}});
 }
 function revisarFechas(actas,avisos){
   const c=candidatosFechas(actas),hoy=iso(new Date());
@@ -1305,7 +1342,7 @@ function renderActas(){
   const lista=actasOrden().reverse(),hoy=iso(new Date());
   if(!lista.some(a=>a.id===actaSel))actaSel=lista[0]?.id||null;
   const a=lista.find(x=>x.id===actaSel);
-  const side=`<aside class="al"><div class="alh"><button class="btn pri sm" id="aImp">${I.up}Cargar actas (.docx)</button><input type="file" id="aFile" accept=".docx" multiple hidden><button class="btn sm txt" id="aPlant" style="margin-top:6px">${I.doc}Plantilla e instructivo</button>${lista.length?`<button class="btn sm txt" id="aBorrar" style="margin-top:2px" title="Quita de la página todas las actas cargadas y sus compromisos. Tus archivos de Word no se tocan.">${I.del}Quitar todas las actas</button>`:""}</div>
+  const side=`<aside class="al"><div class="alh"><button class="btn pri sm" id="aImp">${I.up}Cargar actas (.docx)</button><input type="file" id="aFile" accept=".docx" multiple hidden><button class="btn sm txt" id="aPlant" style="margin-top:6px">${I.doc}Plantilla e instructivo</button>${lista.filter(x=>!x.auto).length?`<button class="btn sm txt" id="aHist" style="margin-top:2px">${I.imp}Juntar actas en un Word</button>`:""}${lista.length?`<button class="btn sm txt" id="aBorrar" style="margin-top:2px" title="Quita de la página todas las actas cargadas y sus compromisos. Tus archivos de Word no se tocan.">${I.del}Quitar todas las actas</button>`:""}</div>
     ${lista.map(x=>{const r=resumenActa(x);return`<button class="ali ${x.id===actaSel?"on":""}" data-acta="${x.id}"><b>${esc(cap(DIAS[pf(x.fecha).getDay()]))} ${esc(fechaCorta(x.fecha))}</b><span>${x.auto&&x.fecha>=hoy?"Próxima reunión · ":""}${n1(r.abiertas,"pendiente","pendientes")}${r.aire?` · ${r.aire} en el aire`:""}${r.cerradas?` · ${n1(r.cerradas,"cumplido","cumplidos")}`:""}</span></button>`}).join("")}</aside>`;
   if(!a){$("#cv").innerHTML=`<div class="actas">${side}<section class="ad"><div class="vacio">${I.doc}<h2>Todavía no hay actas</h2><p>Carga las actas de las reuniones de los viernes (los archivos de Word). La página las lee aquí mismo, sin subirlas a internet, y sigue cada compromiso de acta en acta.</p><button class="btn pri" id="aImp2">${I.up}Cargar actas (.docx)</button></div></section></div>`;return}
   const r=resumenActa(a),grupos=new Map();
@@ -1326,7 +1363,7 @@ function renderActas(){
   $("#cv").innerHTML=`<div class="actas">${side}<section class="ad">
     <div class="ah"><div><div class="spt">${proxima?"Próxima reunión · esta acta se armó sola":a.auto?"Acta que se armó sola":"Acta de reunión técnica"}</div>
       <h2 class="ah2">Reunión del ${esc(fechaLarga(a.fecha))} de ${a.fecha.slice(0,4)}</h2></div>
-      <div class="row"><button class="btn sm" id="aReu">${I.mic}Agregar lo de la reunión</button><button class="btn sm" id="aNew">${I.plus}Nuevo compromiso</button><button class="btn sm" id="aDocs">${I.doc}Abrir en Google Docs</button><button class="btn sm txt" id="aDown">${I.imp}Descargar Word</button>${a.auto?"":`<button class="btn sm txt" id="aIA" title="La IA busca compromisos que se escribieron distinto pero son el mismo">${I.spark}Revisar repetidos con IA</button>`}${a.auto?`<button class="ib sm" id="aDel" title="Eliminar esta acta" aria-label="Eliminar esta acta">${I.del}</button>`:""}</div></div>
+      <div class="row"><button class="btn sm" id="aReu">${I.mic}Agregar lo de la reunión</button><button class="btn sm" id="aNew">${I.plus}Nuevo compromiso</button><button class="btn sm" id="aDocs">${I.doc}Abrir en Google Docs</button><button class="btn sm txt" id="aDown">${I.imp}Descargar Word</button>${a.auto?"":`<button class="btn sm txt" id="aIA" title="La IA busca compromisos que se escribieron distinto pero son el mismo">${I.spark}Revisar repetidos con IA</button>`}${SY.url?`<button class="btn sm txt" id="aDrv">${I.up}Guardar en Drive</button>`:""}<button class="ib sm" id="aDel" title="Borrar esta acta" aria-label="Borrar esta acta">${I.del}</button></div></div>
     <div class="ameta"><label>Modera<input id="aMod" value="${esc(a.modera)}" placeholder="¿Quién modera?"></label><label>Apunta<input id="aApu" value="${esc(a.apunta)}" placeholder="¿Quién toma nota?"></label></div>
     ${a.auto?`<details class="box guia" ${proxima?"open":""}><summary>¿Cómo usar esta acta en la reunión?</summary><ol>
       <li>Esta acta trae todo lo que quedó pendiente en las actas anteriores, ordenado por tema.</li>
@@ -1341,6 +1378,7 @@ function renderActas(){
       <span class="row">${orden.length>1?`<button class="btn sm txt" data-all="1">Abrir todos</button><button class="btn sm txt" data-all="0">Cerrar todos</button>`:""}${r.archivadas?`<button class="btn sm txt" data-f="${filtroActa==="archivados"?"todo":"archivados"}">${filtroActa==="archivados"?"Volver":"Ver archivados ("+r.archivadas+")"}</button>`:""}</span></div>
     ${orden.map(grupo).join("")||`<p class="hint" style="padding:16px 0">No hay compromisos en este grupo.</p>`}
     ${a.part.length?`<details class="box"><summary>Éxitos y cosas por mejorar (${a.part.length} personas)</summary>${a.part.map(p=>`<div class="pp"><b>${esc(p.n)}</b>${p.logros.length?`<div class="m">👍 ${p.logros.map(esc).join("<br>👍 ")}</div>`:""}${p.mejorar.length?`<div class="m">🔧 ${p.mejorar.map(esc).join("<br>🔧 ")}</div>`:""}</div>`).join("")}</details>`:""}
+    ${cajaFaltan(a)}
     ${a.transcripcion?`<details class="box"><summary>Transcripción de la reunión</summary><div class="msg">${esc(a.transcripcion.slice(0,20000))}</div></details>`:""}
   </section></div>`;
 }
@@ -1365,7 +1403,15 @@ function clicActas(e){
   if(b.id==="aDown")return descargarActa(a);
   if(b.id==="aArch"){const l=viejasAire(a),prev=l.map(t=>[t,t.estado,t.cierre]);l.forEach(t=>cumplir(t,a.fecha,"Archivado: no se mencionaba desde el "+fechaCorta(ultMencion(t)),true,"archivada"));save();RF=null;renderActas();
     toast(`${l.length} compromisos archivados`,"Deshacer",()=>{prev.forEach(([t,e,c])=>{t.estado=e;t.cierre=c});save();RF=null;renderActas()});return}
-  if(b.id==="aDel"){const i=S.actas.indexOf(a);S.actas.splice(i,1);save();renderActas();toast("Se eliminó el acta","Deshacer",()=>{S.actas.splice(i,0,a);save();renderActas()});return}
+  if(b.id==="aDel")return borrarActa(a);
+  if(b.id==="aHist")return formHistorial();
+  if(b.id==="aDrv"){toast("Guardando en Drive…");subirDrive(actaDocx(a),`${a.fecha} acta.docx`,"actas").then(j=>{S.archivos={...(S.archivos||{}),[j.id]:j.m};save();toast("El acta quedó guardada en la carpeta de Drive")},e=>toast(e.message));return}
+  const fa=b.dataset.fa;if(fa){
+    if(fa==="ia"){b.disabled=true;b.textContent="Revisando con IA…";faltanConIA(a).then(()=>{renderActas();toast("Listo: la IA revisó lo que faltó")},e=>{toast(e.message);renderActas()});return}
+    if(fa==="todo"){a.faltanNo=[];save();renderActas();return}
+    const k=b.closest("[data-fk]").dataset.fk,o=faltanDe(a).find(x=>x.k===k);if(!o)return;
+    if(fa==="no"){a.faltanNo=[...(a.faltanNo||[]),k];save();renderActas();toast("Se quitó de la lista","Deshacer",()=>{a.faltanNo=(a.faltanNo||[]).filter(x=>x!==k);save();renderActas()});return}
+    if(fa==="add"){formTarea(null,a,{texto:o.texto,alGuardar:()=>{a.faltanNo=[...(a.faltanNo||[]),k];save();render()}});return}}
   const t=tareaDe(b),ac=b.dataset.ta;if(!t||!ac)return;
   if(ac==="hecho"){if(t.cierre&&t.cierre.f===a.fecha){reabrir(t);t.reabierta=true}else{cumplir(t,a.fecha,"",true);t.reabierta=false}}
   else if(ac==="desarch"){reabrir(t);t.reabierta=true}
@@ -1377,7 +1423,7 @@ function clicActas(e){
 function formTarea(t,a,o={}){
   const n=!t,temas=[...new Set([...S.tareas.map(x=>x.tema),...a.temas.map(x=>x.tema)])].sort();
   const ev=t&&t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
-  t=t||{texto:"",tema:a.tablero?"Tareas del equipo":temas[0]||"Otros",sub:"",resp:o.resp||""};
+  t=t||{texto:o.texto||"",tema:a.tablero?"Tareas del equipo":temas[0]||"Otros",sub:"",resp:o.resp||(o.texto?(datosClave(o.texto).find(x=>EQ().includes(x))||""):"")};
   abrir(`<form id="ft"><div class="row between"><h2>${n?(a.tablero?"Nueva tarea":"Nuevo compromiso"):"Compromiso"}</h2>${X}</div>
   <label>Qué hay que hacer<textarea name="texto" rows="3" required>${esc(t.texto)}</textarea></label>
   <div class="two"><label>Tema<input name="tema" list="ltemas" value="${esc(t.tema)}" required><datalist id="ltemas">${temas.map(x=>`<option value="${esc(x)}">`).join("")}</datalist></label>
@@ -1393,7 +1439,7 @@ function formTarea(t,a,o={}){
     if(n){t={id:uid(),manual:true,...(a.tablero?{tablero:true}:{}),desde:a.fecha,menciones:[{f:a.fecha,t:d.texto,manual:true}],estado:"abierta",cierre:null,grupo:"",orig:d.texto};S.tareas.push(t)}
     else t.editado=true;
     Object.assign(t,{texto:d.texto.trim(),tema:d.tema.trim(),sub:d.sub.trim(),resp:d.resp.trim()});t.tk=normTema(t.tema)+"|"+normTema(t.sub);
-    sincronizarEvento(t,d,a);save();cerrar();render();toast(n?(a.tablero?"Tarea agregada":"Compromiso agregado"):"Cambios guardados")};
+    sincronizarEvento(t,d,a);save();cerrar();render();if(n&&o.alGuardar)o.alGuardar();toast(n?(a.tablero?"Tarea agregada":"Compromiso agregado"):"Cambios guardados")};
 }
 function sincronizarEvento(t,d,a){
   let ev=t.eventoId&&S.eventos.find(x=>x.id===t.eventoId);
@@ -1403,28 +1449,157 @@ function sincronizarEvento(t,d,a){
 }
 
 /* ---------- 6. lo de la reunión: transcripción de Meet, notas o audio → IA ---------- */
-async function transcribirAudio(file){
-  if(!S.cfg.key)throw new Error("Pega tu clave en Ajustes IA");
-  if(S.cfg.prov!=="groq")throw new Error("Para pasar audio a texto elige Groq en Ajustes IA");
-  if(file.size>25e6)throw new Error("El archivo pesa más de 25 MB. Usa la transcripción que guarda Google Meet o un audio más corto");
-  const fd=new FormData();fd.append("file",file);fd.append("model","whisper-large-v3-turbo");fd.append("language","es");fd.append("response_format","text");
-  let r;try{r=await fetch("https://api.groq.com/openai/v1/audio/transcriptions",{method:"POST",headers:{Authorization:"Bearer "+S.cfg.key},body:fd})}catch(e){throw new Error("No se pudo conectar con Groq")}
-  if(!r.ok){let m="Error "+r.status;try{const j=await r.json();m+=": "+(j.error?.message||"")}catch(e){}throw new Error(m.slice(0,200))}
-  return(await r.text()).trim();
+/* ---------- pasar voz a texto aquí mismo: gratis, sin clave y sin mandar el audio a internet ----------
+   Usa Whisper (de OpenAI, libre) dentro de Chrome con transformers.js. La primera vez descarga el modelo
+   (unos 250 MB) y Chrome lo guarda; después funciona sin volver a descargarlo. Corre en un "worker" para no trabar la página. */
+const WHISPER={lib:"https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js",modelo:"onnx-community/whisper-small",mb:250};
+let MOTOR=null,COLA=Promise.resolve();
+function puedeTranscribir(){return typeof Worker==="undefined"||typeof WebAssembly==="undefined"?"Este navegador no puede pasar voz a texto. Usa Google Chrome":""}
+function motor(){
+  if(MOTOR)return MOTOR;
+  const code=`import {pipeline} from "${WHISPER.lib}";
+let asr=null;const vistos={};
+async function cargar(){if(asr)return asr;
+  asr=await pipeline("automatic-speech-recognition","${WHISPER.modelo}",{dtype:"q8",progress_callback:p=>{
+    if(p.status==="progress"&&p.total){vistos[p.file]=[p.loaded,p.total];let a=0,b=0;for(const [x,y] of Object.values(vistos)){a+=x;b+=y}postMessage({carga:a/b})}}});
+  return asr}
+onmessage=async e=>{const {id,audio}=e.data;
+  try{const a=await cargar();postMessage({id,trabajando:true});
+    const r=await a(audio,{language:"spanish",task:"transcribe",chunk_length_s:30,stride_length_s:5});
+    postMessage({id,texto:String(r.text||"").trim()})}
+  catch(err){postMessage({id,error:String(err&&err.message||err)})}};`;
+  const w=new Worker(URL.createObjectURL(new Blob([code],{type:"text/javascript"})),{type:"module"}),esperan=new Map();
+  w.onmessage=e=>{const d=e.data;if(d.carga!=null){esperan.forEach(x=>x.estado(`Descargando el programa que pasa voz a texto (solo la primera vez, unos ${WHISPER.mb} MB): ${Math.round(d.carga*100)} %`));return}
+    const x=esperan.get(d.id);if(!x)return;if(d.trabajando){x.estado(x.msg);return}
+    esperan.delete(d.id);if(d.texto!=null)d.texto=limpiarVoz(d.texto);d.error?x.no(new Error(/fetch|network|Failed/i.test(d.error)?"No se pudo descargar el programa que pasa voz a texto. Revisa el internet e intenta otra vez":"No se pudo pasar a texto: "+d.error.slice(0,140))):x.ok(d.texto)};
+  w.onerror=e=>{esperan.forEach(x=>x.no(new Error("No se pudo abrir el programa que pasa voz a texto. Revisa el internet")));esperan.clear();MOTOR=null};
+  MOTOR={w,esperan,n:0};return MOTOR;
 }
+/* en los silencios Whisper a veces "oye" frases de videos de YouTube: se borran */
+const limpiarVoz=t=>t.replace(/[^.!?]*amara\.org[.!]?/gi,"").replace(/(subt[ií]tulos? (realizados? |hechos? )?por[^.]*|¡?suscr[ií]bete[^.!]*!?|gracias por ver( el v[ií]deo)?[^.]*|no olvides suscribirte[^.]*)[.!]?/gi,"").replace(/\s{2,}/g," ").trim();
+/* texto de un pedazo de audio (Float32 a 16 kHz). Va en fila: un pedazo a la vez */
+function vozATexto(audio,estado,msg){
+  const run=()=>new Promise((ok,no)=>{const m=motor(),id=++m.n;m.esperan.set(id,{ok,no,estado,msg});estado(msg);m.w.postMessage({id,audio},[audio.buffer])});
+  const p=COLA.then(run,run);COLA=p.catch(()=>{});return p;
+}
+async function aMono16k(blob){
+  const ctx=new AudioContext({sampleRate:16000});let buf;
+  try{buf=await ctx.decodeAudioData(await blob.arrayBuffer())}catch(e){throw new Error("No se pudo leer ese archivo de audio. Prueba con mp3, m4a o webm")}finally{ctx.close()}
+  if(buf.numberOfChannels===1)return buf.getChannelData(0).slice();
+  const n=buf.length,m=new Float32Array(n);for(let c=0;c<buf.numberOfChannels;c++){const d=buf.getChannelData(c);for(let i=0;i<n;i++)m[i]+=d[i]/buf.numberOfChannels}return m;
+}
+const PARTE_SEG=+new URLSearchParams(location.search).get("parte")||600;/* ?parte=20 solo para pruebas */
+async function transcribirArchivo(file,estado){
+  if(puedeTranscribir())throw new Error(puedeTranscribir());
+  estado("Leyendo el audio…");const todo=await aMono16k(file),paso=PARTE_SEG*16000,n=Math.ceil(todo.length/paso),txt=[];
+  for(let i=0;i<n;i++)txt.push(await vozATexto(todo.slice(i*paso,(i+1)*paso),estado,`Pasando el audio a texto${n>1?` (parte ${i+1} de ${n})`:""}… puede tardar unos minutos`));
+  return txt.filter(Boolean).join("\n\n");
+}
+
+/* ---------- 6b. grabar la reunión de Meet desde la página ----------
+   Chrome graba el sonido de la pestaña de Meet (lo que dicen los demás) más el micrófono de quien graba.
+   Cada 10 minutos se cierra una parte y se manda a pasar a texto, así nada pesa más de lo que acepta Groq.
+   Todo queda en este computador menos el audio que se manda a Groq para pasarlo a texto. */
+let GR=null;
+const mimeAudio=()=>["audio/webm;codecs=opus","audio/webm","audio/mp4"].find(m=>MediaRecorder.isTypeSupported(m))||"";
+const reloj=ms=>{const t=Math.floor(ms/1000);return(t>=3600?Math.floor(t/3600)+":":"")+pad(Math.floor(t/60)%60)+":"+pad(t%60)};
+function formGrabar(a){
+  if(GR&&GR.activa){toast("Ya se está grabando");return}
+  if(!navigator.mediaDevices?.getDisplayMedia||!window.MediaRecorder||movil()){toast("Para grabar usa Google Chrome en un computador");return}
+  const no=puedeTranscribir();
+  abrir(`<form id="fgr"><div class="row between"><h2>Grabar la reunión de Meet</h2>${X}</div>
+  <div class="gpaso"><b>Así se hace</b><ol>
+    <li>Entra primero a la reunión de Meet en otra pestaña de Chrome.</li>
+    <li>Vuelve aquí y toca <b>Empezar a grabar</b>.</li>
+    <li>Chrome pregunta qué compartir: elige <b>Pestaña</b>, toca la pestaña de Meet y deja prendido <b>Compartir también el audio de la pestaña</b>.</li>
+    <li>Vuelve a Meet. Arriba de esta página queda una barra roja que dice cuánto lleva.</li>
+    <li>Al final toca <b>Terminar</b> en esa barra. La página pasa todo a texto y lo deja listo para el acta.</li></ol>
+  <p class="hint" style="margin:0">Deja esta pestaña abierta mientras dura la reunión. No necesita cuenta de pago de Google.</p></div>
+  ${no?`<p class="hint" style="color:var(--danger)">${esc(no)}.</p>`:`<p class="hint">El paso a texto es gratis y se hace en este computador: el audio no se manda a ninguna página. La primera vez Chrome descarga el programa (unos ${WHISPER.mb} MB).</p>`}
+  <label class="imp" style="margin:0"><input type="checkbox" name="ok" required><div><b>Ya avisé a todos que la reunión se va a grabar</b><div class="m">El audio y el texto se quedan en este computador. Si se habla de niños, cuiden ese texto como cuidan las actas.</div></div></label>
+  <div class="dact"><span class="sp1"></span><button class="btn pri">${I.mic}Empezar a grabar</button></div></form>`);
+  $("#x").onclick=cerrar;
+  $("#fgr").onsubmit=e=>{e.preventDefault();cerrar();empezarGrabacion(a)};
+}
+async function empezarGrabacion(a){
+  let pant;
+  try{pant=await navigator.mediaDevices.getDisplayMedia({video:true,audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},selfBrowserSurface:"exclude",surfaceSwitching:"include",systemAudio:"include"})}
+  catch(e){toast("No se empezó a grabar: no se eligió la pestaña de Meet");return}
+  if(!pant.getAudioTracks().length){pant.getTracks().forEach(t=>t.stop());
+    abrir(`<div class="row between"><h2>Falta el audio de Meet</h2>${X}</div><p>No se compartió el audio de la pestaña, así que no se oiría a los demás.</p><p>Toca <b>Intentar otra vez</b>, elige <b>Pestaña</b> (no «Ventana» ni «Pantalla completa») y deja prendido <b>Compartir también el audio de la pestaña</b>.</p><div class="dact"><span class="sp1"></span><button class="btn pri" id="otra">Intentar otra vez</button></div>`);
+    $("#x").onclick=cerrar;$("#otra").onclick=()=>{cerrar();empezarGrabacion(a)};return}
+  let mic=null;try{mic=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}})}catch(e){}
+  const ctx=new AudioContext(),dest=ctx.createMediaStreamDestination();
+  ctx.createMediaStreamSource(new MediaStream(pant.getAudioTracks())).connect(dest);
+  if(mic)ctx.createMediaStreamSource(mic).connect(dest);
+  const g=GR={a,activa:true,pant,mic,ctx,stream:dest.stream,tipo:mimeAudio(),partes:[],todo:[],ini:Date.now(),base:a.transcripcion||""};
+  g.total=new MediaRecorder(g.stream,{mimeType:g.tipo,audioBitsPerSecond:32000});g.total.ondataavailable=e=>e.data.size&&g.todo.push(e.data);g.total.start(10000);
+  nuevaParte(g);
+  g.reloj=setInterval(pintarGrab,1000);g.corte=setInterval(()=>{const r=g.rec;nuevaParte(g);r.stop()},PARTE_SEG*1000);
+  pant.getTracks().forEach(t=>t.addEventListener("ended",()=>terminarGrabacion(g)));
+  pintarGrab();toast(mic?"Grabando la reunión y tu micrófono":"Grabando la reunión (sin tu micrófono)");
+}
+function nuevaParte(g){
+  const r=new MediaRecorder(g.stream,{mimeType:g.tipo,audioBitsPerSecond:32000}),trozos=[],p={n:g.partes.length+1,estado:"grabando",texto:""};
+  g.partes.push(p);g.rec=r;r.ondataavailable=e=>e.data.size&&trozos.push(e.data);
+  r.onstop=()=>{p.blob=new Blob(trozos,{type:g.tipo||"audio/webm"});p.estado=p.blob.size>2000?"lista":"vacia";pasarPartes(g);pintarGrab()};
+  r.start(5000);
+}
+function terminarGrabacion(g){
+  if(!g||!g.activa)return;g.activa=false;g.fin=Date.now();clearInterval(g.corte);
+  if(g.rec.state!=="inactive")g.rec.stop();if(g.total.state!=="inactive")g.total.stop();
+  [g.pant,g.mic].forEach(s=>s&&s.getTracks().forEach(t=>t.stop()));g.ctx.close();pintarGrab();
+}
+async function pasarPartes(g){
+  if(g.ocupado||puedeTranscribir())return;g.ocupado=true;
+  try{for(let p;(p=g.partes.find(x=>x.estado==="lista"||x.estado==="error"&&x.otra));){
+    p.estado="pasando";p.otra=false;pintarGrab();
+    try{p.texto=await vozATexto(await aMono16k(p.blob),m=>{g.msg=m;pintarGrab()},"");p.estado="hecha";g.msg="";guardarTexto(g)}
+    catch(e){p.estado="error";p.err=e.message;g.msg=""}
+    pintarGrab()}}
+  finally{g.ocupado=false}
+}
+function guardarTexto(g){
+  const txt=g.partes.filter(p=>p.texto).map(p=>p.texto).join("\n\n");
+  g.a.transcripcion=(g.base?g.base+"\n\n":"")+txt;save();
+  const t=$("#trx");if(t&&dlg.open)t.value=g.a.transcripcion;
+}
+function pintarGrab(){
+  const g=GR,el=$("#grab");if(!g){el.hidden=true;return}el.hidden=false;
+  const P=g.partes,hechas=P.filter(p=>p.estado==="hecha").length,validas=P.filter(p=>p.estado!=="vacia").length,err=P.filter(p=>p.estado==="error"),no=puedeTranscribir();
+  const pc=(g.msg||"").match(/(\d+) %/),esp=pc?` · preparando el paso a texto ${pc[1]} %`:g.msg?` · ${esc(g.msg)}`:"";
+  let h;
+  if(g.activa)h=`<span class="pt" aria-hidden="true"></span><span>Grabando la reunión · ${reloj(Date.now()-g.ini)}${hechas?` · ${hechas} ${hechas===1?"parte pasada":"partes pasadas"} a texto`:""}${esp}</span><button class="stop" data-g="fin">Terminar</button>`;
+  else if(no)h=`<span>Grabación guardada (${reloj(g.fin-g.ini)}). ${esc(no)}.</span><button data-g="bajar">Descargar audio</button><button data-g="cerrar" aria-label="Cerrar">${I.x}</button>`;
+  else if(P.some(p=>p.estado==="lista"||p.estado==="pasando"||p.estado==="grabando"))h=`<span>Pasando a texto en este computador: ${hechas} de ${validas} partes${esp||"…"}</span><button data-g="bajar">Descargar audio</button>`;
+  else if(err.length)h=`<span>${hechas} de ${validas} partes pasadas a texto. Falló ${err.length===1?"una":err.length}: ${esc(err[0].err)}</span><button data-g="otra">Intentar otra vez</button><button data-g="bajar">Descargar audio</button><button data-g="ver">Ver el texto</button>`;
+  else h=`<span>Listo: la reunión ya está en texto.</span><button data-g="ver">Revisar y pasar al acta</button><button data-g="bajar">Descargar audio</button><button data-g="cerrar" aria-label="Cerrar">${I.x}</button>`;
+  el.innerHTML=h;
+}
+$("#grab").onclick=e=>{const b=e.target.closest("[data-g]"),g=GR;if(!b||!g)return;const v=b.dataset.g;
+  if(v==="fin")terminarGrabacion(g);
+  else if(v==="bajar")bajar(new Blob(g.todo,{type:g.tipo||"audio/webm"}),`${g.a.fecha} reunión.${(g.tipo||"").includes("mp4")?"m4a":"webm"}`);
+  else if(v==="otra"){if(puedeTranscribir()){toast(puedeTranscribir());return}g.partes.forEach(p=>{if(p.estado==="error")p.otra=true});pasarPartes(g)}
+  else if(v==="ver"){if(!S.actas.includes(g.a)){toast("El acta de esa grabación ya no está. Descarga el audio para no perderlo");return}actaSel=g.a.id;if(vista!=="actas")setVista("actas");formReunion(g.a)}
+  else if(v==="cerrar"){GR=null;pintarGrab()}};
+addEventListener("beforeunload",e=>{if(GR&&(GR.activa||GR.partes.some(p=>p.estado==="lista"||p.estado==="pasando"))){e.preventDefault();e.returnValue=""}});
 function formReunion(a){
   const abiertas=S.tareas.filter(t=>{const e=enActa(t,a);return e&&!e.arch&&!e.cerradaAqui});
   abrir(`<form id="fre"><div class="row between"><h2>Agregar lo de la reunión</h2>${X}</div>
   <p class="hint">Pega el texto de la reunión: la transcripción que Google Meet guarda en Drive (actívala en Meet con «Transcripción»), las notas de quien apunta o un resumen. La IA lo compara con los ${abiertas.length} compromisos abiertos y propone qué se cumplió, de qué se habló y qué es nuevo. Tú revisas antes de guardar.</p>
   <textarea id="trx" rows="9" placeholder="Pega aquí la transcripción o las notas de la reunión">${esc(a.transcripcion||"")}</textarea>
-  <div class="row" style="margin-top:8px"><button type="button" class="btn sm" id="aud">${I.up}Pasar un audio a texto</button><input type="file" id="audF" accept="audio/*,video/mp4,video/webm" hidden><span class="hint" id="audE" style="margin:0">Groq, máx. 25 MB</span></div>
+  <div class="row" style="margin-top:8px"><button type="button" class="btn sm pri" id="grb">${I.mic}Grabar la reunión de Meet</button><button type="button" class="btn sm" id="aud">${I.up}Pasar un audio a texto</button><input type="file" id="audF" accept="audio/*,video/*" hidden><span class="hint" id="audE" style="margin:0">Gratis y en este computador, sin clave</span></div>
   <p class="hint">El texto se envía al proveedor de IA que elegiste en Ajustes IA. Si mencionan a niños o datos personales, quítalos antes.</p>
   <div id="rres"></div>
-  <div class="row"><button type="button" class="btn" id="anal">${I.spark}Analizar con IA</button><button class="btn pri" id="apl" disabled>Guardar en el acta</button></div></form>`);
+  <div class="row"><button type="button" class="btn" id="solo">Guardar el texto y comparar con el acta</button><button type="button" class="btn" id="anal">${I.spark}Analizar con IA</button><button class="btn pri" id="apl" disabled>Guardar en el acta</button></div></form>`);
   const f=$("#fre");let res=null;$("#x").onclick=cerrar;
   $("#aud").onclick=()=>$("#audF").click();
-  $("#audF").onchange=async e=>{const file=e.target.files[0];if(!file)return;const s=$("#audE");s.textContent="Pasando el audio a texto…";
-    try{const t=await transcribirAudio(file);$("#trx").value=($("#trx").value?$("#trx").value+"\n\n":"")+t;s.textContent="Listo: revisa el texto"}catch(err){s.textContent=err.message}};
+  $("#grb").onclick=()=>formGrabar(a);
+  $("#solo").onclick=()=>{const t=$("#trx").value.trim();if(!t){toast("Primero pega o graba el texto de la reunión");return}a.transcripcion=t;delete a.faltanIA;save();cerrar();render();
+    const n=faltanDe(a).length;toast(n?`Texto guardado. Hay ${n} cosas que se dijeron y tal vez faltaron: están al final del acta`:"Texto guardado en el acta")};
+  $("#audF").onchange=async e=>{const file=e.target.files[0];if(!file)return;const s=$("#audE");
+    try{const t=await transcribirArchivo(file,m=>{if(s.isConnected)s.textContent=m});const tx=$("#trx");if(tx&&tx.isConnected){tx.value=(tx.value?tx.value+"\n\n":"")+t;s.textContent="Listo: revisa el texto"}
+      else{a.transcripcion=(a.transcripcion?a.transcripcion+"\n\n":"")+t;save();toast("El audio ya está en texto","Ver",()=>formReunion(a))}}catch(err){if(s.isConnected)s.textContent=err.message;else toast(err.message)}};
   $("#anal").onclick=async()=>{
     const txt=$("#trx").value.trim();if(!txt){toast("Primero pega el texto de la reunión");return}
     if(!S.cfg.key){toast("Pega tu clave en Ajustes IA");return}
@@ -1464,6 +1639,66 @@ async function analizarReunion(a,abiertas,txt){
     nuevos:(j.nuevos||[]).filter(x=>s(x.texto)).map(x=>({tema:s(x.tema,60),texto:s(x.texto),responsable:s(x.responsable,60),fecha:okF(x.fecha),ini:okH(x.ini),fin:okH(x.fin)}))};
 }
 
+/* ---------- 6c. lo que se dijo en la reunión y tal vez faltó en el acta ----------
+   Se compara la transcripción de la llamada con lo que quedó escrito en el acta. Sin IA (gratis, en este computador):
+   se buscan frases con señales de compromiso, fecha, persona o decisión cuyas palabras casi no aparecen en el acta,
+   o que sí aparecen pero sin la fecha o la persona que se dijo. Con IA (si hay clave) la revisión es más fina. */
+const SENAL=/\b(vamos a|va a|van a|voy a|vas a|hay que|tenemos que|tiene que|tienen que|toca|quedamos|queda pendiente|pendiente|se (va|van) a|comprometo|compromiso|acordamos|acuerdo|decidimos|propongo|propuesta|importante|urgente|no (se nos )?olvid|recordar|entregar|enviar|mandar|llamar|hablar con|organizar|comprar|confirmar|programar|reunion|taller|visita|jornada|evento|fecha|plazo|hasta el|antes del?|para el|lunes|martes|miercoles|jueves|viernes|sabado|domingo|manana|semana|mes)\b/;
+const MESR="enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre";
+function datosClave(t){const x=sinTilde(t.toLowerCase()),out=[];
+  for(const n of EQ())if(new RegExp("\\b"+sinTilde(n.toLowerCase())+"\\b").test(x))out.push(n);
+  (x.match(new RegExp(`\\b(lunes|martes|miercoles|jueves|viernes|sabado|domingo)( \\d{1,2})?( de (${MESR}))?\\b|\\b\\d{1,2} de (${MESR})\\b|\\b\\d{1,2}(:\\d{2})? ?(am|pm|a\\. ?m|p\\. ?m|de la (manana|tarde|noche))\\b|\\$ ?\\d[\\d.]*|\\b\\d+ (mil|millones|personas|ninos|familias|kits|cartillas)\\b`,"g"))||[]).forEach(v=>out.push(v.trim()));
+  return[...new Set(out)]}
+function textosActa(a){
+  const l=a.temas.flatMap(tm=>[...tm.items.map(i=>i.t),...tm.avances.map(v=>v.t),tm.quien||""]);
+  a.part.forEach(p=>l.push(p.n,...p.logros,...p.mejorar));
+  if(a.auto)S.tareas.forEach(t=>{const e=enActa(t,a);if(e&&!e.arch)l.push(t.texto,...t.menciones.filter(m=>m.f===a.fecha).map(m=>m.t))});
+  return l.filter(Boolean);
+}
+const claveF=t=>normTema(t).slice(0,70);
+const CACHEF=new Map();
+function faltanLocal(a){
+  const firma=a.id+"|"+(a.transcripcion||"").length+"|"+a.temas.length+"|"+S.tareas.length+"|"+EQ().length;if(CACHEF.has(firma))return CACHEF.get(firma);
+  const items=textosActa(a).map(t=>({t,f:fichas(t),x:sinTilde(t.toLowerCase())}));
+  let fr=(a.transcripcion||"").replace(/\s+/g," ").split(/(?<=[.!?])\s+(?=[¿¡A-ZÁÉÍÓÚÑ0-9])/);
+  const unidas=[];for(const f of fr){if(unidas.length&&fichas(f).size<3)unidas[unidas.length-1]+=" "+f;else unidas.push(f)}
+  const out=[],vistas=[];
+  for(const frase of unidas){
+    const F=fichas(frase),x=sinTilde(frase.toLowerCase());if(F.size<4||F.size>60)continue;
+    const nom=fichas(EQ().join(" "));nom.forEach(w=>F.delete(w));/* los nombres no cuentan para decir que dos frases hablan de lo mismo */
+    const dat=datosClave(frase),senal=SENAL.test(x);if(!senal&&!dat.length)continue;
+    let mejorI=null,cov=0;for(const it of items){let n=0;F.forEach(w=>{if(it.f.has(w))n++});const c=n/F.size;if(c>cov){cov=c;mejorI=it}}
+    let tipo="",falta=[];
+    if(cov<.5)tipo="falta";
+    else if(mejorI){/* está en el acta: se revisa si le falta la fecha, la hora o la cantidad que se dijo (el nombre suele ir en «Quien habla») */
+      falta=dat.filter(d=>!EQ().includes(d)&&!mejorI.x.includes(sinTilde(d.toLowerCase())));if(falta.length)tipo="incompleto"}
+    if(!tipo)continue;
+    if(vistas.some(v=>{let n=0;F.forEach(w=>{if(v.has(w))n++});return n/F.size>.6}))continue;vistas.push(F);
+    const puntos=(senal?2:0)+dat.length*2+(x.match(SENAL)||[]).length+(tipo==="incompleto"?1:0);
+    out.push({texto:frase.trim(),tipo,en:tipo==="incompleto"?mejorI.t:"",falta,puntos,k:claveF(frase)});
+  }
+  const top=out.filter(o=>o.puntos>=3).sort((p,q)=>q.puntos-p.puntos).slice(0,30),ks=new Set(top.map(o=>o.k));
+  const res=out.filter(o=>ks.has(o.k));CACHEF.set(firma,res);return res;
+}
+/* lista final: la de la IA si se pidió, si no la de este computador; sin lo que el equipo quitó */
+function faltanDe(a){if(!a||!a.transcripcion)return[];const no=new Set(a.faltanNo||[]);return(a.faltanIA&&a.faltanIA.firma===(a.transcripcion||"").length?a.faltanIA.l:faltanLocal(a)).filter(o=>!no.has(o.k))}
+async function faltanConIA(a){
+  const sis=`Comparas la transcripción de una reunión del equipo de Fondacio (fundación en Altos de Cazucá) con el acta que escribió el equipo. Busca lo que se dijo en la reunión y que tiene valor pero NO quedó en el acta, o quedó escrito incompleto o mal (sin la fecha, la persona, la cantidad o el lugar que se dijo). Importan: compromisos, tareas, fechas, decisiones, acuerdos, alertas, datos y logros. No incluyas saludos, charla ni lo que ya está bien escrito en el acta. Responde SOLO un JSON: {"faltan":[{"texto":"lo que se dijo, en una frase clara","tipo":"falta" o "incompleto","en_acta":"si es incompleto, cómo quedó en el acta","falta":"qué dato le falta"}]}. Máximo 25.`;
+  const raw=await ia([{role:"user",content:`ACTA:\n${textoDe(actaHTML(a,false)).slice(0,14000)}\n\nTRANSCRIPCIÓN DE LA REUNIÓN:\n${a.transcripcion.slice(0,30000)}`}],sis);
+  let j;try{j=JSON.parse(raw.match(/\{[\s\S]*\}/)[0])}catch(e){throw new Error("La IA no devolvió datos legibles. Intenta de nuevo")}
+  const c=(v,n=400)=>typeof v==="string"?v.trim().slice(0,n):"";
+  a.faltanIA={firma:a.transcripcion.length,l:(j.faltan||[]).filter(x=>c(x.texto)).slice(0,25).map(x=>({texto:c(x.texto),tipo:x.tipo==="incompleto"?"incompleto":"falta",en:c(x.en_acta),falta:c(x.falta)?[c(x.falta,120)]:[],k:claveF(x.texto),ia:true}))};
+  save();
+}
+const motivoF=o=>o.tipo==="falta"?"No está en el acta":`En el acta falta: ${o.falta.join(", ")||"un dato"}`;
+function cajaFaltan(a){
+  if(!a.transcripcion)return"";const l=faltanDe(a);
+  return`<details class="box falt" open><summary>Lo que se dijo en la reunión y tal vez faltó en el acta (${l.length})</summary>
+  <p class="hint">Sale de comparar la grabación de la llamada con lo que quedó escrito. Lo que de verdad importe, agréguenlo como compromiso; lo que no, quítenlo de la lista. Esta lista también sale al final del acta en Word y en Google Docs.</p>
+  ${l.length?l.map(o=>`<div class="fi" data-fk="${esc(o.k)}"><div><p>${esc(o.texto)}</p><small>${esc(motivoF(o))}${o.en?` · en el acta dice: «${esc(o.en.slice(0,120))}»`:""}</small></div><div class="tacts"><button class="btn sm" data-fa="add">Agregar como compromiso</button><button class="btn sm txt" data-fa="no">Quitar</button></div></div>`).join(""):`<p style="margin:6px 0">No se encontró nada importante que falte. 👍</p>`}
+  <div class="row" style="margin-top:8px">${S.cfg.key?`<button class="btn sm" data-fa="ia">${I.spark}Revisar mejor con IA</button>`:""}${(a.faltanNo||[]).length?`<button class="btn sm txt" data-fa="todo">Mostrar lo que se quitó (${a.faltanNo.length})</button>`:""}</div></details>`;
+}
+
 /* ---------- 7. el acta para Google Docs o Word, con el formato de Fondacio ---------- */
 function filasActa(a){
   const filas=new Map(),fila=(tema,sub)=>{const k=normTema(tema)+"|"+normTema(sub||"");if(!filas.has(k))filas.set(k,{tema,sub:sub||"",quien:new Set(),des:[],comp:[]});return filas.get(k)};
@@ -1480,7 +1715,7 @@ const OBJ="ORGANIZAR, ACTUALIZAR, SEGUIMIENTO, COMUNICAR, PLANEAR, PONER AL DÍA
 const CAB=["TEMA PRINCIPAL","TEMA SECUNDARIO","QUIEN HABLA","DESARROLLO DEL TEMA","COMPROMISO/ TAREA"];
 const H={td:"border:1px solid #999;padding:4px 6px;vertical-align:top",ul:"margin:0;padding-left:18px"};H.th=H.td+";background:#d9d9d9;font-weight:bold";
 const hSpan=(t,o)=>`<span style="${o.color?"color:#"+o.color+";":""}${o.hl?"background:#ffff00;":""}${o.strike?"text-decoration:line-through;":""}">${esc(t)}</span>`;
-function actaHTML(a){
+function actaHTML(a,conF=true){
   const r=resumenActa(a);
   return`<h2 style="text-align:center">ACTAS DE REUNIONES TÉCNICAS ${a.fecha.slice(0,4)}</h2>
   <p><b>OBJETIVOS:</b> ${OBJ}</p>
@@ -1491,8 +1726,11 @@ function actaHTML(a){
   <tr>${CAB.map(c=>`<td style="${H.th}">${c}</td>`).join("")}</tr>
   ${filasActa(a).map(f=>`<tr><td style="${H.td}"><b>${esc(f.tema.toUpperCase())}</b></td><td style="${H.td}">${esc(f.sub.toUpperCase())}</td><td style="${H.td}">${esc([...f.quien].join(" / "))}</td>
     <td style="${H.td}">${f.des.length?`<ul style="${H.ul}">${f.des.map(d=>`<li>${d.hecho?`<s>${esc(d.t)}</s> <b style="color:#188038">✔ ${d.hecho}</b>${d.nota?": "+esc(d.nota):""}`:esc(d.t)}</li>`).join("")}</ul>`:""}</td>
-    <td style="${H.td}">${f.comp.length?`<ul style="${H.ul}">${f.comp.map(c=>`<li style="${c.nueva?"color:#0000ff":""}"><span style="${c.aire?"background:#ffff00":""}">${esc(c.t)}</span>${c.resp?" — "+esc(c.resp):""} <span style="color:#777;font-size:8pt">(${esc(notaComp(c))})</span></li>`).join("")}</ul>`:""}</td></tr>`).join("")}</table>`;
+    <td style="${H.td}">${f.comp.length?`<ul style="${H.ul}">${f.comp.map(c=>`<li style="${c.nueva?"color:#0000ff":""}"><span style="${c.aire?"background:#ffff00":""}">${esc(c.t)}</span>${c.resp?" — "+esc(c.resp):""} <span style="color:#777;font-size:8pt">(${esc(notaComp(c))})</span></li>`).join("")}</ul>`:""}</td></tr>`).join("")}</table>${conF?htmlFaltan(a):""}`;
 }
+function htmlFaltan(a){const l=faltanDe(a);if(!l.length)return"";
+  return`<h3 style="margin-top:24px">LO QUE SE DIJO EN LA REUNIÓN Y TAL VEZ FALTÓ EN EL ACTA</h3><p style="color:#666"><i>Sale de comparar la grabación de la reunión con el acta. Si algo es importante, pásenlo a la tabla de arriba.</i></p>
+  <ul>${l.map(o=>`<li>${esc(o.texto)} <span style="color:#777;font-size:8pt">(${esc(motivoF(o))})</span></li>`).join("")}</ul>`}
 const textoDe=html=>{const d=document.createElement("div");d.innerHTML=html.replace(/<\/(tr|p|h1|h2|h3|li)>/g,"\n$&").replace(/<br>/g,"\n").replace(/<\/td>/g," | $&");return d.textContent.replace(/\n{3,}/g,"\n\n").trim()};
 const actaTexto=a=>textoDe(actaHTML(a));
 function copiarHTML(html){return navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([textoDe(html)],{type:"text/plain"})})])}
@@ -1553,19 +1791,51 @@ const DX={
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
   }
 };
-function actaDocx(a){
+function actaCuerpo(a){
   const{P,R,tabla,G,T,L}=DX,r=resumenActa(a);
   const filas=[CAB.map(G),...filasActa(a).map(f=>[T(f.tema.toUpperCase(),{b:true}),T(f.sub.toUpperCase()),T([...f.quien].join(" / ")),
     L(f.des,d=>d.hecho?R(d.t,{strike:true,color:"666666"})+R(" ✔ "+d.hecho,{b:true,color:"188038"})+(d.nota?R(": "+d.nota):""):R(d.t)),
     L(f.comp,c=>{const az=c.nueva?"0000FF":"";return R(c.t,{color:az,hl:c.aire?"yellow":""})+(c.resp?R(" — "+c.resp,{color:az}):"")+R(" ("+notaComp(c)+")",{color:"777777",sz:16})})])];
   const part=a.part.length?P(R("PARTICIPANTES: ÉXITOS Y COSAS POR MEJORAR",{b:true}),{antes:240})+tabla([3000,5700,5700],[["PARTICIPANTES","ÉXITOS","COSAS POR MEJORAR"].map(G),
     ...a.part.map(p=>[T(p.n),L(p.logros,R),L(p.mejorar,R)])],true):"";
-  return DX.empacar(DX.encabezado(a.fecha.slice(0,4),fechaLarga(a.fecha)+" de "+a.fecha.slice(0,4),a.modera,a.apunta)
+  const fl=faltanDe(a),falt=fl.length?P(R("LO QUE SE DIJO EN LA REUNIÓN Y TAL VEZ FALTÓ EN EL ACTA",{b:true}),{antes:320})
+    +P(R("Sale de comparar la grabación de la reunión con el acta. Si algo es importante, pásenlo a la tabla de arriba.",{i:true,color:"666666"}),{despues:120})
+    +fl.map(o=>P(R(o.texto)+R(" ("+motivoF(o)+")",{color:"777777",sz:16}),{vineta:true,despues:40})).join(""):"";
+  return DX.encabezado(a.fecha.slice(0,4),fechaLarga(a.fecha)+" de "+a.fecha.slice(0,4),a.modera,a.apunta)
     +P(R("Seguimiento: ",{b:true})+R(`${r.abiertas} pendientes · ${r.aire} en el aire · ${r.cerradas} cumplidos en esta reunión.`),{antes:160})
-    +DX.leyenda()+tabla(DX.ANCHOS,filas,true)+part);
+    +DX.leyenda()+tabla(DX.ANCHOS,filas,true)+part+falt;
 }
+const actaDocx=a=>DX.empacar(actaCuerpo(a));
 function bajar(blob,nombre){const u=URL.createObjectURL(blob),l=document.createElement("a");l.href=u;l.download=nombre;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000)}
 const descargarActa=a=>bajar(actaDocx(a),`${a.fecha} acta.docx`);
+/* borrar un acta: se pregunta antes y se puede deshacer enseguida */
+function borrarActa(a){
+  const hacer=()=>{const prev={actas:[...S.actas],tareas:S.tareas};S.actas=S.actas.filter(x=>x!==a);if(!a.auto)reconstruir();RF=null;actaSel=null;save();render();
+    toast(`Se borró el acta del ${fechaCorta(a.fecha)}`,"Deshacer",()=>{S.actas=prev.actas;S.tareas=prev.tareas;RF=null;actaSel=a.id;save();render()})};
+  if(a.auto&&!a.transcripcion)return hacer();
+  abrir(`<div class="row between"><h2>¿Borrar el acta del ${esc(fechaLarga(a.fecha))}?</h2>${X}</div>
+  <p>Se quita de la página${SY.url?" y de los computadores de todo el equipo":""}. ${a.auto?"":"Los compromisos que salieron solo de esta acta también se quitan; los que vienen de otras actas se quedan."}</p>
+  ${a.transcripcion?`<p>También se borra la transcripción de la reunión que tenía guardada.</p>`:""}
+  <p class="hint">${SY.url?"El archivo de Word sigue guardado en la carpeta de Drive, por si lo necesitan después. ":"Si tienen el archivo de Word, lo pueden volver a cargar cuando quieran. "}Justo después de borrar sale un botón para deshacer.</p>
+  <div class="dact"><span class="sp1"></span><button class="btn" id="no">Cancelar</button><button class="btn pri" id="si" style="background:var(--danger);border-color:var(--danger)">Borrar el acta</button></div>`);
+  $("#x").onclick=$("#no").onclick=cerrar;$("#si").onclick=()=>{cerrar();hacer()};
+}
+/* historial: las últimas N actas en un solo Word (o en Google Docs), una por página */
+function formHistorial(){
+  const reales=actasOrden().filter(a=>!a.auto).reverse(),opc=[2,3,4,6,10].filter(n=>n<reales.length);
+  abrir(`<form id="fh"><div class="row between"><h2>Juntar actas en un solo archivo</h2>${X}</div>
+  <p>Arma un documento con las últimas actas, una por página, empezando por la más reciente. Sirve para tener el historial a mano o mandarlo.</p>
+  <label>¿Cuántas actas?<select name="n">${opc.map(n=>`<option value="${n}" ${n===2?"selected":""}>Las últimas ${n}</option>`).join("")}<option value="${reales.length}" ${opc.includes(2)?"":"selected"}>Todas (${reales.length})</option></select></label>
+  <label class="imp" style="margin-top:10px"><input type="checkbox" name="f" checked><div><b>Incluir lo que se dijo y tal vez faltó</b><div class="m">Al final de cada acta que tenga grabación de la reunión.</div></div></label>
+  <div class="dact">${SY.url?`<button type="button" class="btn txt" id="hDrv">${I.up}Guardar en Drive</button>`:""}<span class="sp1"></span><button type="button" class="btn" id="hDocs">${I.doc}Abrir en Google Docs</button><button class="btn pri">${I.imp}Descargar Word</button></div></form>`);
+  const f=$("#fh"),sel=()=>{const n=+f.elements.n.value,c=f.elements.f.checked;return{l:reales.slice(0,n),c,nombre:`Historial de actas ${reales.slice(0,n).at(-1).fecha} a ${reales[0].fecha}.docx`}};
+  const word=({l,c})=>DX.empacar(l.map(a=>c?actaCuerpo(a):actaCuerpoSin(a)).join(`<w:p><w:r><w:br w:type="page"/></w:r></w:p>`));
+  $("#x").onclick=cerrar;
+  f.onsubmit=e=>{e.preventDefault();const x=sel();bajar(word(x),x.nombre);cerrar();toast(`Listo: ${x.l.length} actas en un Word`)};
+  $("#hDocs").onclick=()=>{const x=sel();cerrar();abrirEnDocs(x.l.map(a=>actaHTML(a,x.c)).join(`<p style="page-break-before:always"></p>`),"el historial")};
+  if($("#hDrv"))$("#hDrv").onclick=()=>{const x=sel();cerrar();toast("Guardando en Drive…");subirDrive(word(x),x.nombre,"historial").then(()=>toast("El historial quedó en la carpeta de Drive (subcarpeta «historial»)"),e=>toast(e.message))};
+}
+const actaCuerpoSin=a=>{const g=a.transcripcion;a.transcripcion="";try{return actaCuerpo(a)}finally{a.transcripcion=g}};
 
 /* ---------- 8. instructivo y plantilla para llenar las actas nuevas ---------- */
 const GUIA=[
@@ -1729,12 +1999,147 @@ $("#sug").onclick=e=>{if(e.target.tagName==="BUTTON")enviar(e.target.textContent
 dlg.addEventListener("mousedown",e=>{if(e.target!==dlg)return;const r=dlg.getBoundingClientRect();
   if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)cerrar()});
 
+/* ---------- 9. compartir con todo el equipo: los datos viven en una carpeta de Google Drive de Fondacio ----------
+   Un programa pequeño de Google (Apps Script, archivo servidor-drive.gs) guarda en la carpeta "Agenda Fondacio"
+   un archivo por computador (agenda-datos-<pc>.json). La página lee los de los demás y junta los cambios:
+   gana el cambio más reciente de cada actividad, acta o compromiso, y lo borrado se recuerda para que no vuelva.
+   El equipo solo abre el link del equipo: página + #drive=<dirección del programa>. Nada que instalar. */
+const SYNC_COL=["eventos","actas","tareas"],SYNC_UNO=["equipo","uniones","archivos"],EJEMPLOS=["Reunión de equipo","Jornada de clasificación de ropa","Feria de economía circular"];
+const CODIGO_DRIVE="// Agenda Fondacio · guarda los datos del equipo en una carpeta de Google Drive.\n// Se pega una sola vez en script.google.com con la cuenta de Google de Fondacio\n// y se publica como \"Aplicación web\" (Ejecutar como: yo · Quién tiene acceso: cualquier persona).\n// Cada computador guarda su propio archivo agenda-datos-<pc>.json en la carpeta \"Agenda Fondacio\".\n// Si en esa carpeta (o en su subcarpeta \"actas\") ponen actas en Word o Google Docs, la página avisa para cargarlas.\n// Las actas que se cargan en la página también se guardan en la subcarpeta \"actas\", y los historiales en \"historial\".\n\nvar CARPETA = 'Agenda Fondacio';\n\nfunction carpeta_() {\n  var it = DriveApp.getFoldersByName(CARPETA);\n  return it.hasNext() ? it.next() : DriveApp.createFolder(CARPETA);\n}\n\nfunction salida_(o) {\n  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction esActa_(f) {\n  var n = f.getName(), t = f.getMimeType();\n  if (/^~\\$/.test(n) || /plantilla|gu[ií]a|instructivo/i.test(n)) return false;\n  return /\\.docx$/i.test(n) || (t === MimeType.GOOGLE_DOCS && /acta/i.test(n));\n}\n\nfunction actas_(c, lista) {\n  var dentro = function (fol) {\n    var it = fol.getFiles();\n    while (it.hasNext()) {\n      var f = it.next();\n      if (esActa_(f)) lista.push({ id: f.getId(), n: f.getName().replace(/\\.docx$/i, '') + '.docx', m: f.getLastUpdated().getTime() });\n    }\n  };\n  dentro(c);\n  var sub = c.getFoldersByName('actas');\n  if (sub.hasNext()) dentro(sub.next());\n}\n\nfunction doGet(e) {\n  var p = (e && e.parameter) || {}, c = carpeta_();\n  if (p.archivo) {\n    var f = DriveApp.getFileById(p.archivo), bytes;\n    if (f.getMimeType() === MimeType.GOOGLE_DOCS) {\n      var url = 'https://docs.google.com/document/d/' + f.getId() + '/export?format=docx';\n      bytes = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } }).getContent();\n    } else bytes = f.getBlob().getBytes();\n    return salida_({ ok: true, nombre: f.getName(), b64: Utilities.base64Encode(bytes) });\n  }\n  var desde = Number(p.desde || 0), datos = [], actas = [], it = c.getFiles();\n  while (it.hasNext()) {\n    var g = it.next(), n = g.getName(), m = g.getLastUpdated().getTime();\n    if (/^agenda-datos-[a-z0-9]+\\.json$/.test(n)) datos.push(m > desde && n !== 'agenda-datos-' + p.pc + '.json' ? { n: n, m: m, txt: g.getBlob().getDataAsString() } : { n: n, m: m });\n  }\n  actas_(c, actas);\n  return salida_({ ok: true, carpeta: c.getUrl(), datos: datos, actas: actas });\n}\n\n// Guarda un archivo (acta en Word, historial) en una subcarpeta. Si ya existe con ese nombre, lo reemplaza.\nfunction subir_(c, d) {\n  var nombre = String(d.nombre || '').replace(/[\\\\/:*?\"<>|]/g, '-').slice(0, 120);\n  var sub = d.carpeta === 'historial' ? 'historial' : 'actas';\n  if (!/\\.docx$/i.test(nombre)) return salida_({ ok: false, error: 'solo se guardan archivos de Word' });\n  var it = c.getFoldersByName(sub), fol = it.hasNext() ? it.next() : c.createFolder(sub);\n  var viejos = fol.getFilesByName(nombre);\n  while (viejos.hasNext()) viejos.next().setTrashed(true);\n  var blob = Utilities.newBlob(Utilities.base64Decode(d.b64), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', nombre);\n  var f = fol.createFile(blob);\n  return salida_({ ok: true, id: f.getId(), m: f.getLastUpdated().getTime(), url: f.getUrl() });\n}\n\nfunction doPost(e) {\n  var d = JSON.parse(e.postData.contents);\n  if (!/^[a-z0-9]{4,12}$/.test(d.pc || '')) return salida_({ ok: false, error: 'datos inválidos' });\n  if (d.subir) return subir_(carpeta_(), d.subir);\n  if (typeof d.txt !== 'string') return salida_({ ok: false, error: 'datos inválidos' });\n  var lock = LockService.getScriptLock();\n  lock.waitLock(20000);\n  try {\n    var c = carpeta_(), n = 'agenda-datos-' + d.pc + '.json', it = c.getFilesByName(n);\n    if (it.hasNext()) it.next().setContent(d.txt); else c.createFile(n, d.txt, 'application/json');\n  } finally { lock.releaseLock(); }\n  return salida_({ ok: true });\n}\n\n// Para probar a mano en el editor: crea la carpeta y pide los permisos.\nfunction probar() {\n  Logger.log(carpeta_().getUrl());\n}\n";
+const PC=(()=>{try{let id=localStorage.getItem("fondacio_pc");if(!id){id=Math.random().toString(36).slice(2,10);localStorage.setItem("fondacio_pc",id)}return id}catch(e){return"pc"+Math.random().toString(36).slice(2,8)}})();
+const sinT=(k,v)=>k==="_t"?undefined:v;
+let BASE=null;
+function baseDe(){const m=new Map();for(const c of SYNC_COL)for(const x of S[c]||[])m.set(c+"|"+x.id,{j:JSON.stringify(x,sinT),t:x._t||0});for(const c of SYNC_UNO)m.set(c,{j:JSON.stringify(S[c]??null),t:(S.sellos||{})[c]||0});return m}
+/* marca con la hora lo que cambió desde la última vez que se guardó */
+function sello(){
+  S.borrados=S.borrados||{};S.sellos=S.sellos||{};
+  if(!BASE){for(const c of SYNC_COL)for(const x of S[c]||[])x._t=x._t||0;BASE=baseDe();return}
+  const ahora=Date.now(),vivos=new Set();
+  for(const c of SYNC_COL)for(const x of S[c]||[]){const k=c+"|"+x.id,b=BASE.get(k);vivos.add(k);x._t=b&&b.j===JSON.stringify(x,sinT)?b.t:ahora}
+  for(const c of SYNC_UNO){const b=BASE.get(c);if(!b||b.j!==JSON.stringify(S[c]??null))S.sellos[c]=ahora}
+  for(const k of BASE.keys())if(k.includes("|")&&!vivos.has(k))S.borrados[k]=ahora;
+  BASE=baseDe();
+}
+function fusionar(L,R){
+  const o={borrados:{...(R.borrados||{})},sellos:{}};
+  for(const[k,t]of Object.entries(L.borrados||{}))o.borrados[k]=Math.max(t,o.borrados[k]||0);
+  for(const c of SYNC_COL){const m=new Map();for(const x of[...(R[c]||[]),...(L[c]||[])]){const y=m.get(x.id);if(!y||(x._t||0)>(y._t||0))m.set(x.id,x)}
+    o[c]=[...m.values()].filter(x=>{const b=o.borrados[c+"|"+x.id];return!(b&&b>=(x._t||0))})}
+  const vacio=v=>v==null||(Array.isArray(v)?!v.length:typeof v==="object"&&!Object.keys(v).length);
+  for(const c of SYNC_UNO){const a=(L.sellos||{})[c]||0,b=(R.sellos||{})[c]||0;o[c]=vacio(R[c])?L[c]??null:vacio(L[c])||b>a?R[c]:L[c];o.sellos[c]=Math.max(a,b)}
+  /* una sola acta por fecha: si dos computadores cargaron la misma, queda una */
+  const porF=new Map();for(const a of o.actas){const y=porF.get(a.fecha);if(!y){porF.set(a.fecha,a);continue}
+    const gana=(!!y.auto!==!!a.auto)?(y.auto?a:y):((a._t||0)>(y._t||0)?a:y),pierde=gana===a?y:a;porF.set(a.fecha,gana);o.borrados["actas|"+pierde.id]=Math.max(o.borrados["actas|"+pierde.id]||0,(pierde._t||0)+1)}
+  o.actas=[...porF.values()];
+  return o;
+}
+const compartido=()=>{const d={};for(const c of[...SYNC_COL,...SYNC_UNO,"sellos","borrados"])d[c]=S[c];return d};
+const LS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){}};
+var SY={url:LS("fondacio_drive")||"",estado:"off",ult:0,ocupado:false,otra:false,escrito:LS("fondacio_escrito")||"",desde:0,t:0,callado:false,carpeta:"",err:""};
+const urlOk=u=>/^https:\/\/script\.google\.com\/(a\/macros\/[^/]+|macros)\/s\/[\w-]{20,}\/exec$/.test(u);
+/* la página publicada (GitHub Pages): el link del equipo siempre apunta ahí para que abra en cualquier computador o celular */
+const PAGINA="https://andresprogma.github.io/fondacio/fondacio.html";
+const linkEquipo=()=>(location.protocol==="https:"&&!/^(127\.0\.0\.1|localhost)/.test(location.host)?location.origin+location.pathname:PAGINA)+"#drive="+encodeURIComponent(SY.url);
+function programarSync(){clearTimeout(SY.t);SY.t=setTimeout(sincronizar,1500)}
+async function pedir(params,cuerpo){
+  let r;try{r=await fetch(SY.url+(params?"?"+new URLSearchParams(params):""),cuerpo?{method:"POST",body:JSON.stringify(cuerpo)}:{})}catch(e){throw new Error("Sin conexión con Google Drive. Revisa el internet")}
+  let j;try{j=await r.json()}catch(e){throw new Error("Google Drive no respondió bien. ¿El link del equipo está completo?")}
+  if(!j.ok)throw new Error(j.error||"Google Drive no aceptó el pedido");return j;
+}
+async function sincronizar(){
+  if(!SY.url)return;if(SY.ocupado){SY.otra=true;return}SY.ocupado=true;
+  try{
+    sello();
+    const j=await pedir({desde:SY.desde,pc:PC});
+    SY.carpeta=j.carpeta||"";let R=null,otros=0;
+    for(const d of j.datos||[]){SY.desde=Math.max(SY.desde,d.m);if(d.n!==`agenda-datos-${PC}.json`)otros++;if(!d.txt)continue;try{const x=JSON.parse(d.txt);if(x&&x.v===1)R=R?fusionar(R,x):x}catch(e){}}
+    if(otros&&LS("fondacio_unido")!==SY.url){/* la primera vez que este computador entra a un equipo con datos, se quitan sus actividades de ejemplo */
+      S.eventos=S.eventos.filter(e=>!(EJEMPLOS.includes(e.titulo)&&!e._t&&!e.tareaId));BASE=null;sello();LS("fondacio_unido",SY.url)}
+    if(R){
+      const antes=JSON.stringify(compartido()),reales=()=>S.actas.filter(a=>!a.auto).map(a=>a.id+":"+(a._t||0)).sort().join(),r0=reales(),M=fusionar(compartido(),R);
+      if(JSON.stringify(M)!==antes){
+        Object.assign(S,M);BASE=baseDe();if(reales()!==r0)reconstruir();
+        SY.callado=true;crearActaViernes();if(S.ui.cal&&!EQ().some(n=>llave(n)===llave(S.ui.cal)))S.ui.cal="";save();SY.callado=false;RF=null;
+        render();renderCals();if(!$("#quien").hidden)pantallaQuien();
+        if(SY.ult)toast("Llegaron cambios de otra persona del equipo");
+      }
+    }
+    const txt=JSON.stringify({v:1,pc:PC,quien:S.ui.yo||"",...compartido()});
+    if(txt!==SY.escrito){await pedir(null,{pc:PC,txt});SY.escrito=txt;LS("fondacio_escrito",txt.length<2e6?txt:"")}
+    SY.estado="ok";SY.ult=Date.now();SY.err="";
+    actasEnDrive(j.actas||[]);
+  }catch(e){SY.estado="error";SY.err=e.message||String(e)}
+  finally{SY.ocupado=false;pintarSync();if(SY.otra){SY.otra=false;programarSync()}}
+}
+/* actas en Word o Google Docs que alguien puso o cambió en la carpeta */
+function actasEnDrive(lista){
+  S.archivos=S.archivos||{};const nuevas=lista.filter(a=>S.archivos[a.id]!==a.m),k=nuevas.map(a=>a.id+a.m).join();
+  if(!nuevas.length||SY.avisado===k)return;SY.avisado=k;
+  toast(nuevas.length===1?`Hay un acta nueva o cambiada en Drive: ${nuevas[0].n}`:`Hay ${nuevas.length} actas nuevas o cambiadas en Drive`,"Cargar",async()=>{
+    try{toast("Trayendo las actas de Drive…");const files=[];
+      for(const a of nuevas){const j=await pedir({archivo:a.id});const b=Uint8Array.from(atob(j.b64),c=>c.charCodeAt(0));files.push(new File([b],a.n,{lastModified:a.m}))}
+      const ar={...S.archivos};nuevas.forEach(a=>ar[a.id]=a.m);S.archivos=ar;await importarActas(files,{reemplazar:true,desdeDrive:true});save()}
+    catch(e){toast(e.message)}});
+}
+async function conectarDrive(url){
+  url=(url||"").trim();const m=url.match(/#drive=(.+)$/);if(m)url=decodeURIComponent(m[1]);
+  if(!urlOk(url)){toast("Ese link no sirve. Debe ser el link del equipo o la dirección que termina en /exec");return false}
+  SY.url=url;SY.desde=0;SY.escrito="";SY.ult=0;LS("fondacio_drive",url);LS("fondacio_escrito",null);
+  SY.estado="ok";pintarSync();await sincronizar();
+  if(SY.estado==="ok"){toast("Listo: esta página ya está conectada con el equipo");return true}
+  toast(SY.err);return false;
+}
+function desconectarDrive(){SY.url="";SY.estado="off";LS("fondacio_drive",null);LS("fondacio_escrito",null);pintarSync();toast("Esta página ya no comparte con el equipo. Lo de aquí se queda")}
+function pintarSync(){
+  const el=$("#sync");if(!el)return;
+  const hace=SY.ult?Math.round((Date.now()-SY.ult)/1000):0,cuando=!SY.ult?"ahora":hace<60?"hace un momento":`hace ${Math.round(hace/60)} min`;
+  el.innerHTML=`<div class="sync">${
+    SY.url&&SY.estado!=="error"?`<b><span class="pt" style="--c:#188038"></span>Compartido con el equipo</b><p>Guardado en Google Drive · revisado ${cuando}.</p><button class="btn txt" data-sy="info">Link del equipo</button>`:
+    SY.url?`<b><span class="pt" style="--c:#D93025"></span>No se pudo hablar con Drive</b><p>${esc((SY.err||"").slice(0,140))} Lo que hagas se guarda aquí y se manda cuando vuelva la conexión.</p><button class="btn" data-sy="otra">Intentar otra vez</button>`:
+    `<b><span class="pt"></span>Solo en este computador</b><p>Para que todo el equipo vea lo mismo desde cualquier computador o celular, abran el link del equipo.</p><button class="btn pri" data-sy="info">Compartir con el equipo</button>`}</div>`;
+}
+function formCompartir(){
+  if(SY.url){
+    abrir(`<div class="row between"><h2>Link del equipo</h2>${X}</div>
+    <p>Este es el link que usa todo el equipo. Mándenlo por WhatsApp o correo: quien lo abra ve las mismas actividades, actas, compromisos y tableros, en cualquier computador o celular, sin instalar nada.</p>
+    <label>Link del equipo<input id="lk" readonly value="${esc(linkEquipo())}"></label>
+    <p class="hint">Cuídenlo como una contraseña: quien tenga el link puede ver y cambiar la agenda, y las actas tienen datos de niños. No lo publiquen en redes ni en grupos abiertos.</p>
+    ${SY.carpeta?`<p class="hint">Los datos quedan en la carpeta <a href="${esc(SY.carpeta)}" target="_blank" rel="noopener">Agenda Fondacio</a> de Google Drive. Si ponen ahí un acta (en Word o en Google Docs con «acta» en el nombre), la página avisa para cargarla.</p>`:""}
+    <div class="dact"><button class="btn txt del" id="desc">Dejar de compartir aquí</button><span class="sp1"></span><button class="btn pri" id="cop">${I.copy}Copiar el link</button></div>`);
+    $("#x").onclick=cerrar;$("#cop").onclick=()=>{navigator.clipboard.writeText(linkEquipo()).then(()=>toast("Link copiado"),()=>{$("#lk").select();toast("Cópialo con Cmd+C o Ctrl+C")})};
+    $("#desc").onclick=()=>{cerrar();desconectarDrive()};return;
+  }
+  abrir(`<div class="row between"><h2>Compartir con el equipo</h2>${X}</div>
+  <h3>¿Ya te mandaron el link del equipo?</h3>
+  <p class="hint">Ábrelo y listo. O pégalo aquí:</p>
+  <div class="row"><input id="lkIn" placeholder="Pega el link del equipo" style="flex:1" aria-label="Link del equipo"><button class="btn pri" id="lkOk">Conectar</button></div>
+  <h3 style="margin-top:20px">Crear el link del equipo (una sola vez, quien sepa de computadores)</h3>
+  <div class="gpaso"><ol>
+    <li>Entra a <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> con la cuenta de Google de Fondacio (la que va a guardar los datos).</li>
+    <li>Borra lo que aparece, toca <b>Copiar el programa</b> aquí abajo y pégalo allá. Guarda con el disquete.</li>
+    <li>Arriba a la derecha: <b>Implementar → Nueva implementación</b>. En el engranaje elige <b>Aplicación web</b>. «Ejecutar como»: <b>Yo</b>. «Quién tiene acceso»: <b>Cualquier persona</b>. Toca <b>Implementar</b>.</li>
+    <li>Google pide permisos: <b>Autorizar acceso</b>, elige la cuenta, toca <b>Configuración avanzada → Ir a … (no seguro)</b> y <b>Permitir</b>. Sale ese aviso porque el programa es de Fondacio y no de una empresa; no le da acceso a nadie más.</li>
+    <li>Copia la <b>URL de la aplicación web</b> (termina en <i>/exec</i>) y pégala arriba, donde dice «Pega el link del equipo».</li>
+    <li>La página te da el link del equipo para mandarle a todos.</li></ol>
+  <button class="btn" id="copGs">${I.copy}Copiar el programa</button></div>`);
+  $("#x").onclick=cerrar;
+  $("#copGs").onclick=()=>navigator.clipboard.writeText(CODIGO_DRIVE).then(()=>toast("Programa copiado: pégalo en script.google.com"),()=>toast("No se pudo copiar. Está en el archivo servidor-drive.gs"));
+  $("#lkOk").onclick=async()=>{const b=$("#lkOk");b.disabled=true;b.textContent="Conectando…";if(await conectarDrive($("#lkIn").value))formCompartir();else{b.disabled=false;b.textContent="Conectar"}};
+}
+$("#sync").onclick=e=>{const b=e.target.closest("[data-sy]");if(!b)return;if(b.dataset.sy==="otra")sincronizar();else formCompartir()};
+/* el link del equipo trae la dirección en #drive=…: se guarda y se borra de la barra */
+(()=>{const m=location.hash.match(/#drive=(.+)$/);if(!m)return;const u=decodeURIComponent(m[1]);history.replaceState(null,"",location.pathname+location.search);
+  if(urlOk(u)&&u!==SY.url){SY.url=u;SY.desde=0;SY.escrito="";LS("fondacio_drive",u);LS("fondacio_escrito",null)}})();
+setInterval(()=>{if(SY.url&&!document.hidden)sincronizar();else pintarSync()},30000);
+document.addEventListener("visibilitychange",()=>{if(SY.url&&!document.hidden)sincronizar()});
+
 if(movil()||S.ui.panel!=="asis")S.ui.panel=null;
 if(crearActaViernes())save();
 if(!S.equipo){S.equipo=equipoInicial();save()}
 if(S.ui.cal&&!EQ().some(n=>llave(n)===llave(S.ui.cal)))S.ui.cal="";
 renderCals();aplicarUI();render();renderChat();
 pantallaQuien();
+pintarSync();if(SY.url){SY.estado="ok";sincronizar()}
 </script>
 </body>
 </html>
